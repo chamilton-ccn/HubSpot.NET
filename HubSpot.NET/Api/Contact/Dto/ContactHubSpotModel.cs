@@ -53,7 +53,8 @@ namespace HubSpot.NET.Api.Contact.Dto
         [IgnoreDataMember]
         public DateTime? UpdatedAt { get; set; }
 
-        public string RouteBasePath => "/contacts/v1";
+        //public string RouteBasePath => "/contacts/v1";
+        public string RouteBasePath => "/crm/v3/objects/contacts";
         public bool IsNameValue => false;
         public virtual void ToHubSpotDataEntity(ref dynamic converted)
         {

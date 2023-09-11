@@ -30,7 +30,8 @@
         /// <exception cref="NotImplementedException"></exception>
         public T Create<T>(T entity) where T : ContactHubSpotModel, new()
         {
-            var path = $"{entity.RouteBasePath}/contact";
+            //var path = $"{entity.RouteBasePath}/contact";
+            var path = $"{entity.RouteBasePath}";
             return _client.Execute<T>(path, entity, Method.Post, convertToPropertiesSchema: true);
         }
 

@@ -1,4 +1,6 @@
-﻿namespace HubSpot.NET.Core.OAuth
+﻿using System.Linq;
+
+namespace HubSpot.NET.Core.OAuth
 {
     using System.Collections.Generic;
     using System.Text;
@@ -112,15 +114,24 @@
             if (builder.Length > 0)
                 request.AddQueryParameter("scope", builder.ToString());
 
-            RestResponse<HubSpotToken> serverReponse = client.Post<HubSpotToken>(request);
+            // CEH 
+            //RestResponse<HubSpotToken> serverResponse = client.Post<HubSpotToken>(request);
+            
+            RestResponse serverResponse = client.Post(request);
+            if (serverResponse.Content != null)
+            {
+                return JsonConvert.DeserializeObject<HubSpotToken>(serverResponse.Content);
+            }
+            
+            if (serverResponse.ResponseStatus != ResponseStatus.Completed)
+                throw new HubSpotException("Server did not respond to authorization request. Content: " + serverResponse.Content, new HubSpotError(serverResponse.StatusCode, serverResponse.Content), serverResponse.Content);
 
-            if (serverReponse.ResponseStatus != ResponseStatus.Completed)
-                throw new HubSpotException("Server did not respond to authorization request. Content: " + serverReponse.Content, new HubSpotError(serverReponse.StatusCode, serverReponse.Content), serverReponse.Content);
+            if (serverResponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                throw new HubSpotException("Error generating authentication token.", JsonConvert.DeserializeObject<HubSpotError>(serverResponse.Content), serverResponse.Content);
 
-            if (serverReponse.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                throw new HubSpotException("Error generating authentication token.", JsonConvert.DeserializeObject<HubSpotError>(serverReponse.Content), serverReponse.Content);
-
-            return serverReponse.Data;
+            //CEH
+            // return serverResponse.Data;
+            return new HubSpotToken(); // fudging this for now.
         }
     }
 }
