@@ -10,6 +10,11 @@ C# .NET Wrapper around the common HubSpot APIs:
 * Owners
 * COS Files API (adds the ability to upload files to use as attachments to engagements)
 
+## Modifications
+
+* Upgrading from `RestSharp` 105.2.3 -> 110.2.0
+* Updating to V3/V4 API endpoints
+
 ## Getting Started
 To get started, install the [Nuget package](https://www.nuget.org/packages/Chinchilla.HubSpot.NET/) and create a instance of `HubSpotApi` passing your API Key as the only parameter. 
 

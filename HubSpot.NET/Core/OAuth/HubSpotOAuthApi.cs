@@ -91,7 +91,8 @@
 
             RestRequest request = new RestRequest(MidRoute)
             {
-                JsonSerializer = new FakeSerializer()
+                // CEH https://restsharp.dev/serialization.html#json
+                //JsonSerializer = new FakeSerializer()
             };
 
             Dictionary<string, string> jsonPreStringPairs = JsonConvert.DeserializeObject<Dictionary<string, string>>(JsonConvert.SerializeObject(model));
@@ -111,7 +112,7 @@
             if (builder.Length > 0)
                 request.AddQueryParameter("scope", builder.ToString());
 
-            IRestResponse<HubSpotToken> serverReponse = client.Post<HubSpotToken>(request);
+            RestResponse<HubSpotToken> serverReponse = client.Post<HubSpotToken>(request);
 
             if (serverReponse.ResponseStatus != ResponseStatus.Completed)
                 throw new HubSpotException("Server did not respond to authorization request. Content: " + serverReponse.Content, new HubSpotError(serverReponse.StatusCode, serverReponse.Content), serverReponse.Content);
