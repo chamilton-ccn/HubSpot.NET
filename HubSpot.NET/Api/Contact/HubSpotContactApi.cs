@@ -30,9 +30,8 @@
         /// <exception cref="NotImplementedException"></exception>
         public T Create<T>(T entity) where T : ContactHubSpotModel, new()
         {
-            //var path = $"{entity.RouteBasePath}/contact";
             var path = $"{entity.RouteBasePath}";
-            return _client.Execute<T>(path, entity, Method.Post, convertToPropertiesSchema: true);
+            return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
         }
 
         /// <summary>
@@ -43,8 +42,17 @@
         /// <returns>The created entity (with ID set)</returns>
         public T CreateOrUpdate<T>(T entity) where T : ContactHubSpotModel, new()
         {
-            var path = $"{entity.RouteBasePath}/contact/createOrUpdate/email/{entity.Email}/";
-            return _client.Execute<T>(path, entity, Method.Post, convertToPropertiesSchema: true);
+            try
+            {
+                return Create(entity);
+            }
+            catch (HubSpotException e)
+            {
+                /*var path = $"{entity.RouteBasePath}/{entity.Email}"
+                    .SetQueryParam("idProperty", "email");
+                return _client.Execute<T>(path, entity, Method.Patch, SerialisationType.PropertyBag);*/
+                return Update(entity);
+            }
         }
 
         /// <summary>
@@ -55,20 +63,20 @@
         /// <returns>The contact entity or null if the contact does not exist</returns>
         public T GetById<T>(long contactId) where T : ContactHubSpotModel, new()
         {
-            var path = $"{new T().RouteBasePath}/contact/vid/{contactId}/profile";
+            var path = $"{new T().RouteBasePath}/{contactId}";
 
             try
             {
                 T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
-             }
+            }
             catch (HubSpotException exception)
             {
                 if (exception.ReturnedError.StatusCode == HttpStatusCode.NotFound)
                     return null;
                 throw;
             }
-       }
+        }
 
         /// <summary>
         /// Gets a contact by their email address
@@ -78,20 +86,20 @@
         /// <returns>The contact entity or null if the contact does not exist</returns>
         public T GetByEmail<T>(string email) where T : ContactHubSpotModel, new()
         {
-            var path =  $"{new T().RouteBasePath}/contact/email/{email}/profile";
-
+            var path = $"{new T().RouteBasePath}/{email}"
+                .SetQueryParam("idProperty", "email");
             try
             {
                 T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
-             }
+            }
             catch (HubSpotException exception)
             {
                 if (exception.ReturnedError.StatusCode == HttpStatusCode.NotFound)
                     return null;
                 throw;
             }
-       }
+        }
 
         /// <summary>
         /// Gets a contact by their user token
@@ -99,9 +107,10 @@
         /// <param name="userToken">User token to search for from hubspotutk cookie</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
+        [Obsolete("GetByUserToken is deprecated in HubSpot API >= v3")]
         public T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new()
         {
-            var path = $"{new T().RouteBasePath}/contact/utk/{userToken}/profile";
+            var path = $"/contacts/v1/contact/utk/{userToken}/profile";
 
             try
             {
@@ -128,16 +137,17 @@
             if (opts == null)
                 opts = new ListRequestOptions();
 
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/lists/all/contacts/all"
-                .SetQueryParam("count", opts.Limit);
+            var path = $"{new ContactHubSpotModel().RouteBasePath}"
+                .SetQueryParam("limit", opts.Limit);
 
             if (opts.PropertiesToInclude.Any())
                 path = path.SetQueryParam("property", opts.PropertiesToInclude);
 
             if (opts.Offset.HasValue)
-                path = path.SetQueryParam("vidOffset", opts.Offset);
+                path = path.SetQueryParam("after", opts.Offset);
 
-			ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, convertToPropertiesSchema: true);
+            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(
+                path, convertToPropertiesSchema: true);
 
             return data;
         }
@@ -147,24 +157,25 @@
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contact">The contact entity</param>
-        public void Update<T>(T contact) where T : ContactHubSpotModel, new()
+        public T Update<T>(T contact) where T : ContactHubSpotModel, new()
         {
-            if (contact.Id < 1)
-                throw new ArgumentException("Contact entity must have an id set!");
-
-            var path = $"{contact.RouteBasePath}/contact/vid/{contact.Id}/profile";
-
-            _client.Execute(path, contact, Method.Post, convertToPropertiesSchema: true);
+            var path = contact.Id != null
+                ? $"{contact.RouteBasePath}/{contact.Id}"
+                : (contact.Email != null 
+                    ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
+                    : throw new ArgumentException("Contact entity must have an id or email set!"));
+            
+            //_client.Execute(path, contact, Method.Post, convertToPropertiesSchema: true);
+            return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
         }
         
         /// <summary>
-        /// Deletes a given contact
+        /// Deletes (archives) a given contact
         /// </summary>
         /// <param name="contactId">The ID of the contact</param>
         public void Delete(long contactId)
         {
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/contact/vid/{contactId}";
-
+            var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
         }
 
@@ -207,7 +218,7 @@
             
             path = path.SetQueryParam("showListMemberships", opts.ShowListMemberships);
 
-			ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
+            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
 
             return data;
         }
@@ -272,7 +283,7 @@
             
             path = path.SetQueryParam("showListMemberships", opts.ShowListMemberships);
 
-			ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
+            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
 
             return data;
         }

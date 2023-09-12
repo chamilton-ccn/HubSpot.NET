@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
@@ -16,34 +18,42 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <value>
         /// The contacts.
         /// </value>
-        [DataMember(Name = "contacts")]
+        [DataMember(Name = "results")]
         public IList<T> Contacts { get; set; } = new List<T>();
 
         /// <summary>
-        /// Gets or sets a value indicating whether more results are available.
+        /// DEPRECATED! Gets or sets a value indicating whether more results are available.
         /// </summary>
         /// <value>
         /// <c>true</c> if [more results available]; otherwise, <c>false</c>.
         /// </value>
         /// <remarks>
-        /// This is a mapping of the "has-more" prop in the JSON return data from HubSpot
+        /// This is here for backward compatibility
         /// </remarks>
-        [DataMember(Name = "has-more")]
-        public bool MoreResultsAvailable { get; set; }
+        [IgnoreDataMember]
+        [Obsolete(
+            "DEPRECATED. In the v3 API, 'list' responses will always have a paging object containing an 'after'" +
+            " offset, therefore `MoreResultsAvailable` will always be true.")]
+        public bool MoreResultsAvailable = true;
 
         /// <summary>
-        /// Gets or sets the continuation offset.
+        /// DEPRECATED! Gets the continuation offset.
         /// </summary>
         /// <value>
         /// The continuation offset.
         /// </value>
         /// <remarks>
-        /// This is a mapping of the "vid-offset" prop in the JSON reeturn data from HubSpot
+        /// This is here for backward compatibility
         /// </remarks>
-        [DataMember(Name = "vid-offset")]
-        public long ContinuationOffset { get; set; }
+        [IgnoreDataMember]
+        [Obsolete("DEPRECATED. In the v3 API, 'list' responses will always have a paging object containing an 'after'" +
+                  " offset, so this value will always be the same as `Paging.Next.After`")]
+        public long ContinuationOffset => int.Parse(Paging.Next.After);
+        
+        [DataMember(Name = "paging")]
+        public PagingModel Paging { get; set; }
 
-        public string RouteBasePath => "/contacts/v1";
+        public string RouteBasePath => "/crm/v3/objects/contacts";
 
         public bool IsNameValue => false;
         public virtual void ToHubSpotDataEntity(ref dynamic converted)

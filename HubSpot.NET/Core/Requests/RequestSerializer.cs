@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -155,10 +156,7 @@ namespace HubSpot.NET.Core.Requests
                 var converted = _requestDataConverter.FromHubSpotListResponse<T>(expandoObject);
                 return converted;
             }
-            else
-            {
-                return JsonConvert.DeserializeObject<T>(json, _jsonSerializerSettings);
-            }
+            return JsonConvert.DeserializeObject<T>(json, _jsonSerializerSettings);
         }
     }
 }

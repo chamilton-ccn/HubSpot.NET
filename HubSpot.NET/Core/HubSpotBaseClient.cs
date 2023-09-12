@@ -58,7 +58,7 @@ namespace HubSpot.NET.Core
             string json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, serialisationType);
-
+            
             T data = SendRequest(absoluteUriPath, method, json, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
 
             return data;

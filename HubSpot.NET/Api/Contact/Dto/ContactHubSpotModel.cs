@@ -15,9 +15,17 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// Contacts unique ID in HubSpot
         /// </summary>
-        [DataMember(Name = "vid")]
+        [DataMember(Name = "hs_object_id")]
         [IgnoreDataMember]
         public long? Id { get; set; }
+        
+        /// <summary>
+        /// Legacy unique ID in HubSpot
+        /// </summary>
+        [DataMember(Name = "vid")]
+        [IgnoreDataMember]
+        public long? V1Id { get; set; }        
+        
         [DataMember(Name = "email")]
         public string Email { get; set; }
         [DataMember(Name = "firstname")]
@@ -53,7 +61,6 @@ namespace HubSpot.NET.Api.Contact.Dto
         [IgnoreDataMember]
         public DateTime? UpdatedAt { get; set; }
 
-        //public string RouteBasePath => "/contacts/v1";
         public string RouteBasePath => "/crm/v3/objects/contacts";
         public bool IsNameValue => false;
         public virtual void ToHubSpotDataEntity(ref dynamic converted)

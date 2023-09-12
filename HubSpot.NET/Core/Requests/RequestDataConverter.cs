@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using HubSpot.NET.Api;
+using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core.Attributes;
 using HubSpot.NET.Core.Extensions;
 using HubSpot.NET.Core.Interfaces;
@@ -96,40 +97,52 @@ namespace HubSpot.NET.Core.Requests
         {
             // get a handle to the underlying dictionary values of the ExpandoObject
             var expandoDict = (IDictionary<string, object>)dynamicObject;
-
+            
             // For LIST contacts the "contacts" property should be populated, for LIST companies the "companies" property should be populated, and so on
             // in our T item, search for a property that is an IList<IHubSpotEntity> and use that as our prop name selector into the DynamoObject.....
             // So on the IContactListHubSpotEntity we have a IList<IHubSpotEntity> Contacts - find that prop, lowercase to contacts and that prop should
             // be in the DynamoObject from HubSpot! Tricky stuff
             var targetType = typeof(IHubSpotModel);
+
             var data = new T();
+           
             var dataProps = data.GetType().GetProperties();
-            var dataTargetProp = dataProps.SingleOrDefault(p => targetType.IsAssignableFrom(p.PropertyType.GenericTypeArguments.FirstOrDefault()));
+            
+            var dataTargetProp = dataProps.SingleOrDefault(
+                p => targetType.IsAssignableFrom(p.PropertyType.GenericTypeArguments.FirstOrDefault()));
 
             if (dataTargetProp == null)
             {
-                throw new ArgumentException("Unable to locate a property on the data class that implements IList<T> where T is a IHubSpotEntity");
+                throw new ArgumentException("Unable to locate a property on the data class that implements " +
+                                            "IList<T> where T is a IHubSpotEntity");
             }
-
+            
             var propSerializedName = dataTargetProp.GetPropSerializedName();
+            
             if (!expandoDict.ContainsKey(propSerializedName))
             {
-                throw new ArgumentException($"The json data does not contain a property of name {propSerializedName} which is required to decode the json data");
+                throw new ArgumentException($"The json data does not contain a property of name " +
+                                            $"{propSerializedName} which is required to decode the json data");
             }
-
+            
             // Find the generic type for the List in question
             var genericEntityType = dataTargetProp.PropertyType.GenericTypeArguments.First();
+            
             // get a handle to Add on the list (actually from ICollection)
             var listAddMethod = dataTargetProp.PropertyType.FindMethodRecursively("Add", genericEntityType);
+            
             // Condensed version of : https://stackoverflow.com/a/4194063/1662254
             var listInstance = Activator.CreateInstance(typeof(List<>).MakeGenericType(genericEntityType));
+            
             if (listAddMethod == null)
             {
-                throw new ArgumentException("Unable to locate Add method on the list of items to deserialize into - is it an IList?");
+                throw new ArgumentException("Unable to locate Add method on the list of items to deserialize " +
+                                            "into - is it an IList?");
             }
 
             // Convert all the entities
             var jsonEntities = expandoDict[propSerializedName];
+
             foreach (var entry in jsonEntities as List<object>)
             {
                 // convert single entity
@@ -140,7 +153,7 @@ namespace HubSpot.NET.Core.Requests
             }
             // assign our reflected list instance onto the data object
             dataTargetProp.SetValue(data, listInstance);
-
+            
             var allPropNamesInSerializedFormat = GetAllPropsWithSerializedNameAsKey(dataProps);
             // Now try to map any remaining props from the dynamo object into the response dto we shall return
             foreach (var kvp in expandoDict)
@@ -167,7 +180,6 @@ namespace HubSpot.NET.Core.Requests
                     theProp.SetValue(data, kvp.Value);
                 }
             }
-
             return data;
         }
 
@@ -279,7 +291,6 @@ namespace HubSpot.NET.Core.Requests
                 isDeletedProp?.SetValue(dto, isDeletedData);
             }
 
-
             if (dto is PagingModel && expandoDict.TryGetValue("next", out var nextData))
             {
                 // TODO use properly serialized name of prop to find it
@@ -289,15 +300,22 @@ namespace HubSpot.NET.Core.Requests
                 var nextDto = ConvertSingleEntity(expandoEntry, Activator.CreateInstance(nextProp.PropertyType));
                 nextProp?.SetValue(dto, nextDto);
             }
-            else if (dto is NextModel && expandoDict.TryGetValue("after", out var afterData))
+            
+            if (dto is NextModel && expandoDict.TryGetValue("after", out var afterData))
             {
                 // TODO use properly serialized name of prop to find it
                 var afterProp = dtoProps.SingleOrDefault(q => q.GetPropSerializedName() == "after");
                 afterProp?.SetValue(dto, afterData);
             }
+            else if (dto is NextModel && expandoDict.TryGetValue("link", out var linkData))
+            {
+                // TODO use properly serialized name of prop to find it
+                var linkProp = dtoProps.SingleOrDefault(q => q.GetPropSerializedName() == "link");
+                linkProp?.SetValue(dto, linkData);
+            }
 
-            // The Properties object in the json / response data contains all the props we wish to map - if that does not exist
-            // we cannot proceeed
+            // The Properties object in the json / response data contains all the props we wish to map, if that does not
+            // exist we cannot proceed
             if (!expandoDict.TryGetValue("properties", out var dynamicProperties)) return dto;
 
             foreach (var dynamicProp in dynamicProperties as ExpandoObject)

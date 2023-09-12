@@ -15,7 +15,7 @@ namespace HubSpot.NET.Core.Interfaces
         T GetById<T>(long contactId) where T : ContactHubSpotModel, new();
         T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new();
         ContactListHubSpotModel<T> List<T>(ListRequestOptions opts = null) where T : ContactHubSpotModel, new();
-        void Update<T>(T contact) where T : ContactHubSpotModel, new();
+        T Update<T>(T contact) where T : ContactHubSpotModel, new();
         ContactListHubSpotModel<T> RecentlyCreated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new();
         ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new();
         ContactSearchHubSpotModel<T> Search<T>(ContactSearchRequestOptions opts = null) where T : ContactHubSpotModel, new();

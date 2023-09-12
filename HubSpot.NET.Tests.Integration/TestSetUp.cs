@@ -4,6 +4,7 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 #endif
 
+using System;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.OAuth.Dto;
