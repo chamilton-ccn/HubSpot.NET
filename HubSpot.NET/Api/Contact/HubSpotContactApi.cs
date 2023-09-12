@@ -48,9 +48,6 @@
             }
             catch (HubSpotException e)
             {
-                /*var path = $"{entity.RouteBasePath}/{entity.Email}"
-                    .SetQueryParam("idProperty", "email");
-                return _client.Execute<T>(path, entity, Method.Patch, SerialisationType.PropertyBag);*/
                 return Update(entity);
             }
         }
@@ -107,6 +104,7 @@
         /// <param name="userToken">User token to search for from hubspotutk cookie</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
+        // TODO - Cleanup/remove
         [Obsolete("GetByUserToken is deprecated in HubSpot API >= v3")]
         public T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new()
         {
@@ -164,8 +162,6 @@
                 : (contact.Email != null 
                     ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
                     : throw new ArgumentException("Contact entity must have an id or email set!"));
-            
-            //_client.Execute(path, contact, Method.Post, convertToPropertiesSchema: true);
             return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
         }
         
@@ -185,16 +181,25 @@
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
+        // TODO - Convert to V3 API (INCOMPLETE)
         public void Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
         {
-            var path =  $"{new T().RouteBasePath}/contact/batch";
+            // Create
+            var path =  $"{new T().RouteBasePath}/batch/create";
+            
+            //Update
+            //var path =  $"{new T().RouteBasePath}/batch/update";
 
             _client.ExecuteBatch(path, contacts.Select(c => (object) c).ToList(), Method.Post, convertToPropertiesSchema: true);
+            // Ultimately, SendRequest is called by ExecuteBatch and the JSON is serialized like this:
+            // _serializer.SerializeEntity(entities, SerializationType.PropertiesSchema)
+            // TODO - Implement the HubSpotBatchResponseModel
         }
 
         /// <summary>
         /// Get recently updated (or created) contacts
         /// </summary>
+        // TODO - Convert to V3 API
         public ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
@@ -223,6 +228,7 @@
             return data;
         }
 
+        // TODO - Convert to V3 API
         public ContactSearchHubSpotModel<T> Search<T>(ContactSearchRequestOptions opts = null)
             where T : ContactHubSpotModel, new()
         {
@@ -260,6 +266,7 @@
         /// <summary>
         /// Get a list of recently created contacts
         /// </summary>
+        // TODO - Convert to V3 API
         public ContactListHubSpotModel<T> RecentlyCreated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)

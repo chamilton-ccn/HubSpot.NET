@@ -19,13 +19,6 @@ namespace HubSpot.NET.Api.Contact.Dto
         [IgnoreDataMember]
         public long? Id { get; set; }
         
-        /// <summary>
-        /// Legacy unique ID in HubSpot
-        /// </summary>
-        [DataMember(Name = "vid")]
-        [IgnoreDataMember]
-        public long? V1Id { get; set; }        
-        
         [DataMember(Name = "email")]
         public string Email { get; set; }
         [DataMember(Name = "firstname")]

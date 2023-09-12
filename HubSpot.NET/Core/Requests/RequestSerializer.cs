@@ -54,7 +54,7 @@ namespace HubSpot.NET.Core.Requests
         /// Serializes the entity to JSON.
         /// </summary>
         /// <param name="obj">The entity.</param>
-        /// <param name="convertToPropertiesSchema"></param>
+        /// <param name="serialisationType"></param>
         /// <returns>The serialized entity</returns>
         public virtual string SerializeEntity(object obj, SerialisationType serialisationType = SerialisationType.PropertyBag)
         {
@@ -143,7 +143,7 @@ namespace HubSpot.NET.Core.Requests
         }
 
         /// <summary>
-        /// Deserialize the given JSON from a List requet into a <see cref="IHubSpotModel"/>
+        /// Deserialize the given JSON from a List request into a <see cref="IHubSpotModel"/>
         /// </summary>
         /// <param name="json">The JSON data returned from a List request to HubSpot</param>
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
