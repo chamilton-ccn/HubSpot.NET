@@ -15,7 +15,7 @@ namespace HubSpot.NET.Api
         /// Gets or set the query term to use when searching
         /// </summary>
         [DataMember(Name = "filterGroups")]
-        public IList<SearchRequestFilterGroup> FilterGroups { get; set; }
+        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>();
 
         private int _limit = 20;
         private readonly int _upperLimit;

@@ -22,39 +22,28 @@ namespace HubSpot.NET.Api.Contact.Dto
         public IList<T> Contacts { get; set; } = new List<T>();
 
         /// <summary>
-        /// DEPRECATED! Gets or sets a value indicating whether more results are available.
+        /// Gets or sets a value indicating whether more results are available.
         /// </summary>
         /// <value>
         /// <c>true</c> if [more results available]; otherwise, <c>false</c>.
         /// </value>
-        /// <remarks>
-        /// This is here for backward compatibility
-        /// </remarks>
         [IgnoreDataMember]
-        [Obsolete(
-            "DEPRECATED. In the v3 API, 'list' responses will always have a paging object containing an 'after'" +
-            " offset, therefore `MoreResultsAvailable` will always be true.")]
-        public bool MoreResultsAvailable = true;
+        public bool MoreResultsAvailable => Paging != null;
 
         /// <summary>
-        /// DEPRECATED! Gets the continuation offset.
+        /// Gets the continuation offset.
         /// </summary>
         /// <value>
         /// The continuation offset.
         /// </value>
-        /// <remarks>
-        /// This is here for backward compatibility
-        /// </remarks>
         [IgnoreDataMember]
-        [Obsolete("DEPRECATED. In the v3 API, 'list' responses will always have a paging object containing an 'after'" +
-                  " offset, so this value will always be the same as `Paging.Next.After`")]
         public long ContinuationOffset => int.Parse(Paging.Next.After);
         
         [DataMember(Name = "paging")]
         public PagingModel Paging { get; set; }
 
         public string RouteBasePath => "/crm/v3/objects/contacts";
-
+        
         public bool IsNameValue => false;
         public virtual void ToHubSpotDataEntity(ref dynamic converted)
         {

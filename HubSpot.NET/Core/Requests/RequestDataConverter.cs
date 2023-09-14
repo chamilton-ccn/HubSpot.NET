@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace HubSpot.NET.Core.Requests
         public dynamic ToHubspotDataEntity(IHubSpotModel entity, bool batchMode = false)
         {
             dynamic mapped = new ExpandoObject();
-
+            
             mapped.Properties = new List<HubspotDataEntityProp>();
 
             var allProps = entity.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
@@ -78,7 +79,6 @@ namespace HubSpot.NET.Core.Requests
                     mapped.email = value;
                 }
             }
-            
             return mapped;
         }
 
@@ -111,6 +111,7 @@ namespace HubSpot.NET.Core.Requests
             var dataTargetProp = dataProps.SingleOrDefault(
                 p => targetType.IsAssignableFrom(p.PropertyType.GenericTypeArguments.FirstOrDefault()));
 
+            
             if (dataTargetProp == null)
             {
                 throw new ArgumentException("Unable to locate a property on the data class that implements " +
@@ -307,7 +308,8 @@ namespace HubSpot.NET.Core.Requests
                 var afterProp = dtoProps.SingleOrDefault(q => q.GetPropSerializedName() == "after");
                 afterProp?.SetValue(dto, afterData);
             }
-            else if (dto is NextModel && expandoDict.TryGetValue("link", out var linkData))
+            
+            if (dto is NextModel && expandoDict.TryGetValue("link", out var linkData))
             {
                 // TODO use properly serialized name of prop to find it
                 var linkProp = dtoProps.SingleOrDefault(q => q.GetPropSerializedName() == "link");

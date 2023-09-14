@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -86,8 +87,8 @@ namespace HubSpot.NET.Tests.Integration
 				sampleContacts.Add(contact);
 			}
 
-			// HubSpot is rather slow to update the list... wait 10 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(10 * 1000);
+			// HubSpot is rather slow to update the list... wait 15 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(15 * 1000);
 
 			try
 			{

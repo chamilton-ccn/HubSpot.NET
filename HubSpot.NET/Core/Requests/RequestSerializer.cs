@@ -61,15 +61,43 @@ namespace HubSpot.NET.Core.Requests
             if (obj is IHubSpotModel entity && serialisationType == SerialisationType.PropertiesSchema)
             {
                 var converted = _requestDataConverter.ToHubspotDataEntity(entity);
-
+                
                 entity.ToHubSpotDataEntity(ref converted);
-
+                
                 return JsonConvert.SerializeObject(
                     converted,
                     _jsonSerializerSettings);
             }
-
+            
             dynamic _obj = obj;
+            
+            if (serialisationType == SerialisationType.BatchUpdateSchema)
+            {
+                dynamic entitiesList = new List<object> { };
+                foreach (var item in _obj)
+                {
+                    if (item.Id != null)
+                    {
+                        var id = item.Id;
+                        item.Id = null;
+                        entitiesList.Add(new { id = id, properties = item });
+                        continue;
+                    }
+                    entitiesList.Add(new { properties = item });
+                }
+                return JsonConvert.SerializeObject(new { inputs = entitiesList }, _jsonSerializerSettings);
+            }
+            
+            if (serialisationType == SerialisationType.BatchCreationSchema)
+            {
+                dynamic entitiesList = new List<object> { };
+                foreach (var item in _obj)
+                {
+                    entitiesList.Add(new { properties = item });
+                }
+                return JsonConvert.SerializeObject(new { inputs = entitiesList }, _jsonSerializerSettings);
+            }            
+            
             if (serialisationType == SerialisationType.PropertyBag)
             {
                 _obj = new { properties = obj };
@@ -83,7 +111,7 @@ namespace HubSpot.NET.Core.Requests
                     _obj.properties.ObjectId = null;
                 }
             }
-
+            
             return JsonConvert.SerializeObject(
                  _obj,
                 _jsonSerializerSettings);
@@ -153,6 +181,7 @@ namespace HubSpot.NET.Core.Requests
             if (deserializeAsProperties)
             {
                 var expandoObject = JsonConvert.DeserializeObject<ExpandoObject>(json);
+                
                 var converted = _requestDataConverter.FromHubSpotListResponse<T>(expandoObject);
                 return converted;
             }

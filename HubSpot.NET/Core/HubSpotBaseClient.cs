@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using HubSpot.NET.Api;
 using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.OAuth.Dto;
 using HubSpot.NET.Core.Requests;
@@ -89,17 +91,25 @@ namespace HubSpot.NET.Core
             SendRequest(absoluteUriPath, method, json);
         }
 
-        public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, bool convertToPropertiesSchema = true)
+        /*public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, bool convertToPropertiesSchema = true)
         {
             ExecuteBatch(absoluteUriPath, entities, method, convertToPropertiesSchema ? SerialisationType.PropertiesSchema : SerialisationType.Raw);
-        }
-        public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag)
+        }*/
+        
+        //public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag)
+        public T ExecuteBatch<T>(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
             string json = (method == Method.Get || entities == null)
                 ? null
                 : _serializer.SerializeEntity(entities, serialisationType);
-
-            SendRequest(absoluteUriPath, method, json);
+            
+            Console.WriteLine(json);
+            
+            var data = SendRequest(absoluteUriPath,
+                method,
+                json,
+                responseData => (T)_serializer.DeserializeListEntity<T>(responseData, serialisationType != SerialisationType.Raw));
+            return data;
         }
 
         public T ExecuteMultipart<T>(string absoluteUriPath, byte[] data, string filename, Dictionary<string,string> parameters, Method method = Method.Post) where T : new()
@@ -131,7 +141,7 @@ namespace HubSpot.NET.Core
             string json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, true);
-
+            
             var data = SendRequest(
                 absoluteUriPath,
                 method,

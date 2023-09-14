@@ -186,8 +186,8 @@ namespace HubSpot.NET.Tests.Integration
 				sampleCompanys.Add(company);
 			}
 
-			// HubSpot is rather slow to update... wait 5 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(5 * 1000);
+			// HubSpot is rather slow to update... wait 15 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(15 * 1000);
 
 			try
 			{
@@ -225,7 +225,7 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual(false, results.Results.Any(c => string.IsNullOrWhiteSpace(c.Name)), "Some companies do not have a name.");
 				Assert.IsNotNull(results.Paging);
 				Assert.IsNotNull(results.Paging.Next);
-				Assert.IsFalse(string.IsNullOrWhiteSpace(results.Paging.Next.After), "Paging did not deserlise correctly");
+				Assert.IsFalse(string.IsNullOrWhiteSpace(results.Paging.Next.After), "Paging did not deserialize correctly");
 				Assert.AreEqual("2", results.Paging.Next.After);
 
 				// Second Act

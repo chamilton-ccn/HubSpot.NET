@@ -7,6 +7,6 @@ namespace HubSpot.NET.Api
     public class SearchRequestFilterGroup
     {
         [DataMember(Name = "filters")]
-        public IList<SearchRequestFilter> Filters { get; set; }
+        public IList<SearchRequestFilter> Filters { get; set; } = new List<SearchRequestFilter>();
     }
 }

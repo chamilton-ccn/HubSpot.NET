@@ -3,6 +3,8 @@
 	public enum SerialisationType
 	{
 		PropertiesSchema,
+		BatchCreationSchema,
+		BatchUpdateSchema,
 		PropertyBag,
 		Raw
 	}

@@ -33,6 +33,31 @@
             var path = $"{entity.RouteBasePath}";
             return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
         }
+        
+        /// <summary>
+        /// Updates a given contact
+        /// </summary>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <param name="contact">The contact entity</param>
+        public T Update<T>(T contact) where T : ContactHubSpotModel, new()
+        {
+            var path = contact.Id != null
+                ? $"{contact.RouteBasePath}/{contact.Id}"
+                : (contact.Email != null 
+                    ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
+                    : throw new ArgumentException("Contact entity must have an id or email set!"));
+            return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Deletes (archives) a given contact
+        /// </summary>
+        /// <param name="contactId">The ID of the contact</param>
+        public void Delete(long contactId)
+        {
+            var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
+            _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
+        }
 
         /// <summary>
         /// Creates or Updates a contact entity based on the Entity Email
@@ -104,8 +129,6 @@
         /// <param name="userToken">User token to search for from hubspotutk cookie</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
-        // TODO - Cleanup/remove
-        [Obsolete("GetByUserToken is deprecated in HubSpot API >= v3")]
         public T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new()
         {
             var path = $"/contacts/v1/contact/utk/{userToken}/profile";
@@ -151,55 +174,80 @@
         }
 
         /// <summary>
-        /// Updates a given contact
-        /// </summary>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contact">The contact entity</param>
-        public T Update<T>(T contact) where T : ContactHubSpotModel, new()
-        {
-            var path = contact.Id != null
-                ? $"{contact.RouteBasePath}/{contact.Id}"
-                : (contact.Email != null 
-                    ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
-                    : throw new ArgumentException("Contact entity must have an id or email set!"));
-            return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
-        }
-        
-        /// <summary>
-        /// Deletes (archives) a given contact
-        /// </summary>
-        /// <param name="contactId">The ID of the contact</param>
-        public void Delete(long contactId)
-        {
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
-            _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
-        }
-
-        /// <summary>
         /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
-        /// Best performance is with a maximum of 250 contacts.
+        /// Best performance is with a maximum of 250 contacts. This method will determine whether a contact in the
+        /// batch needs to be updated or created, and in the latter case, it will try to create them as a batch, but if
+        /// that fails, it will execute CreateOrUpdate for each contact in the batch. 
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
-        // TODO - Convert to V3 API (INCOMPLETE)
-        public void Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
+        public ContactListHubSpotModel<T> Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
         {
-            // Create
-            var path =  $"{new T().RouteBasePath}/batch/create";
+            var createPath = $"{new T().RouteBasePath}/batch/create";
+            var updatePath = $"{new T().RouteBasePath}/batch/update";
             
-            //Update
-            //var path =  $"{new T().RouteBasePath}/batch/update";
+            var contactsWithId = new List<T>();
+            var contactsWithEmail = new List<T>();
 
-            _client.ExecuteBatch(path, contacts.Select(c => (object) c).ToList(), Method.Post, convertToPropertiesSchema: true);
-            // Ultimately, SendRequest is called by ExecuteBatch and the JSON is serialized like this:
-            // _serializer.SerializeEntity(entities, SerializationType.PropertiesSchema)
-            // TODO - Implement the HubSpotBatchResponseModel
+            foreach (var contact in contacts)
+            {
+                if (contact.Id != null)
+                {
+                    contactsWithId.Add(contact);
+                }
+                else if (contact.Email != null && contact.Id == null)
+                {
+                    contactsWithEmail.Add(contact);
+                }
+            }
+
+            var contactsResults = new ContactListHubSpotModel<T>();
+            
+            // If the contacts in our batch have Id values, we assume this is an update operation.
+            if (contactsWithId.Count != 0)
+            {
+                foreach (var _contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                    updatePath, contactsWithId.Select(c => (object)c).ToList(), Method.Post,
+                    serialisationType: SerialisationType.BatchUpdateSchema).Contacts)
+                    contactsResults.Contacts.Add(_contact);
+            }
+            // If the contacts in our batch only have an Email address, we don't know whether or not they need to be
+            // created or updated so we try to create the entire batch first, and if it fails (any single contact in the
+            // batch can cause the entire operation to fail) we try to CreateOrUpdate each contact in the batch
+            // individually.
+            if (contactsWithEmail.Count != 0)
+            {
+                try
+                {
+                    foreach (var _contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                        createPath, contactsWithEmail.Select(c => (object)c).ToList(), Method.Post,
+                        serialisationType: SerialisationType.BatchCreationSchema).Contacts)
+                        contactsResults.Contacts.Add(_contact);
+                }
+                catch (HubSpotException e)
+                {
+                    foreach (var contactWithEmail in contactsWithEmail)
+                    {
+                        contactsResults.Contacts.Add(CreateOrUpdate(contactWithEmail));
+                    }
+                }
+            }
+            return contactsResults;
         }
 
+        public ContactListHubSpotModel<T> V3RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        {
+            if (opts == null)
+                opts = new SearchRequestOptions();
+
+            var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
+            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
+            return data;
+        }
+        
         /// <summary>
         /// Get recently updated (or created) contacts
         /// </summary>
-        // TODO - Convert to V3 API
         public ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
