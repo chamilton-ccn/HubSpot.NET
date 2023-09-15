@@ -6,7 +6,7 @@ namespace HubSpot.NET.Api
     public class NextModel
     {
         [DataMember(Name = "after")]
-        public string After { get; set; }
+        public long After { get; set; }
         
         [DataMember(Name = "link")]
         public string Link { get; set; }

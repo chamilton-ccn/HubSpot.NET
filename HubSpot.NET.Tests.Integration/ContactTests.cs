@@ -104,10 +104,10 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
 				Assert.AreEqual(3, results.Contacts.Count, "Did not return 3 of the 5 results.");
 				Assert.AreEqual(false, results.Contacts.Any(c => string.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
-				Assert.AreNotEqual(0, results.ContinuationOffset);
+				Assert.AreNotEqual(0, results.Offset);
 
 				// Second Act
-				searchOptions.Offset = results.ContinuationOffset;
+				searchOptions.Offset = results.Offset;
 				var results2 = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
 
 				Assert.IsFalse(results2.MoreResultsAvailable, "Did not identify at the end of results.");
@@ -167,7 +167,7 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
 				Assert.AreEqual(2, results.Contacts.Count, "Did not return 3 of the 5 results.");
 				Assert.AreEqual(false, results.Contacts.Any(c => string.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
-				Assert.AreNotEqual(0, results.ContinuationOffset);
+				Assert.AreNotEqual(0, results.Offset);
 
 				// Cannot actually test recently updated as recently created polutes the results.
 			}

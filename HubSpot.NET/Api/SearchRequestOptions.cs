@@ -9,16 +9,39 @@ namespace HubSpot.NET.Api
     /// Options used when querying for a list matching the query term
     /// </summary>
     [DataContract]
-    public class SearchRequestOptions : ListRequestOptions
+    public class SearchRequestOptions
     {
         /// <summary>
-        /// Gets or set the query term to use when searching
+        /// Gets or set the query term to use when searching. Limited to three groups.
+        /// <a href="https://developers.hubspot.com/docs/api/crm/search#filter-search-results">Reference</a>
         /// </summary>
         [DataMember(Name = "filterGroups")]
-        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>();
+        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3)
+            { new SearchRequestFilterGroup() };
 
         private int _limit = 20;
         private readonly int _upperLimit;
+        
+        /// <summary>
+        /// Gets the SearchRequestSort object, which determines how to return the results. By default, we'll sort by
+        /// "createdate", "descending". This member is never interacted with directly.
+        /// </summary>
+        [DataMember(Name = "sorts")]
+        private IList<SearchRequestSort> Sort =>
+            new List<SearchRequestSort>(1)
+            {
+                new SearchRequestSort
+                {
+                    SortOn = SortBy,
+                    Direction = SortDirection
+                }
+            };
+        
+        [IgnoreDataMember]
+        public string SortBy { get; set; } = "createdate";
+        
+        [IgnoreDataMember]
+        public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
 
         /// <summary>
         /// Gets or sets the number of items to return.
@@ -30,7 +53,7 @@ namespace HubSpot.NET.Api
         /// The number of items to return.
         /// </value>
         [DataMember(Name = "limit")]
-        public override int Limit
+        public virtual int Limit
         {
             get => _limit;
             set
@@ -38,14 +61,15 @@ namespace HubSpot.NET.Api
                 if (value < 1 || value > _upperLimit)
                 {
                     throw new ArgumentException(
-                        $"Number of items to return must be a positive integer greater than 0, and less than {_upperLimit} - you provided {value}");
+                        $"Number of items to return must be a positive integer greater than 0, and less than" +
+                        $" {_upperLimit} - you provided {value}");
                 }
                 _limit = value;
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.ListRequestOptions"/> class.
+        /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.SearchRequestOptions"/> class.
         /// </summary>
         /// <param name="upperLimit">Upper limit for the amount of items to request for the list.</param>
         public SearchRequestOptions(int upperLimit)
@@ -54,7 +78,6 @@ namespace HubSpot.NET.Api
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.ListRequestOptions"/> class.
         /// Sets the upper limit to 100 
         /// </summary>
         public SearchRequestOptions()
@@ -70,10 +93,15 @@ namespace HubSpot.NET.Api
         /// The return DTO from List contains the current "offset" that you can inject into your next list call 
         /// to continue the listing process
         /// </remarks>
-        [DataMember(Name = "after")]
-        public new string Offset { get; set; } = null;
+        [DataMember(Name = "after", EmitDefaultValue = false)]
+        public long? Offset { get; set; }
 
+        /// <summary>
+        /// Specifies the properties that should be returned by the search.
+        /// See <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects">this page</a> for a list of
+        /// default values returned by each object type.
+        /// </summary>
         [DataMember(Name = "properties")]
-        public override List<string> PropertiesToInclude { get; set; }
+        public virtual List<string> PropertiesToInclude { get; set; }
     }
 }

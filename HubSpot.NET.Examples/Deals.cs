@@ -85,7 +85,7 @@ namespace HubSpot.NET.Examples
             //        new ListRequestOptions { PropertiesToInclude = new List<string> { "dealname", "amount", "hubspot_owner_id", "closedate" }, Limit = 100, Offset = offset });
 
             //    moreResults = allDeals.MoreResultsAvailable;
-            //    if (moreResults) offset = allDeals.ContinuationOffset;
+            //    if (moreResults) offset = allDeals.Offset;
             //}
 
             /**

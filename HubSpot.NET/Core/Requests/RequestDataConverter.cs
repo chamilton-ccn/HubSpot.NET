@@ -203,7 +203,7 @@ namespace HubSpot.NET.Core.Requests
         /// as vid and other root level objects stored in the HubSpot JSON response
         /// </remarks>
         /// <param name="dynamicObject">An <see cref="ExpandoObject"/> instance that contains a single HubSpot entity to deserialize</param>
-        /// <param name="dto">An instantiated DTO that shall recieve data</param>
+        /// <param name="dto">An instantiated DTO that shall receive data</param>
         /// <returns>The populated DTO</returns>
         internal object ConvertSingleEntity(ExpandoObject dynamicObject, object dto)
         {
@@ -306,7 +306,7 @@ namespace HubSpot.NET.Core.Requests
             {
                 // TODO use properly serialized name of prop to find it
                 var afterProp = dtoProps.SingleOrDefault(q => q.GetPropSerializedName() == "after");
-                afterProp?.SetValue(dto, afterData);
+                afterProp?.SetValue(dto, Convert.ToInt64(afterData));
             }
             
             if (dto is NextModel && expandoDict.TryGetValue("link", out var linkData))

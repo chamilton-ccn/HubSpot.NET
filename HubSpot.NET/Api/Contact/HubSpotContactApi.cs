@@ -235,11 +235,16 @@
             return contactsResults;
         }
 
+        // TODO - This isn't finished yet.
         public ContactListHubSpotModel<T> V3RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
+            {
                 opts = new SearchRequestOptions();
-
+                var searchFilterGroup = new SearchRequestFilterGroup();
+                searchFilterGroup.Filters.Add( new SearchRequestFilter());
+                opts.FilterGroups.Add(searchFilterGroup);
+            }
             var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
             ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
             return data;

@@ -225,11 +225,11 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual(false, results.Results.Any(c => string.IsNullOrWhiteSpace(c.Name)), "Some companies do not have a name.");
 				Assert.IsNotNull(results.Paging);
 				Assert.IsNotNull(results.Paging.Next);
-				Assert.IsFalse(string.IsNullOrWhiteSpace(results.Paging.Next.After), "Paging did not deserialize correctly");
-				Assert.AreEqual("2", results.Paging.Next.After);
+				Assert.IsFalse(string.IsNullOrWhiteSpace(results.Paging.Next.After.ToString()), "Paging did not deserialize correctly");
+				Assert.AreEqual(2, results.Paging.Next.After);
 
 				// Second Act
-				searchOptions.Offset = results.Paging.Next.After;
+				searchOptions.Offset = results.Paging.Next.After; // TODO - fixme (Cannot convert source type 'string' to target type 'System.Nullable<long>')
 				var results2 = companyApi.Search<CompanyHubSpotModel>(searchOptions);
 
 				Assert.AreEqual(1, results2.Results.Count, "Did not return 1 of the 5 results.");

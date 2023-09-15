@@ -21,6 +21,18 @@ namespace HubSpot.NET.Api
 
 		[EnumMember(Value = "NEQ")]
 		NotEqualTo,
+		
+		/// <remarks>
+		/// The "BETWEEN" operator is inclusive.
+		/// </remarks>
+		[EnumMember(Value = "BETWEEN")]
+		Between,
+		
+		[EnumMember(Value = "IN")]
+		In,
+		
+		[EnumMember(Value = "NOT_IN")]
+		NotIn,
 
 		[EnumMember(Value = "HAS_PROPERTY")]
 		HasAValue,

@@ -206,12 +206,12 @@ namespace HubSpot.NET.Tests.Integration
                 TicketListHubSpotModel<TicketHubSpotModel> results = ticketApi.List<TicketHubSpotModel>(listRequestOptions);
 
                 // Assert
-                Assert.IsFalse(string.IsNullOrEmpty(results.Paging.Next.After), "Did not identify more results are available.");
+                Assert.IsFalse(string.IsNullOrEmpty(results.Paging.Next.After.ToString()), "Did not identify more results are available.");
                 Assert.AreEqual(3, results.Tickets.Count, "Did not return 3 of the 5 results.");
                 Assert.AreEqual(false, results.Tickets.Any(c => string.IsNullOrWhiteSpace(c.Subject)), "Some tickets do not have a subject.");
 
                 // Second Act
-                listRequestOptions.After = results.Paging.Next.After;
+                listRequestOptions.After = results.Paging.Next.After.ToString();
                 var results2 = ticketApi.List<TicketHubSpotModel>(listRequestOptions);
 
                 Assert.IsNull(results2.Paging, "Did not identify at the end of results.");

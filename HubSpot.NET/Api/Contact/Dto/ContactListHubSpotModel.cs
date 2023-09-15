@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
@@ -37,7 +38,19 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// The continuation offset.
         /// </value>
         [IgnoreDataMember]
-        public long ContinuationOffset => int.Parse(Paging.Next.After);
+        public long? Offset {
+            get
+            {
+                try
+                {
+                    return Paging.Next.After;
+                }
+                catch (NullReferenceException)
+                {
+                    return null;
+                }
+            }
+        }
         
         [DataMember(Name = "paging")]
         public PagingModel Paging { get; set; }

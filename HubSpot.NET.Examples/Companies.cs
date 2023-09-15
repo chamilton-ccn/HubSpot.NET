@@ -122,9 +122,9 @@ namespace HubSpot.NET.Examples
                 throw new InvalidOperationException("No companies found.");
             if (searchedCompanies.Total != 22)
                 throw new InvalidOperationException($"'{searchedCompanies.Total:N0}' companies found when we expected 22.");
-            if (searchedCompanies.Paging == null || searchedCompanies.Paging.Next == null || string.IsNullOrWhiteSpace(searchedCompanies.Paging.Next.After))
+            if (searchedCompanies.Paging == null || searchedCompanies.Paging.Next == null || string.IsNullOrWhiteSpace(searchedCompanies.Paging.Next.After.ToString()))
                 throw new InvalidOperationException("Paging did not deserlise correctly.");
-            if (searchedCompanies.Paging.Next.After != "20")
+            if (searchedCompanies.Paging.Next.After != 20)
                 throw new InvalidOperationException($"'{searchedCompanies.Paging.Next.After}' as a value for Paging.Next.After was not the expted 20.");
             for (int i = 0; i < sampleCompanies.Count; i++)
             {
