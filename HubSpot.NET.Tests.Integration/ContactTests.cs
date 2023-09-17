@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using HubSpot.NET.Api;
 using HubSpot.NET.Api.Contact;
 using HubSpot.NET.Api.Contact.Dto;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,16 +30,25 @@ namespace HubSpot.NET.Tests.Integration
 
 			try
 			{
-				var searchOptions = new ContactSearchRequestOptions
+				var searchOptions = new SearchRequestOptions
 				{
-					Query = "sampledomain.com",
 					Limit = 3,
 					SortBy = "lastname",
-					Order = SortingOrderType.Ascending
+					SortDirection = SearchRequestSortType.Ascending
 				};
+				var filterGroup = new SearchRequestFilterGroup();
+				var filter = new SearchRequestFilter
+				{
+					Operator = SearchRequestFilterOperatorType.EqualTo,
+					Value = "sampledomain.com",
+					PropertyName = "website"
+				};
+				filterGroup.Filters.Add(filter);
+				searchOptions.FilterGroups[0] = filterGroup;
 
 				// Act
-				ContactSearchHubSpotModel<ContactHubSpotModel> results = contactApi.Search<ContactHubSpotModel>(searchOptions);
+				//ContactSearchHubSpotModel<ContactHubSpotModel> results = contactApi.Search<ContactHubSpotModel>(searchOptions);
+				var results = contactApi.Search<ContactHubSpotModel>(searchOptions);
 
 				// Assert
 				Assert.AreEqual(5, results.Total, "Did not identify a total of 5 results.");
@@ -48,10 +57,10 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual($"User 1", results.Contacts[0].LastName, $"Last Name '{results.Contacts[0].LastName}' did not match User 1.");
 				Assert.AreEqual($"User 2", results.Contacts[1].LastName, $"Last Name '{results.Contacts[1].LastName}' did not match User 2.");
 				Assert.AreEqual($"User 3", results.Contacts[2].LastName, $"Last Name '{results.Contacts[2].LastName}' did not match User 3.");
-				Assert.AreNotEqual(0, results.ContinuationOffset);
+				Assert.AreNotEqual(0, results.Offset);
 
 				// Second Act
-				searchOptions.Offset = results.ContinuationOffset;
+				searchOptions.Offset = results.Offset;
 				results = contactApi.Search<ContactHubSpotModel>(searchOptions);
 
 				Assert.AreEqual(5, results.Total, "Did not identify a total of 5 results.");
@@ -63,10 +72,12 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				for (int i = 0; i < sampleContacts.Count; i++)
+				foreach (var contact in sampleContacts)
 				{
-					contactApi.Delete(sampleContacts[i].Id.Value);
+					Console.WriteLine($"Deleting contact: #{contact.Id} ({contact.Email})");
+					contactApi.Delete(contact.Id);
 				}
+					
 			}
 		}
 
@@ -88,28 +99,39 @@ namespace HubSpot.NET.Tests.Integration
 			}
 
 			// HubSpot is rather slow to update the list... wait 15 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(15 * 1000);
+			System.Threading.Thread.Sleep(10 * 1000);
 
 			try
 			{
-				var searchOptions = new ListRecentRequestOptions
+				var searchOptions = new SearchRequestOptions
 				{
 					Limit = 3
 				};
+				var filterGroup = new SearchRequestFilterGroup();
+				var filter = new SearchRequestFilter
+				{
+					Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
+					Value = DateTimeOffset.UtcNow.AddSeconds(-30).ToUnixTimeMilliseconds().ToString(),
+					PropertyName = "createdate"
+				};
+				filterGroup.Filters.Add(filter);
+				// Replace the default empty filter group with this one
+				// TODO - Find a reasonable method of identifying empty filter groups and removing them
+				searchOptions.FilterGroups[0] = filterGroup;
 
 				// Act
-				ContactListHubSpotModel<ContactHubSpotModel> results = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
-
+				var results = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
+                
 				// Assert
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
 				Assert.AreEqual(3, results.Contacts.Count, "Did not return 3 of the 5 results.");
 				Assert.AreEqual(false, results.Contacts.Any(c => string.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
 				Assert.AreNotEqual(0, results.Offset);
-
+				
 				// Second Act
 				searchOptions.Offset = results.Offset;
 				var results2 = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
-
+                
 				Assert.IsFalse(results2.MoreResultsAvailable, "Did not identify at the end of results.");
 				Assert.AreEqual(2, results2.Contacts.Count, "Did not return 2 of the 5 results.");
 				Assert.AreEqual(false, results2.Contacts.Any(c => string.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
@@ -117,10 +139,8 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				for (int i = 0; i < sampleContacts.Count; i++)
-				{
-					contactApi.Delete(sampleContacts[i].Id.Value);
-				}
+				foreach (var contact in sampleContacts)
+                    contactApi.Delete(contact.Id);
 			}
 		}
 
@@ -149,13 +169,15 @@ namespace HubSpot.NET.Tests.Integration
 				// This is intentional to skip to every odd item
 				i++;
 			}
+			
+			
 
 			// HubSpot is rather slow to update the list... wait 10 seconds to allow it to catch up
 			System.Threading.Thread.Sleep(10 * 1000);
 
 			try
 			{
-				var searchOptions = new ListRecentRequestOptions
+				var searchOptions = new SearchRequestOptions
 				{
 					Limit = 2
 				};
@@ -174,10 +196,8 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				for (int i = 0; i < sampleContacts.Count; i++)
-				{
-					contactApi.Delete(sampleContacts[i].Id.Value);
-				}
+				foreach (var contact in sampleContacts)
+					contactApi.Delete(contact.Id);
 			}
 		}
 
@@ -211,8 +231,8 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			finally
 			{
-				// Clean-up
-				contactApi.Delete(contact.Id.Value);
+                // Clean-up
+				contactApi.Delete(contact.Id);
 			}
 		}
 
@@ -258,7 +278,7 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				contactApi.Delete(contact.Id.Value);
+				contactApi.Delete(contact.Id);
 			}
 		}
 
@@ -279,7 +299,7 @@ namespace HubSpot.NET.Tests.Integration
 			ContactHubSpotModel contact = contactApi.Create(sampleContact);
 
 			// Act
-			contactApi.Delete(contact.Id.Value);
+			contactApi.Delete(contact.Id);
 
 			// Assert
 			contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email);

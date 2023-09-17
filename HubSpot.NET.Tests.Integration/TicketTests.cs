@@ -327,7 +327,8 @@ namespace HubSpot.NET.Tests.Integration
             var contact = contactApi.Create(sampleContact);
 
             // Act
-            ticketApi.AssociateToContact(ticket, contact.Id.Value);
+            //ticketApi.AssociateToContact(ticket, contact.Id.Value); // TODO - remove
+            ticketApi.AssociateToContact(ticket, contact.Id);
 
             var ticketAssociations = ticketApi.GetAssociations(ticket);
 
@@ -341,7 +342,7 @@ namespace HubSpot.NET.Tests.Integration
             {
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
-                contactApi.Delete(contact.Id.Value);
+                contactApi.Delete(contact.Id);
                 companyApi.Delete(company.Id.Value);                               
             }
         }
@@ -498,9 +499,8 @@ namespace HubSpot.NET.Tests.Integration
             var contact = contactApi.Create(sampleContact);
 
             // Act
-            ticketApi.AssociateToContact(ticket, contact.Id.Value);
-
-            ticketApi.DeleteContactAssociation(ticket.Id.Value, contact.Id.Value);
+            ticketApi.AssociateToContact(ticket, contact.Id);
+            ticketApi.DeleteContactAssociation(ticket.Id.Value, contact.Id);
 
             var ticketAssociations = ticketApi.GetAssociations(ticket);
 
@@ -513,7 +513,7 @@ namespace HubSpot.NET.Tests.Integration
             {
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
-                contactApi.Delete(contact.Id.Value);
+                contactApi.Delete(contact.Id);
                 companyApi.Delete(company.Id.Value);
             }
         }

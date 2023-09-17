@@ -14,6 +14,12 @@ namespace HubSpot.NET.Api.Contact.Dto
     public class ContactListHubSpotModel<T> : IHubSpotModel where T: ContactHubSpotModel, new()
     {
         /// <summary>
+        /// Total number of contacts in the Contacts list.
+        /// </summary>
+        [DataMember(Name = "total")]
+        public long Total { get; set; }
+        
+        /// <summary>
         /// Gets or sets the contacts.
         /// </summary>
         /// <value>
@@ -37,12 +43,18 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <value>
         /// The continuation offset.
         /// </value>
+        /// <remarks>
+        /// If the contact list is the result of a search and the SearchRequestOptions member has been populated, set
+        /// the SearchRequestOptions offset to match the Paging offset.
+        /// </remarks>
         [IgnoreDataMember]
         public long? Offset {
             get
             {
                 try
                 {
+                    if (SearchRequestOptions != null)
+                        SearchRequestOptions.Offset = Paging.Next.After;
                     return Paging.Next.After;
                 }
                 catch (NullReferenceException)
@@ -54,6 +66,17 @@ namespace HubSpot.NET.Api.Contact.Dto
         
         [DataMember(Name = "paging")]
         public PagingModel Paging { get; set; }
+
+        /// <summary>
+        /// Set the default search behavior.
+        /// </summary>
+        private SearchRequestOptions _searchRequestOptions = null;
+        private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
+        [IgnoreDataMember]
+        public SearchRequestOptions SearchRequestOptions {
+            get => _searchRequestOptions ?? _defaultSearchRequestOptions;
+            set => _searchRequestOptions = value;
+        }
 
         public string RouteBasePath => "/crm/v3/objects/contacts";
         

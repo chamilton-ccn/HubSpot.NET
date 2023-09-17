@@ -141,6 +141,8 @@ namespace HubSpot.NET.Core
             string json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, true);
+            // TODO - remove
+            Console.WriteLine(json);
             
             var data = SendRequest(
                 absoluteUriPath,
@@ -153,6 +155,8 @@ namespace HubSpot.NET.Core
         protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) where T : IHubSpotModel, new()
         {
             string responseData = SendRequest(path, method, json);
+            // TODO - remove
+            //Console.WriteLine(responseData);
 
             if (string.IsNullOrWhiteSpace(responseData))
                 return default;

@@ -19,7 +19,7 @@ namespace HubSpot.NET.Api
         public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3)
             { new SearchRequestFilterGroup() };
 
-        private int _limit = 20;
+        private int _limit = 50;
         private readonly int _upperLimit;
         
         /// <summary>
@@ -80,10 +80,8 @@ namespace HubSpot.NET.Api
         /// <summary>
         /// Sets the upper limit to 100 
         /// </summary>
-        public SearchRequestOptions()
-            : this(100)
+        public SearchRequestOptions() : this(100)
         {
-
         }
 
         /// <summary>

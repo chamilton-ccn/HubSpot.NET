@@ -15,9 +15,9 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// Contacts unique ID in HubSpot
         /// </summary>
-        [DataMember(Name = "hs_object_id")]
-        [IgnoreDataMember]
-        public long? Id { get; set; }
+        [DataMember(Name = "hs_object_id", EmitDefaultValue = false)]
+        //[IgnoreDataMember]
+        public long Id { get; set; }
         
         [DataMember(Name = "email")]
         public string Email { get; set; }

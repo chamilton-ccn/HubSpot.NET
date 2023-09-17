@@ -1,4 +1,6 @@
-﻿namespace HubSpot.NET.Api.Contact
+﻿using System.ComponentModel;
+
+namespace HubSpot.NET.Api.Contact
 {
     using System;
     using System.Collections.Generic;
@@ -41,7 +43,7 @@
         /// <param name="contact">The contact entity</param>
         public T Update<T>(T contact) where T : ContactHubSpotModel, new()
         {
-            var path = contact.Id != null
+            var path = contact.Id != 0L
                 ? $"{contact.RouteBasePath}/{contact.Id}"
                 : (contact.Email != null 
                     ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
@@ -234,26 +236,44 @@
             }
             return contactsResults;
         }
+        
+        public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        {
+            if (opts == null)
+                return RecentlyCreated<T>();
+            var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
+            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
+            data.SearchRequestOptions = opts;
+            return data;
+        }
 
-        // TODO - This isn't finished yet.
-        public ContactListHubSpotModel<T> V3RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        public ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
             {
-                opts = new SearchRequestOptions();
-                var searchFilterGroup = new SearchRequestFilterGroup();
-                searchFilterGroup.Filters.Add( new SearchRequestFilter());
-                opts.FilterGroups.Add(searchFilterGroup);
+                // By default, search options will sort by "createdate" in descending order
+                opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
+                // 
+                opts.Limit = 100;
             }
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
-            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
-            return data;
+            return Search<T>(opts);
+        }
+        
+        public ContactListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        {
+            if (opts == null)
+            {
+                // By default, search options will sort by "createdate" in descending order
+                opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
+                opts.SortBy = "lastmodifieddate";
+            }
+            return Search<T>(opts);
         }
         
         /// <summary>
         /// Get recently updated (or created) contacts
         /// </summary>
-        public ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        /*public ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
                 opts = new ListRecentRequestOptions();
@@ -279,10 +299,10 @@
             ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
 
             return data;
-        }
+        }*/
 
         // TODO - Convert to V3 API
-        public ContactSearchHubSpotModel<T> Search<T>(ContactSearchRequestOptions opts = null)
+        /*public ContactSearchHubSpotModel<T> Search<T>(ContactSearchRequestOptions opts = null)
             where T : ContactHubSpotModel, new()
         {
             if (opts == null)
@@ -314,13 +334,13 @@
             ContactSearchHubSpotModel<T> data = _client.ExecuteList<ContactSearchHubSpotModel<T>>(path, convertToPropertiesSchema: true);
 
             return data;
-        }
+        }*/
 
         /// <summary>
         /// Get a list of recently created contacts
         /// </summary>
         // TODO - Convert to V3 API
-        public ContactListHubSpotModel<T> RecentlyCreated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        /*public ContactListHubSpotModel<T> RecentlyCreated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
                 opts = new ListRecentRequestOptions();
@@ -346,6 +366,6 @@
             ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
 
             return data;
-        }
+        }*/
     }
 }
