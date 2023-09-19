@@ -237,11 +237,7 @@
             if (contactsWithId.Contacts.Count != 0)
             {
                 //TODO - remove debugging
-                Console.WriteLine($"THERE ARE CONTACTS WITH IDS");
-                /*foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
-                    updatePath, contactsWithId.Contacts.Select(c => (object)c).ToList(), Method.Post,
-                    serialisationType: SerialisationType.BatchUpdateSchema).Contacts)
-                    contactsResults.Contacts.Add(contact);*/
+                //Console.WriteLine($"THERE ARE CONTACTS WITH IDS");
                 foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
                              updatePath, contactsWithId, Method.Post,
                              serialisationType: SerialisationType.BatchUpdateSchema).Results)

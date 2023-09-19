@@ -133,7 +133,7 @@ namespace HubSpot.NET.Core
                     Console.WriteLine(i.GetValue(testJson));
                     foreach (var j in (List<ContactHubSpotModel>)i.GetValue(testJson))
                     {
-                        Console.WriteLine($"DOES IT FUCKING WORK BEFORE SendRequest? {j.Email}");
+                        Console.WriteLine($"DOES IT WORK BEFORE SendRequest? {j.Email}");
                     }
                     
                 }
@@ -152,7 +152,7 @@ namespace HubSpot.NET.Core
                     Console.WriteLine(property.GetValue(data));
                     foreach (var j in (List<ContactHubSpotModel>)property.GetValue(data))
                     {
-                        Console.WriteLine($"DOES IT FUCKING WORK AFTER SendRequest? {j.Email}");
+                        Console.WriteLine($"DOES IT WORK AFTER SendRequest? {j.Email}");
                     }
                 }                
             }
@@ -244,7 +244,7 @@ namespace HubSpot.NET.Core
             Console.WriteLine($" #### >>>> #### Status is here? {testJson.Status}");
             foreach (var result in testJson.Results)
             {
-                Console.WriteLine($"FUCKING RESULTS! {result.Email}");
+                Console.WriteLine($"RESULTS! {result.Email}");
             }
 
             if (!response.IsSuccessful)
