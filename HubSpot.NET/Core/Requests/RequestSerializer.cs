@@ -74,6 +74,11 @@ namespace HubSpot.NET.Core.Requests
             
             if (serialisationType == SerialisationType.BatchUpdateSchema)
             {
+                var data =  JsonConvert.SerializeObject(_obj, _jsonSerializerSettings); // TODO - experimental
+                // TODO - remove debugging
+                Console.WriteLine("BATCH UPDATE SCHEMA");
+                Console.WriteLine(data);
+                return data;
                 dynamic entitiesList = new List<object> { };
                 foreach (var item in _obj)
                 {
@@ -91,6 +96,11 @@ namespace HubSpot.NET.Core.Requests
             
             if (serialisationType == SerialisationType.BatchCreationSchema)
             {
+                var data = JsonConvert.SerializeObject(_obj, _jsonSerializerSettings); // TODO - experimental
+                // TODO - remove debugging
+                Console.WriteLine("BATCH CREATE SCHEMA");
+                Console.WriteLine(data);
+                return data;
                 dynamic entitiesList = new List<object> { };
                 foreach (var item in _obj)
                 {
@@ -127,6 +137,7 @@ namespace HubSpot.NET.Core.Requests
                  _obj,
                 _jsonSerializerSettings);
             // TODO - remove debugging
+            Console.WriteLine($"### RequestSerializer line #132");
             Console.WriteLine(json);
             return json;
         }

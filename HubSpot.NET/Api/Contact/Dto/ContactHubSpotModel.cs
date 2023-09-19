@@ -17,7 +17,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         //[IgnoreDataMember]
-        public long Id { get; set; }
+        public long? Id { get; set; }
         
         /*[DataMember(Name = "email")]
         public string Email { get; set; }

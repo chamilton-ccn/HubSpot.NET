@@ -58,6 +58,7 @@ namespace HubSpot.NET.Tests.Integration
 					"lastmodifieddate"
 				};
 				
+				//TODO - remove debugging
 				Console.WriteLine($"FILTER");
 				Console.WriteLine($"{filter.PropertyName} {filter.Operator} {filter.Value}");
 
@@ -91,6 +92,7 @@ namespace HubSpot.NET.Tests.Integration
 				// Clean-up
 				foreach (var contact in sampleContacts)
 				{
+					//TODO - remove debugging
 					Console.WriteLine($"Deleting contact: #{contact.Id} ({contact.Email})");
 					contactApi.Delete(contact.Id);
 				}
@@ -180,6 +182,7 @@ namespace HubSpot.NET.Tests.Integration
 			for (int i = 0; i < sampleContacts.Count; i++)
 			{
 				ContactHubSpotModel contact = sampleContacts[i];
+				//TODO - remove debugging
 				Console.WriteLine($"Created at: {contact.CreatedAt}");
 				Console.WriteLine($"Updated at: {contact.UpdatedAt}");
 				contact.FirstName = $"Updated Test";

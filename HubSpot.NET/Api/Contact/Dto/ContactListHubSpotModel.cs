@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
+using Newtonsoft.Json;
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
@@ -14,10 +15,19 @@ namespace HubSpot.NET.Api.Contact.Dto
     public class ContactListHubSpotModel<T> : IHubSpotModel where T: ContactHubSpotModel, new()
     {
         /// <summary>
+        /// List request status
+        /// </summary>
+        [DataMember(Name = "status", EmitDefaultValue = false)]
+        public string Status { get; set; }
+        
+        /// <summary>
         /// Total number of contacts in the Contacts list.
         /// </summary>
-        [DataMember(Name = "total")]
-        public long Total { get; set; }
+        [DataMember(Name = "total", EmitDefaultValue = false)]
+        public long? Total { get; set; }
+
+        private IList<T> _contacts { get; set; } = new List<T>(); // status IS getting populated, but in inconsistent ways. AH HA!
+        
         
         /// <summary>
         /// Gets or sets the contacts.
@@ -25,9 +35,43 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <value>
         /// The contacts.
         /// </value>
-        [DataMember(Name = "results")]
-        public IList<T> Contacts { get; set; } = new List<T>();
+        //public IList<T> Contacts { get; set; } = new List<T>();
+        public IList<T> Contacts
+        {
+            get => _contacts;
+            set => _contacts = value;
+        }
 
+        [DataMember(Name = "inputs")]
+        private IList<T> Inputs => Contacts;
+
+        [DataMember(Name = "results")]
+        //public IList<T> Results { get; set; } = new List<T>();
+        public IList<T> Results
+        {
+            get => _contacts;
+            set => _contacts = value;
+        }
+        
+
+        /// <summary>
+        /// A count of errors returned in the response
+        /// </summary>
+        [DataMember(Name = "numErrors", EmitDefaultValue = false)]
+        public long? TotalErrors { get; set; }
+
+        /// <summary>
+        /// A list of errors returned in the response
+        /// </summary>
+        [DataMember(Name = "errors", EmitDefaultValue = false)]
+        public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
+        
+        [DataMember(Name = "startedAt", EmitDefaultValue = false)]
+        public DateTime StartedAt { get; set; }
+        
+        [DataMember(Name = "completedAt", EmitDefaultValue = false)]
+        public DateTime CompletedAt { get; set; }
+        
         /// <summary>
         /// Gets or sets a value indicating whether more results are available.
         /// </summary>
@@ -77,23 +121,6 @@ namespace HubSpot.NET.Api.Contact.Dto
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;
             set => _searchRequestOptions = value;
         }
-        
-        // TODO - add an "Errors" object; example schema:
-        /*
-            "errors": [
-                {
-                    "status": "error",
-                    "category": "OBJECT_NOT_FOUND",
-                    "message": "Could not get some null objects, they may be deleted or not exist. Check that ids are valid.",
-                    "context": {
-                        "ids": [
-                            "8043019663",
-                            "8043019664"
-                        ]
-                    }
-                }
-            ],
-         */
 
         public string RouteBasePath => "/crm/v3/objects/contacts";
         

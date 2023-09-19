@@ -11,8 +11,10 @@ namespace HubSpot.NET.Core.Interfaces
         T Create<T>(T entity) where T : ContactHubSpotModel, new();
         T CreateOrUpdate<T>(T entity) where T : ContactHubSpotModel, new();
         void Delete(ContactHubSpotModel contact);
-        void Delete(long contactId);
-        ContactListHubSpotModel<T> Batch<T>(List<T> entities) where T : ContactHubSpotModel, new();
+        void Delete(long? contactId);
+        //ContactListHubSpotModel<T> Batch<T>(List<T> entities) where T : ContactHubSpotModel, new();
+        //ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> entities) where T : ContactHubSpotModel, new();
+        ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> entities) where T : ContactHubSpotModel, new();
         T GetByEmail<T>(string email, ListRequestOptionsV3 opts = null) where T : ContactHubSpotModel, new();
         T GetById<T>(long contactId) where T : ContactHubSpotModel, new();
         T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new();

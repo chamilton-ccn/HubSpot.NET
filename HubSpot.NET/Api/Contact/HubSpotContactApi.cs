@@ -41,11 +41,13 @@
         /// <param name="contact">The contact entity</param>
         public T Update<T>(T contact) where T : ContactHubSpotModel, new()
         {
-            var path = contact.Id != 0L
+            var path = contact.Id != null
                 ? $"{contact.RouteBasePath}/{contact.Id}"
                 : (contact.Email != null 
                     ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
                     : throw new ArgumentException("Contact entity must have an id or email set!"));
+            // TODO - remove debugging
+            Console.WriteLine($"Updating... {path}");
             return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
         }
         
@@ -53,7 +55,7 @@
         /// Deletes (archives) a given contact
         /// </summary>
         /// <param name="contactId">The ID of the contact</param>
-        public void Delete(long contactId)
+        public void Delete(long? contactId)
         {
             var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
@@ -67,6 +69,8 @@
         /// </param>
         public void Delete(ContactHubSpotModel contact)
         {
+            if (contact.Id == null)
+                throw new ArgumentException("You must specify a contact ID to delete");
             Delete(contact.Id);
         }
 
@@ -201,53 +205,80 @@
         /// <param name="contacts">The set of contacts to update/create</param>
         /// <returns>A list of contacts that were either updated or created</returns>
         /// TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
-        public ContactListHubSpotModel<T> Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
+        //public ContactListHubSpotModel<T> Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
+        public ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
         {
-            var createPath = $"{new T().RouteBasePath}/batch/create";
-            var updatePath = $"{new T().RouteBasePath}/batch/update";
-            
-            var contactsWithId = new List<T>();
-            var contactsWithEmail = new List<T>();
+            var createPath = $"{new ContactListHubSpotModel<T>().RouteBasePath}/batch/create";
+            var updatePath = $"{new ContactListHubSpotModel<T>().RouteBasePath}/batch/update";
 
-            foreach (var contact in contacts)
+            var contactsWithId = new ContactListHubSpotModel<T>();
+            var contactsWithEmail = new ContactListHubSpotModel<T>();
+            
+            foreach (var contact in contacts.Contacts)
             {
                 // If contact.Id isn't the default value for long, add it to the list of contacts with a valid Id
-                if (contact.Id != 0L) 
+                if (contact.Id != null)
                 {
-                    contactsWithId.Add(contact);
+                    //TODO - remove debugging
+                    //Console.WriteLine($"CONTACTS WITH IDS #{contact.Id} {contact.Email}");
+                    contactsWithId.Contacts.Add(contact);
                 }
                 else if (contact.Email != null)
                 {
-                    contactsWithEmail.Add(contact);
+                    //TODO - remove debugging
+                    //Console.WriteLine($"CONTACTS WITH EMAIL #{contact.Id} {contact.Email}");
+                    contactsWithEmail.Contacts.Add(contact);
                 }
             }
 
             var contactsResults = new ContactListHubSpotModel<T>();
             
             // If the contacts in our batch have Id values, we assume this is an update operation.
-            if (contactsWithId.Count != 0)
+            if (contactsWithId.Contacts.Count != 0)
             {
-                foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
-                    updatePath, contactsWithId.Select(c => (object)c).ToList(), Method.Post,
+                //TODO - remove debugging
+                Console.WriteLine($"THERE ARE CONTACTS WITH IDS");
+                /*foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                    updatePath, contactsWithId.Contacts.Select(c => (object)c).ToList(), Method.Post,
                     serialisationType: SerialisationType.BatchUpdateSchema).Contacts)
+                    contactsResults.Contacts.Add(contact);*/
+                foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                             updatePath, contactsWithId, Method.Post,
+                             serialisationType: SerialisationType.BatchUpdateSchema).Results)
+                {
+                    // TODO - remove debugging
+                    Console.WriteLine(
+                        $"CONTACTS WITH ID RESULTS: {contact.Id} {contact.FirstName} {contact.LastName} <{contact.Email}>");
                     contactsResults.Contacts.Add(contact);
+                }
             }
             // If the contacts in our batch only have an Email address, we don't know whether or not they need to be
             // created or updated so we try to create the entire batch first, and if it fails (any single contact in the
             // batch can cause the entire operation to fail) we try to CreateOrUpdate each contact in the batch
             // individually.
-            if (contactsWithEmail.Count != 0)
+            if (contactsWithEmail.Contacts.Count != 0)
             {
+                //TODO - remove debugging
+                Console.WriteLine($"THERE ARE CONTACTS WITH EMAILS");
                 try
                 {
-                    foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
-                        createPath, contactsWithEmail.Select(c => (object)c).ToList(), Method.Post,
+                    /*foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                        createPath, contactsWithEmail.Contacts.Select(c => (object)c).ToList(), Method.Post,
                         serialisationType: SerialisationType.BatchCreationSchema).Contacts)
+                        contactsResults.Contacts.Add(contact);*/
+                    foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                                 createPath, contactsWithEmail, Method.Post,
+                                 serialisationType: SerialisationType.BatchCreationSchema).Results)
+                    {
+                        // TODO - remove debugging
+                        Console.WriteLine(
+                            $"CONTACTS WITH EMAIL RESULTS: {contact.Id} {contact.FirstName} {contact.LastName} <{contact.Email}>");
                         contactsResults.Contacts.Add(contact);
+                    }
                 }
                 catch (HubSpotException e)
                 {
-                    foreach (var contactWithEmail in contactsWithEmail)
+                    foreach (var contactWithEmail in contactsWithEmail.Contacts)
                     {
                         contactsResults.Contacts.Add(CreateOrUpdate(contactWithEmail));
                     }

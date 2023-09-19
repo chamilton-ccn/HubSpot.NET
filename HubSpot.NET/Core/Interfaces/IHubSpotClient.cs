@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using HubSpot.NET.Api;
+using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core.OAuth.Dto;
 using RestSharp;
 
@@ -18,7 +20,9 @@ namespace HubSpot.NET.Core.Interfaces
 
         //void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, bool convertToPropertiesSchema = true);
         //void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag);
-        T ExecuteBatch<T>(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new();
+        //T ExecuteBatch<T>(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new();
+        //T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new();
+        T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new();
         
         T ExecuteMultipart<T>(string absoluteUriPath, byte[] data, string filename, Dictionary<string,string> parameters, Method method = Method.Post) where T : new();
 
