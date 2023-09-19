@@ -4,6 +4,7 @@ using System.Linq;
 using HubSpot.NET.Api;
 using HubSpot.NET.Api.Contact;
 using HubSpot.NET.Api.Contact.Dto;
+using HubSpot.NET.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HubSpot.NET.Tests.Integration
@@ -28,6 +29,8 @@ namespace HubSpot.NET.Tests.Integration
 				sampleContacts.Add(contact);
 			}
 
+			System.Threading.Thread.Sleep(30 * 1000); // Wait for hubspot to update!
+			
 			try
 			{
 				var searchOptions = new SearchRequestOptions
@@ -41,14 +44,28 @@ namespace HubSpot.NET.Tests.Integration
 				{
 					Operator = SearchRequestFilterOperatorType.EqualTo,
 					Value = "sampledomain.com",
-					PropertyName = "website"
+					PropertyName = "hs_email_domain"
 				};
 				filterGroup.Filters.Add(filter);
-				searchOptions.FilterGroups[0] = filterGroup;
+				searchOptions.FilterGroups.Add(filterGroup);
+				searchOptions.PropertiesToInclude = new List<string>
+				{
+					"firstname",
+					"lastname",
+					"email",
+					"hs_email_domain",
+					"createdate",
+					"lastmodifieddate"
+				};
+				
+				Console.WriteLine($"FILTER");
+				Console.WriteLine($"{filter.PropertyName} {filter.Operator} {filter.Value}");
+
 
 				// Act
-				//ContactSearchHubSpotModel<ContactHubSpotModel> results = contactApi.Search<ContactHubSpotModel>(searchOptions);
 				var results = contactApi.Search<ContactHubSpotModel>(searchOptions);
+				Console.WriteLine($"TOTAL: {results.Total}");
+				Console.WriteLine($"CONTACTS COUNT: {results.Contacts.Count}");
 
 				// Assert
 				Assert.AreEqual(5, results.Total, "Did not identify a total of 5 results.");
@@ -97,10 +114,10 @@ namespace HubSpot.NET.Tests.Integration
 				});
 				sampleContacts.Add(contact);
 			}
-
-			// HubSpot is rather slow to update the list... wait 15 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(10 * 1000);
-
+            
+			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(30 * 1000);
+            
 			try
 			{
 				var searchOptions = new SearchRequestOptions
@@ -111,14 +128,13 @@ namespace HubSpot.NET.Tests.Integration
 				var filter = new SearchRequestFilter
 				{
 					Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
-					Value = DateTimeOffset.UtcNow.AddSeconds(-30).ToUnixTimeMilliseconds().ToString(),
+					Value = ((DateTimeOffset)sampleContacts.First().CreatedAt).AddSeconds(-10)
+						.ToUnixTimeMilliseconds().ToString(),
 					PropertyName = "createdate"
 				};
 				filterGroup.Filters.Add(filter);
-				// Replace the default empty filter group with this one
-				// TODO - Find a reasonable method of identifying empty filter groups and removing them
-				searchOptions.FilterGroups[0] = filterGroup;
-
+				searchOptions.FilterGroups.Add(filterGroup);
+				
 				// Act
 				var results = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
                 
@@ -164,16 +180,16 @@ namespace HubSpot.NET.Tests.Integration
 			for (int i = 0; i < sampleContacts.Count; i++)
 			{
 				ContactHubSpotModel contact = sampleContacts[i];
+				Console.WriteLine($"Created at: {contact.CreatedAt}");
+				Console.WriteLine($"Updated at: {contact.UpdatedAt}");
 				contact.FirstName = $"Updated Test";
 				contactApi.Update(contact);
 				// This is intentional to skip to every odd item
 				i++;
 			}
-			
-			
 
-			// HubSpot is rather slow to update the list... wait 10 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(10 * 1000);
+			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(30 * 1000);
 
 			try
 			{
@@ -257,6 +273,12 @@ namespace HubSpot.NET.Tests.Integration
 
 			// Act
 			contactApi.Update(contact);
+			
+			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(30 * 1000);
+			
+			Console.WriteLine($"TEST1: {contact.Phone} {contact.Email}");
+			
 
 			try
 			{
@@ -267,7 +289,13 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual("Second Sample Company", contact.Company);
 
 				// Second Act
-				contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email);
+				contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email, new ListRequestOptionsV3
+				{
+					PropertiesToInclude = new List<string> {"phone", "email", "company"}
+				});
+				
+				Console.WriteLine($"TEST2: {contact.Phone} {contact.Email}");
+				Console.WriteLine($"TEST2: {sampleContact.Phone} {sampleContact.Email}");
 
 				// Second Assert
 				Assert.AreNotEqual(sampleContact.Phone, contact.Phone);
@@ -278,7 +306,7 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				contactApi.Delete(contact.Id);
+				//contactApi.Delete(contact.Id);
 			}
 		}
 

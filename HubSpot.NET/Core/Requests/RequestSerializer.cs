@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -96,11 +97,21 @@ namespace HubSpot.NET.Core.Requests
                     entitiesList.Add(new { properties = item });
                 }
                 return JsonConvert.SerializeObject(new { inputs = entitiesList }, _jsonSerializerSettings);
-            }            
+            }
             
             if (serialisationType == SerialisationType.PropertyBag)
             {
-                _obj = new { properties = obj };
+                _obj = obj;
+                // TODO - Remove me! (debugging/experimenting)
+                /*var readOnlyProperties = new List<string>() { "CreatedAt", "UpdatedAt" };
+                foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(obj.GetType()))
+                {
+                    if (readOnlyProperties.Contains(property.Name))
+                        property.SetValue(obj, null);
+                    Console.WriteLine($"PROPERTY {property.Name} {property.GetValue(obj)}");
+                }*/
+                
+                //_obj = new { properties = obj };
                 if (obj is Api.Task.Dto.TaskHubSpotModel)
                 {
                     _obj.properties.Id = null;
@@ -112,9 +123,12 @@ namespace HubSpot.NET.Core.Requests
                 }
             }
             
-            return JsonConvert.SerializeObject(
+            var json = JsonConvert.SerializeObject(
                  _obj,
                 _jsonSerializerSettings);
+            // TODO - remove debugging
+            Console.WriteLine(json);
+            return json;
         }
 
 

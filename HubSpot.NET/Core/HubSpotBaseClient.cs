@@ -6,6 +6,7 @@ using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.OAuth.Dto;
 using HubSpot.NET.Core.Requests;
 using HubSpot.NET.Core.Serializers;
+using Newtonsoft.Json;
 using RestSharp;
 
 namespace HubSpot.NET.Core
@@ -57,11 +58,13 @@ namespace HubSpot.NET.Core
         }
         public T Execute<T>(string absoluteUriPath, object entity = null, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            string json = (method == Method.Get || entity == null)
+            var json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, serialisationType);
             
-            T data = SendRequest(absoluteUriPath, method, json, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
+            //T data = SendRequest(absoluteUriPath, method, json, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
+            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
+            var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
 
             return data;
         }
@@ -73,8 +76,10 @@ namespace HubSpot.NET.Core
         }
         public T Execute<T>(string absoluteUriPath, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            T data = SendRequest(absoluteUriPath, method, null, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
-
+            //T data = SendRequest(absoluteUriPath, method, null, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
+            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
+            var data = SendRequest(absoluteUriPath, method, null, JsonConvert.DeserializeObject<T>);
+            
             return data;
         }
 
@@ -102,8 +107,6 @@ namespace HubSpot.NET.Core
             string json = (method == Method.Get || entities == null)
                 ? null
                 : _serializer.SerializeEntity(entities, serialisationType);
-            
-            Console.WriteLine(json);
             
             var data = SendRequest(absoluteUriPath,
                 method,
@@ -142,22 +145,31 @@ namespace HubSpot.NET.Core
                 ? null
                 : _serializer.SerializeEntity(entity, true);
             // TODO - remove
+            Console.WriteLine($"-> HubSpotBaseClient line #146");
             Console.WriteLine(json);
             
+            /*var data = SendRequest(
+                absoluteUriPath,
+                method,
+                json,
+                responseData => (T)_serializer.DeserializeListEntity<T>(responseData, serialisationType != SerialisationType.Raw));*/
+            
+            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
             var data = SendRequest(
                 absoluteUriPath,
                 method,
                 json,
-                responseData => (T)_serializer.DeserializeListEntity<T>(responseData, serialisationType != SerialisationType.Raw));
+                JsonConvert.DeserializeObject<T>);
+            // TODO - remove
+            Console.WriteLine($"-> HubSpotBaseClient line #162");
+            Console.WriteLine(data);
             return data;
         }
 
         protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) where T : IHubSpotModel, new()
         {
             string responseData = SendRequest(path, method, json);
-            // TODO - remove
-            //Console.WriteLine(responseData);
-
+            
             if (string.IsNullOrWhiteSpace(responseData))
                 return default;
 

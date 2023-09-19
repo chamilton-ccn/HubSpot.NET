@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace HubSpot.NET.Core.Extensions
@@ -9,6 +12,19 @@ namespace HubSpot.NET.Core.Extensions
         public static bool IsNullOrEmpty(this string value)
         {
             return string.IsNullOrEmpty(value);
+        }
+
+        // TODO - this is nowhere near complete. We need a generalized version for V3 query parameters. Format:
+        // TODO - ?properties=property1,property2,property3
+        public static string SetQueryParams(this string url, string name, List<string> parameters)
+        {
+            var urlParams = new StringBuilder();
+            var newUrl = new StringBuilder(url);
+            newUrl.Append("&");
+            newUrl.Append($"{name}=");
+            urlParams.Append(WebUtility.UrlEncode(string.Join(",", parameters)));
+            newUrl.Append(urlParams);
+            return newUrl.ToString();
         }
 
         public static string SetQueryParam(this string url, string name, string value)

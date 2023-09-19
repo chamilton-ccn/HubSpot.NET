@@ -1,17 +1,13 @@
-﻿using System.ComponentModel;
-
-namespace HubSpot.NET.Api.Contact
+﻿namespace HubSpot.NET.Api.Contact
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Reflection;
-    using System.Runtime.Serialization;
-    using HubSpot.NET.Api.Contact.Dto;
-    using HubSpot.NET.Core;
-    using HubSpot.NET.Core.Extensions;
-    using HubSpot.NET.Core.Interfaces;
+    using Dto;
+    using Core;
+    using Core.Extensions;
+    using Core.Interfaces;
     using RestSharp;
 
    public class HubSpotContactApi : IHubSpotContactApi
@@ -33,6 +29,8 @@ namespace HubSpot.NET.Api.Contact
         public T Create<T>(T entity) where T : ContactHubSpotModel, new()
         {
             var path = $"{entity.RouteBasePath}";
+            // TODO - remove debugging
+            Console.WriteLine($"Creating... {path}");
             return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
         }
         
@@ -59,6 +57,17 @@ namespace HubSpot.NET.Api.Contact
         {
             var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
+        }
+        
+        /// <summary>
+        /// Deletes (archives) a given contact
+        /// </summary>
+        /// <param name="contact">
+        /// A ContactHubSpotModel instance
+        /// </param>
+        public void Delete(ContactHubSpotModel contact)
+        {
+            Delete(contact.Id);
         }
 
         /// <summary>
@@ -106,12 +115,21 @@ namespace HubSpot.NET.Api.Contact
         /// Gets a contact by their email address
         /// </summary>
         /// <param name="email">Email address to search for</param>
+        /// <param name="opts">Request options - used for pagination etc.</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
-        public T GetByEmail<T>(string email) where T : ContactHubSpotModel, new()
+        public T GetByEmail<T>(string email, ListRequestOptionsV3 opts = null) where T : ContactHubSpotModel, new()
         {
+            if (opts == null)
+                opts = new ListRequestOptionsV3(); // TODO - ListRequestOptions -or- ListRequestOptionsV3; one has to go!
+            
             var path = $"{new T().RouteBasePath}/{email}"
                 .SetQueryParam("idProperty", "email");
+            
+            if (opts.PropertiesToInclude.Any())
+                path = path.SetQueryParams("properties", opts.PropertiesToInclude);
+            
+            Console.WriteLine(path);
             try
             {
                 T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
@@ -151,7 +169,6 @@ namespace HubSpot.NET.Api.Contact
         /// <summary>
         /// List all available contacts 
         /// </summary>
-        /// <param name="properties">List of properties to fetch for each contact</param>
         /// <param name="opts">Request options - used for pagination etc.</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>A list of contacts</returns>
@@ -169,9 +186,8 @@ namespace HubSpot.NET.Api.Contact
             if (opts.Offset.HasValue)
                 path = path.SetQueryParam("after", opts.Offset);
 
-            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(
+            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(
                 path, convertToPropertiesSchema: true);
-
             return data;
         }
 
@@ -183,6 +199,8 @@ namespace HubSpot.NET.Api.Contact
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
+        /// <returns>A list of contacts that were either updated or created</returns>
+        /// TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
         public ContactListHubSpotModel<T> Batch<T>(List<T> contacts) where T : ContactHubSpotModel, new()
         {
             var createPath = $"{new T().RouteBasePath}/batch/create";
@@ -193,11 +211,12 @@ namespace HubSpot.NET.Api.Contact
 
             foreach (var contact in contacts)
             {
-                if (contact.Id != null)
+                // If contact.Id isn't the default value for long, add it to the list of contacts with a valid Id
+                if (contact.Id != 0L) 
                 {
                     contactsWithId.Add(contact);
                 }
-                else if (contact.Email != null && contact.Id == null)
+                else if (contact.Email != null)
                 {
                     contactsWithEmail.Add(contact);
                 }
@@ -208,10 +227,10 @@ namespace HubSpot.NET.Api.Contact
             // If the contacts in our batch have Id values, we assume this is an update operation.
             if (contactsWithId.Count != 0)
             {
-                foreach (var _contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
                     updatePath, contactsWithId.Select(c => (object)c).ToList(), Method.Post,
                     serialisationType: SerialisationType.BatchUpdateSchema).Contacts)
-                    contactsResults.Contacts.Add(_contact);
+                    contactsResults.Contacts.Add(contact);
             }
             // If the contacts in our batch only have an Email address, we don't know whether or not they need to be
             // created or updated so we try to create the entire batch first, and if it fails (any single contact in the
@@ -221,10 +240,10 @@ namespace HubSpot.NET.Api.Contact
             {
                 try
                 {
-                    foreach (var _contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
+                    foreach (var contact in _client.ExecuteBatch<ContactListHubSpotModel<T>>(
                         createPath, contactsWithEmail.Select(c => (object)c).ToList(), Method.Post,
                         serialisationType: SerialisationType.BatchCreationSchema).Contacts)
-                        contactsResults.Contacts.Add(_contact);
+                        contactsResults.Contacts.Add(contact);
                 }
                 catch (HubSpotException e)
                 {
@@ -242,130 +261,36 @@ namespace HubSpot.NET.Api.Contact
             if (opts == null)
                 return RecentlyCreated<T>();
             var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
-            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
+            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
             data.SearchRequestOptions = opts;
             return data;
         }
 
         public ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
-            if (opts == null)
-            {
-                // By default, search options will sort by "createdate" in descending order
-                opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
-                // 
-                opts.Limit = 100;
-            }
+            if (opts != null) return Search<T>(opts);
+            opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
+            opts.Limit = 100;
+            var searchRequestFilterGroup = new SearchRequestFilterGroup();
+            // SearchRequestFilter defaults to "createdate GreaterThanOrEqualTo 7 days ago"
+            var searchRequestFilter = new SearchRequestFilter();
+            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
+            opts.FilterGroups.Add(searchRequestFilterGroup);
             return Search<T>(opts);
         }
         
         public ContactListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
-            if (opts == null)
-            {
-                // By default, search options will sort by "createdate" in descending order
-                opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
-                opts.SortBy = "lastmodifieddate";
-            }
+            if (opts != null) return Search<T>(opts);
+            opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
+            opts.Limit = 100;
+            opts.SortBy = "lastmodifieddate";
+            var searchRequestFilterGroup = new SearchRequestFilterGroup();
+            var searchRequestFilter = new SearchRequestFilter();
+            searchRequestFilter.PropertyName = "lastmodifieddate";
+            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
+            opts.FilterGroups.Add(searchRequestFilterGroup);
             return Search<T>(opts);
         }
-        
-        /// <summary>
-        /// Get recently updated (or created) contacts
-        /// </summary>
-        /*public ContactListHubSpotModel<T> RecentlyUpdated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new ListRecentRequestOptions();
-
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/lists/recently_updated/contacts/recent"
-                .SetQueryParam("count", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("property", opts.PropertiesToInclude);
-
-            if (opts.Offset.HasValue)
-                path = path.SetQueryParam("vidOffset", opts.Offset);
-
-            if (!string.IsNullOrEmpty(opts.TimeOffset))
-                path = path.SetQueryParam("timeOffset", opts.TimeOffset);
-            
-            path = path.SetQueryParam("propertyMode", opts.PropertyMode);
-            
-            path = path.SetQueryParam("formSubmissionMode", opts.FormSubmissionMode);
-            
-            path = path.SetQueryParam("showListMemberships", opts.ShowListMemberships);
-
-            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
-
-            return data;
-        }*/
-
-        // TODO - Convert to V3 API
-        /*public ContactSearchHubSpotModel<T> Search<T>(ContactSearchRequestOptions opts = null)
-            where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new ContactSearchRequestOptions();
-
-            var path = $"{new T().RouteBasePath}/search/query"
-                .SetQueryParam("q", opts.Query)
-                .SetQueryParam("count", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("property", opts.PropertiesToInclude);
-
-            if (opts.Offset != null)
-                path = path.SetQueryParam("offset", opts.Offset);
-
-            if (!string.IsNullOrWhiteSpace(opts.SortBy))
-            {
-                path = path.SetQueryParam("sort", opts.SortBy);
-
-                Type enumType = typeof(SortingOrderType);
-                MemberInfo[] memberInfos = enumType.GetMember(opts.Order.ToString());
-                MemberInfo enumValueMemberInfo = memberInfos.FirstOrDefault(m => m.DeclaringType == enumType);
-                object[] valueAttributes = enumValueMemberInfo.GetCustomAttributes(typeof(EnumMemberAttribute), false);
-                string description = ((EnumMemberAttribute)valueAttributes[0]).Value;
-
-                path = path.SetQueryParam("order", description);
-            }
-
-            ContactSearchHubSpotModel<T> data = _client.ExecuteList<ContactSearchHubSpotModel<T>>(path, convertToPropertiesSchema: true);
-
-            return data;
-        }*/
-
-        /// <summary>
-        /// Get a list of recently created contacts
-        /// </summary>
-        // TODO - Convert to V3 API
-        /*public ContactListHubSpotModel<T> RecentlyCreated<T>(ListRecentRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new ListRecentRequestOptions();
-
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/lists/all/contacts/recent"
-                .SetQueryParam("count", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("property", opts.PropertiesToInclude);
-
-            if (opts.Offset.HasValue)
-                path = path.SetQueryParam("vidOffset", opts.Offset);
-
-            if (!string.IsNullOrEmpty(opts.TimeOffset))
-                path = path.SetQueryParam("timeOffset", opts.TimeOffset);
-            
-            path = path.SetQueryParam("propertyMode", opts.PropertyMode);
-            
-            path = path.SetQueryParam("formSubmissionMode", opts.FormSubmissionMode);
-            
-            path = path.SetQueryParam("showListMemberships", opts.ShowListMemberships);
-
-            ContactListHubSpotModel<T> data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, convertToPropertiesSchema: true);
-
-            return data;
-        }*/
     }
 }

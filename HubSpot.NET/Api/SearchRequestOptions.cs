@@ -16,8 +16,7 @@ namespace HubSpot.NET.Api
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#filter-search-results">Reference</a>
         /// </summary>
         [DataMember(Name = "filterGroups")]
-        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3)
-            { new SearchRequestFilterGroup() };
+        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>();
 
         private int _limit = 50;
         private readonly int _upperLimit;
@@ -72,6 +71,7 @@ namespace HubSpot.NET.Api
         /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.SearchRequestOptions"/> class.
         /// </summary>
         /// <param name="upperLimit">Upper limit for the amount of items to request for the list.</param>
+        // TODO - this may not be necessary
         public SearchRequestOptions(int upperLimit)
         {
             _upperLimit = upperLimit;
@@ -80,6 +80,7 @@ namespace HubSpot.NET.Api
         /// <summary>
         /// Sets the upper limit to 100 
         /// </summary>
+        // TODO - this may not be necessary
         public SearchRequestOptions() : this(100)
         {
         }

@@ -77,6 +77,23 @@ namespace HubSpot.NET.Api.Contact.Dto
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;
             set => _searchRequestOptions = value;
         }
+        
+        // TODO - add an "Errors" object; example schema:
+        /*
+            "errors": [
+                {
+                    "status": "error",
+                    "category": "OBJECT_NOT_FOUND",
+                    "message": "Could not get some null objects, they may be deleted or not exist. Check that ids are valid.",
+                    "context": {
+                        "ids": [
+                            "8043019663",
+                            "8043019664"
+                        ]
+                    }
+                }
+            ],
+         */
 
         public string RouteBasePath => "/crm/v3/objects/contacts";
         
