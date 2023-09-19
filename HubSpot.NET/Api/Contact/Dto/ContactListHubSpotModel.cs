@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
-using Newtonsoft.Json;
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
@@ -26,34 +23,37 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "total", EmitDefaultValue = false)]
         public long? Total { get; set; }
 
-        private IList<T> _contacts { get; set; } = new List<T>(); // status IS getting populated, but in inconsistent ways. AH HA!
-        
+        /// <summary>
+        /// This is a backing property for both Contacts and Results
+        /// </summary>
+        private IList<T> ContactsList { get; set; } = new List<T>();
         
         /// <summary>
         /// Gets or sets the contacts.
         /// </summary>
         /// <value>
-        /// The contacts.
+        /// The contacts. Serialized as "inputs" in batch requests.
         /// </value>
-        //public IList<T> Contacts { get; set; } = new List<T>();
+        [DataMember(Name = "inputs")]
         public IList<T> Contacts
         {
-            get => _contacts;
-            set => _contacts = value;
-        }
-
-        [DataMember(Name = "inputs")]
-        private IList<T> Inputs => Contacts;
-
-        [DataMember(Name = "results")]
-        //public IList<T> Results { get; set; } = new List<T>();
-        public IList<T> Results
-        {
-            get => _contacts;
-            set => _contacts = value;
+            get => ContactsList;
+            set => ContactsList = value;
         }
         
-
+        /// <summary>
+        /// Gets or sets the contacts.
+        /// </summary>
+        /// <value>
+        /// Also the contacts. Serialized as "results" in batch responses.
+        /// </value>        
+        [DataMember(Name = "results")]
+        public IList<T> Results
+        {
+            get => ContactsList;
+            set => ContactsList = value;
+        }
+        
         /// <summary>
         /// A count of errors returned in the response
         /// </summary>
@@ -63,8 +63,13 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// A list of errors returned in the response
         /// </summary>
-        [DataMember(Name = "errors", EmitDefaultValue = false)]
+        [DataMember(Name = "errors")] 
         public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
+
+        public bool ShouldSerializeErrors() //=> Errors.Count > 0; //TODO - reformat this.
+        {
+            return Errors.Count > 0;
+        } 
         
         [DataMember(Name = "startedAt", EmitDefaultValue = false)]
         public DateTime StartedAt { get; set; }

@@ -15,36 +15,29 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// Contacts unique ID in HubSpot
         /// </summary>
+        /// <remarks>
+        /// If this value is 0L (default value for long) then we don't want it serialized at all
+        /// </remarks>
         [DataMember(Name = "id", EmitDefaultValue = false)]
-        //[IgnoreDataMember]
-        public long? Id { get; set; }
+        public long Id { get; set; }
         
-        /*[DataMember(Name = "email")]
-        public string Email { get; set; }
-        [DataMember(Name = "firstname")]
-        public string FirstName { get; set; }
-        [DataMember(Name = "lastname")]
-        public string LastName { get; set; }
-        [DataMember(Name = "website")]
-        public string Website { get; set; }
-        [DataMember(Name = "company")]
-        public string Company { get; set; }
-        [DataMember(Name = "phone")]
-        public string Phone { get; set; }
-        [DataMember(Name = "address")]
-        public string Address { get; set; }
-        [DataMember(Name = "city")]
-        public string City { get; set; }
-        [DataMember(Name = "state")]
-        public string State { get; set; }
-        [DataMember(Name = "zip")]
-        public string ZipCode { get; set; }*/
-
         [DataMember(Name = "properties")]
         private ContactPropertiesModel Properties { get; set; } = new ContactPropertiesModel();
         
-        // Experimental
-        
+        // TODO - Associations List
+        // See: https://developers.hubspot.com/docs/api/crm/contacts (Create a batch of contacts)
+        // Example: (it resides on the same level as "properties")
+        // "associations": [
+        // {
+        //     "to": {
+        //         "id": "company"
+        //     },
+        //     "types": [
+        //     {
+        //         "associationCategory": "USER_DEFINED",
+        //         "associationTypeId": 123
+        //     }
+        //     ]
         
         public string Email
         {
@@ -69,6 +62,12 @@ namespace HubSpot.NET.Api.Contact.Dto
             get => Properties.Website;
             set => Properties.Website = value;
         }
+        
+        public string EmailDomain
+        {
+            get => Properties.EmailDomain;
+            set => Properties.EmailDomain = value;
+        }        
         
         public string Company
         {
@@ -107,20 +106,17 @@ namespace HubSpot.NET.Api.Contact.Dto
             set => Properties.ZipCode = value;
         }
         
-        // END
-        
-        
+        // TODO - does this "fit" anymore?
         [DataMember(Name="associatedcompanyid")]
         public long? AssociatedCompanyId { get;set; }
 
+        // TODO - does this "fit" anymore?
         [DataMember(Name="hubspot_owner_id")]
         public long? OwnerId { get;set; }
 
-        //[IgnoreDataMember]
         [DataMember(Name = "createdAt", EmitDefaultValue = false)]
         public DateTime? CreatedAt { get; set; }
-
-        //[IgnoreDataMember]
+        
         [DataMember(Name = "updatedAt", EmitDefaultValue = false)]
         public DateTime? UpdatedAt { get; set; }
 

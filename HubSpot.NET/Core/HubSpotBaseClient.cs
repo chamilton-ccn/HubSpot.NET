@@ -58,14 +58,13 @@ namespace HubSpot.NET.Core
         {
             return Execute<T>(absoluteUriPath, entity, method, convertToPropertiesSchema ? SerialisationType.PropertiesSchema : SerialisationType.Raw);
         }
+        
         public T Execute<T>(string absoluteUriPath, object entity = null, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
             var json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, serialisationType);
             
-            //T data = SendRequest(absoluteUriPath, method, json, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
-            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
             var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
 
             return data;
@@ -78,10 +77,7 @@ namespace HubSpot.NET.Core
         }
         public T Execute<T>(string absoluteUriPath, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            //T data = SendRequest(absoluteUriPath, method, null, responseData => (T)_serializer.DeserializeEntity<T>(responseData, serialisationType != SerialisationType.Raw));
-            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
             var data = SendRequest(absoluteUriPath, method, null, JsonConvert.DeserializeObject<T>);
-            
             return data;
         }
 
@@ -97,65 +93,14 @@ namespace HubSpot.NET.Core
 
             SendRequest(absoluteUriPath, method, json);
         }
-
-        /*public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, bool convertToPropertiesSchema = true)
-        {
-            ExecuteBatch(absoluteUriPath, entities, method, convertToPropertiesSchema ? SerialisationType.PropertiesSchema : SerialisationType.Raw);
-        }*/
         
-        //public void ExecuteBatch(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag)
-        //public T ExecuteBatch<T>(string absoluteUriPath, List<object> entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
-        //public T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
-        //public T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
-        //public T ExecuteBatch<T>(string absoluteUriPath, T entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag)
         public T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            string json = (method == Method.Get || entities == null)
+            var json = (method == Method.Get || entities == null) // TODO "entities == null" is never true.
                 ? null
                 : _serializer.SerializeEntity(entities, serialisationType);
             
-            // TODO - remove debugging
-            // It makes sense for "results" to be empty here
-            Console.WriteLine($"BEGIN HubSpotBaseClient line #112");
-            Console.WriteLine(json);
-            Console.WriteLine($"END HubSpotBaseClient line #112");
-            
-            /*var data = SendRequest(absoluteUriPath,
-                method,
-                json,
-                responseData => (T)_serializer.DeserializeListEntity<T>(responseData, serialisationType != SerialisationType.Raw));*/
-            // TODO - remove debugging
-            var testJson = JsonConvert.DeserializeObject<T>(json);
-            foreach (var i in testJson.GetType().GetProperties())
-            {
-                if (i.Name == "Results")
-                {
-                    Console.WriteLine(i.GetValue(testJson));
-                    foreach (var j in (List<ContactHubSpotModel>)i.GetValue(testJson))
-                    {
-                        Console.WriteLine($"DOES IT WORK BEFORE SendRequest? {j.Email}");
-                    }
-                    
-                }
-                    
-            }
-            
-            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
             var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
-
-            Console.WriteLine($"HubSpotBaseClient line #123");
-            foreach (var property in data.GetType().GetProperties())
-            {
-                //Console.WriteLine($"-> DATA PROPERTY: {property.Name}");
-                if (property.Name == "Results")
-                {
-                    Console.WriteLine(property.GetValue(data));
-                    foreach (var j in (List<ContactHubSpotModel>)property.GetValue(data))
-                    {
-                        Console.WriteLine($"DOES IT WORK AFTER SendRequest? {j.Email}");
-                    }
-                }                
-            }
             return data;
         }
 
@@ -185,68 +130,34 @@ namespace HubSpot.NET.Core
         }
         public T ExecuteList<T>(string absoluteUriPath, object entity = null, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            string json = (method == Method.Get || entity == null)
+            var json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, true);
-            // TODO - remove
-            Console.WriteLine($"-> HubSpotBaseClient line #146");
-            Console.WriteLine(json);
-            
-            /*var data = SendRequest(
-                absoluteUriPath,
-                method,
-                json,
-                responseData => (T)_serializer.DeserializeListEntity<T>(responseData, serialisationType != SerialisationType.Raw));*/
-            
-            // TODO - experimental. Attempting to make serialization/deserialization less complex. Original line is above.
-            var data = SendRequest(
-                absoluteUriPath,
-                method,
-                json,
-                JsonConvert.DeserializeObject<T>);
-            // TODO - remove
-            Console.WriteLine($"-> HubSpotBaseClient line #162");
-            Console.WriteLine(data);
+
+            var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
+
             return data;
         }
 
         protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) where T : IHubSpotModel, new()
         {
-            string responseData = SendRequest(path, method, json);
-            
-            //TODO - remove debugging
-            Console.WriteLine($"***** SENDING REQUEST from HubSpotBaseClient line 195");
-            
-            if (string.IsNullOrWhiteSpace(responseData))
-                return default;
-
-            return deserializeFunc(responseData);
+            var responseData = SendRequest(path, method, json);
+            return string.IsNullOrWhiteSpace(responseData) ? default : deserializeFunc(responseData);
         }
 
         protected virtual string SendRequest(string path, Method method, string json)
         {
-            //TODO - remove debugging
-            Console.WriteLine($"***** SENDING REQUEST from HubSpotBaseClient line 206");
-            
-            RestRequest request = ConfigureRequestAuthentication(path, method);
+            var request = ConfigureRequestAuthentication(path, method);
 
             if (method != Method.Get && !string.IsNullOrWhiteSpace(json))
                 request.AddParameter("application/json", json, ParameterType.RequestBody);
 
-            RestResponse response = _client.Execute(request);
+            var response = _client.Execute(request);
 
-            string responseData = response.Content;
-            
-            //TODO - remove debugging
-            Console.WriteLine($"***** RESPONSE");
+            var responseData = response.Content;
+            // TODO - remove debugging
+            Console.WriteLine($"Inbound response");
             Console.WriteLine(responseData);
-            var testJson = JsonConvert.DeserializeObject<ContactListHubSpotModel<ContactHubSpotModel>>(responseData);
-            Console.WriteLine($" #### >>>> #### Status is here? {testJson.Status}");
-            foreach (var result in testJson.Results)
-            {
-                Console.WriteLine($"RESULTS! {result.Email}");
-            }
-
             if (!response.IsSuccessful)
                 throw new HubSpotException("Error from HubSpot", new HubSpotError(response.StatusCode, response.StatusDescription), responseData);
 

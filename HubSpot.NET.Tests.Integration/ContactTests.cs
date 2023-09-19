@@ -28,8 +28,9 @@ namespace HubSpot.NET.Tests.Integration
 				});
 				sampleContacts.Add(contact);
 			}
-
-			System.Threading.Thread.Sleep(30 * 1000); // Wait for hubspot to update!
+			
+			// HubSpot is rather slow to update... wait 20 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(20 * 1000);
 			
 			try
 			{
@@ -57,16 +58,9 @@ namespace HubSpot.NET.Tests.Integration
 					"createdate",
 					"lastmodifieddate"
 				};
-				
-				//TODO - remove debugging
-				Console.WriteLine($"FILTER");
-				Console.WriteLine($"{filter.PropertyName} {filter.Operator} {filter.Value}");
-
-
+                
 				// Act
 				var results = contactApi.Search<ContactHubSpotModel>(searchOptions);
-				Console.WriteLine($"TOTAL: {results.Total}");
-				Console.WriteLine($"CONTACTS COUNT: {results.Contacts.Count}");
 
 				// Assert
 				Assert.AreEqual(5, results.Total, "Did not identify a total of 5 results.");
@@ -92,8 +86,6 @@ namespace HubSpot.NET.Tests.Integration
 				// Clean-up
 				foreach (var contact in sampleContacts)
 				{
-					//TODO - remove debugging
-					Console.WriteLine($"Deleting contact: #{contact.Id} ({contact.Email})");
 					contactApi.Delete(contact.Id);
 				}
 					
@@ -117,8 +109,8 @@ namespace HubSpot.NET.Tests.Integration
 				sampleContacts.Add(contact);
 			}
             
-			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(30 * 1000);
+			// HubSpot is rather slow to update the list... wait 20 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(20 * 1000);
             
 			try
 			{
@@ -182,17 +174,14 @@ namespace HubSpot.NET.Tests.Integration
 			for (int i = 0; i < sampleContacts.Count; i++)
 			{
 				ContactHubSpotModel contact = sampleContacts[i];
-				//TODO - remove debugging
-				Console.WriteLine($"Created at: {contact.CreatedAt}");
-				Console.WriteLine($"Updated at: {contact.UpdatedAt}");
 				contact.FirstName = $"Updated Test";
 				contactApi.Update(contact);
 				// This is intentional to skip to every odd item
 				i++;
 			}
 
-			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(30 * 1000);
+			// HubSpot is rather slow to update the list... wait 20 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(20 * 1000);
 
 			try
 			{
@@ -277,12 +266,9 @@ namespace HubSpot.NET.Tests.Integration
 			// Act
 			contactApi.Update(contact);
 			
-			// HubSpot is rather slow to update the list... wait 30 seconds to allow it to catch up
-			System.Threading.Thread.Sleep(30 * 1000);
-			
-			Console.WriteLine($"TEST1: {contact.Phone} {contact.Email}");
-			
-
+			// HubSpot is rather slow to update the list... wait 20 seconds to allow it to catch up
+			System.Threading.Thread.Sleep(20 * 1000);
+            
 			try
 			{
 				// Assert
@@ -296,10 +282,7 @@ namespace HubSpot.NET.Tests.Integration
 				{
 					PropertiesToInclude = new List<string> {"phone", "email", "company"}
 				});
-				
-				Console.WriteLine($"TEST2: {contact.Phone} {contact.Email}");
-				Console.WriteLine($"TEST2: {sampleContact.Phone} {sampleContact.Email}");
-
+                
 				// Second Assert
 				Assert.AreNotEqual(sampleContact.Phone, contact.Phone);
 				Assert.AreNotEqual(sampleContact.Company, contact.Company);
@@ -309,7 +292,7 @@ namespace HubSpot.NET.Tests.Integration
 			finally
 			{
 				// Clean-up
-				//contactApi.Delete(contact.Id);
+				contactApi.Delete(contact.Id);
 			}
 		}
 

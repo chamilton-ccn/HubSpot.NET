@@ -72,54 +72,9 @@ namespace HubSpot.NET.Core.Requests
             
             dynamic _obj = obj;
             
-            if (serialisationType == SerialisationType.BatchUpdateSchema)
-            {
-                var data =  JsonConvert.SerializeObject(_obj, _jsonSerializerSettings); // TODO - experimental
-                // TODO - remove debugging
-                Console.WriteLine("BATCH UPDATE SCHEMA");
-                Console.WriteLine(data);
-                return data;
-                dynamic entitiesList = new List<object> { };
-                foreach (var item in _obj)
-                {
-                    if (item.Id != null)
-                    {
-                        var id = item.Id;
-                        item.Id = null;
-                        entitiesList.Add(new { id = id, properties = item });
-                        continue;
-                    }
-                    entitiesList.Add(new { properties = item });
-                }
-                return JsonConvert.SerializeObject(new { inputs = entitiesList }, _jsonSerializerSettings);
-            }
-            
-            if (serialisationType == SerialisationType.BatchCreationSchema)
-            {
-                var data = JsonConvert.SerializeObject(_obj, _jsonSerializerSettings); // TODO - experimental
-                // TODO - remove debugging
-                Console.WriteLine("BATCH CREATE SCHEMA");
-                Console.WriteLine(data);
-                return data;
-                dynamic entitiesList = new List<object> { };
-                foreach (var item in _obj)
-                {
-                    entitiesList.Add(new { properties = item });
-                }
-                return JsonConvert.SerializeObject(new { inputs = entitiesList }, _jsonSerializerSettings);
-            }
-            
             if (serialisationType == SerialisationType.PropertyBag)
             {
                 _obj = obj;
-                // TODO - Remove me! (debugging/experimenting)
-                /*var readOnlyProperties = new List<string>() { "CreatedAt", "UpdatedAt" };
-                foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(obj.GetType()))
-                {
-                    if (readOnlyProperties.Contains(property.Name))
-                        property.SetValue(obj, null);
-                    Console.WriteLine($"PROPERTY {property.Name} {property.GetValue(obj)}");
-                }*/
                 
                 //_obj = new { properties = obj };
                 if (obj is Api.Task.Dto.TaskHubSpotModel)
@@ -137,7 +92,7 @@ namespace HubSpot.NET.Core.Requests
                  _obj,
                 _jsonSerializerSettings);
             // TODO - remove debugging
-            Console.WriteLine($"### RequestSerializer line #132");
+            Console.WriteLine($"Outbound request");
             Console.WriteLine(json);
             return json;
         }
