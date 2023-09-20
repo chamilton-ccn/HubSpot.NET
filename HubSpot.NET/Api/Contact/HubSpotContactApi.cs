@@ -123,7 +123,7 @@ namespace HubSpot.NET.Api.Contact
         public T GetByEmail<T>(string email, ListRequestOptionsV3 opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptionsV3(); // TODO - ListRequestOptions -or- ListRequestOptionsV3; one has to go!
+                opts = new ListRequestOptionsV3(); // TODO - SearchRequestOptions -or- ListRequestOptionsV3; one has to go!
             
             var path = $"{new T().RouteBasePath}/{email}"
                 .SetQueryParam("idProperty", "email");
@@ -168,53 +168,18 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
-        /// <summary>
-        /// List all available contacts 
-        /// </summary>
-        /// <param name="opts">Request options - used for pagination etc.</param>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <returns>A list of contacts</returns>
-        public ContactListHubSpotModel<T> List<T>(ListRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new ListRequestOptions();
-
-            var path = $"{new ContactHubSpotModel().RouteBasePath}"
-                .SetQueryParam("limit", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("property", opts.PropertiesToInclude);
-
-            if (opts.Offset.HasValue)
-                path = path.SetQueryParam("after", opts.Offset);
-
-            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(
-                path, convertToPropertiesSchema: true);
-            return data;
-        }
 
         /// <summary>
         /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
-        /// Best performance is with a maximum of 250 contacts. This method will determine whether a contact in the
-        /// batch needs to be updated or created, and in the latter case, it will try to create them as a batch, but if
-        /// that fails, it will execute CreateOrUpdate for each contact in the batch. 
+        /// Batch operations are <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">limited to 100
+        /// records per batch</see>. This method will determine whether a contact in the batch needs to be updated or
+        /// created, and in the latter case, it will try to create them as a batch, but if that fails, it will execute
+        /// CreateOrUpdate for each contact in the batch. 
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
         /// <returns>A list of contacts that were either updated or created</returns>
         /// TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
-        /// TODO - this should be two separate operations (create/update)
-
-        public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
-            where T : ContactHubSpotModel, new()
-        {
-            var path = $"{contacts.RouteBasePath}/batch/create";
-            // TODO leaving serialisatonType in place for now. Remove after it is no longer meaningful.
-            return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-            // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
-            //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-        }
-        
         public ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new() // TODO - rename to "BatchUpdateOrCreate"
         {
             var createPath = $"{new ContactListHubSpotModel<T>().RouteBasePath}/batch/create";
@@ -241,6 +206,8 @@ namespace HubSpot.NET.Api.Contact
             // If the contacts in our batch have Id values, we assume this is an update operation.
             if (contactsWithId.Contacts.Count != 0)
             {
+                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
+                //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
                 var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(updatePath, contactsWithId, Method.Post,
                     serialisationType: SerialisationType.Raw);
                 foreach (var error in data.Errors)
@@ -256,6 +223,8 @@ namespace HubSpot.NET.Api.Contact
             {
                 try
                 {
+                    // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
+                    //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
                     var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
                         Method.Post, serialisationType: SerialisationType.Raw);
                     foreach (var error in data.Errors)
@@ -274,11 +243,36 @@ namespace HubSpot.NET.Api.Contact
             return contactsResults;
         }
         
+        /// <summary>
+        /// List all available contacts (basically "search" but with no filter criteria. Nearly identical to
+        /// </summary>
+        /// <param name="opts">Request options - used for pagination etc.</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>A list of contacts</returns>
+        public ContactListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        {
+            if (opts == null)
+                opts = new SearchRequestOptions();
+
+            var path = $"{new T().RouteBasePath}"
+                .SetQueryParam("limit", opts.Limit);
+
+            if (opts.PropertiesToInclude.Any())
+                path = path.SetQueryParam("property", opts.PropertiesToInclude); // TODO - this does not result in a correct URL for the V3 API
+
+            if (opts.Offset.HasValue)
+                path = path.SetQueryParam("after", opts.Offset);
+
+            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(
+                path, convertToPropertiesSchema: true);
+            return data;
+        }
+        
         public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
                 return RecentlyCreated<T>();
-            var path = $"{new ContactHubSpotModel().RouteBasePath}/search";
+            var path = $"{new T().RouteBasePath}/search";
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
             data.SearchRequestOptions = opts;
             return data;

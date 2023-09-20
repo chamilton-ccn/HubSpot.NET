@@ -134,7 +134,7 @@ namespace HubSpot.NET.Tests.Integration
 
 			try
 			{
-				var searchOptions = new ListRequestOptions
+				var searchOptions = new SearchRequestOptions
 				{
 					PropertiesToInclude = new List<string> { "dealname", "amount" },
 					Limit = 3

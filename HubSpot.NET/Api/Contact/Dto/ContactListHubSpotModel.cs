@@ -126,7 +126,7 @@ namespace HubSpot.NET.Api.Contact.Dto
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;
             set => _searchRequestOptions = value;
         }
-
+        
         public string RouteBasePath => "/crm/v3/objects/contacts";
         
         public bool IsNameValue => false;

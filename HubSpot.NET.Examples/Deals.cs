@@ -3,6 +3,7 @@ using HubSpot.NET.Api.Deal.Dto;
 using HubSpot.NET.Core;
 using System;
 using System.Collections.Generic;
+using SearchRequestOptions = HubSpot.NET.Core.SearchRequestOptions;
 
 namespace HubSpot.NET.Examples
 {
@@ -32,7 +33,7 @@ namespace HubSpot.NET.Examples
             /**
              * Search for a deal
              */
-            var searchedDeal = api.Deal.Search<DealHubSpotModel>(new SearchRequestOptions()
+            var searchedDeal = api.Deal.Search<DealHubSpotModel>(new Api.SearchRequestOptions()
             {
                 FilterGroups = new List<SearchRequestFilterGroup>
                 {
@@ -71,7 +72,7 @@ namespace HubSpot.NET.Examples
              * Get all deals
              */
             var deals = api.Deal.List<DealHubSpotModel>(false,
-                new ListRequestOptions(250) { PropertiesToInclude = new List<string> { "dealname", "amount" } });
+                new SearchRequestOptions(250) { PropertiesToInclude = new List<string> { "dealname", "amount" } });
 
             /**
              *  Get all deals
@@ -82,7 +83,7 @@ namespace HubSpot.NET.Examples
             //while (moreResults)
             //{
             //    var allDeals = api.Deal.List<DealHubSpotModel>(false,
-            //        new ListRequestOptions { PropertiesToInclude = new List<string> { "dealname", "amount", "hubspot_owner_id", "closedate" }, Limit = 100, Offset = offset });
+            //        new SearchRequestOptions { PropertiesToInclude = new List<string> { "dealname", "amount", "hubspot_owner_id", "closedate" }, Limit = 100, Offset = offset });
 
             //    moreResults = allDeals.MoreResultsAvailable;
             //    if (moreResults) offset = allDeals.Offset;

@@ -86,12 +86,12 @@ namespace HubSpot.NET.Examples
              * By default only a few properties are returned
              */
             var contacts = api.Contact.List<ContactHubSpotModel>(
-                new ListRequestOptions { PropertiesToInclude = new List<string> { "firstname", "lastname", "email" } });
+                new SearchRequestOptions { PropertiesToInclude = new List<string> { "firstname", "lastname", "email" } });
 
             /**
              * Get the most recently updated contacts, limited to 10
              */
-            var recentlyUpdated = api.Contact.RecentlyUpdated<ContactHubSpotModel>(new ListRecentRequestOptions()
+            var recentlyUpdated = api.Contact.RecentlyUpdated<ContactHubSpotModel>(new SearchRecentRequestOptions()
             {
                 Limit = 10
             });
@@ -99,7 +99,7 @@ namespace HubSpot.NET.Examples
             /**
              * Get the most recently created contacts, limited to 10
              */
-            var recentlyCreated = api.Contact.RecentlyCreated<ContactHubSpotModel>(new ListRecentRequestOptions()
+            var recentlyCreated = api.Contact.RecentlyCreated<ContactHubSpotModel>(new SearchRecentRequestOptions()
             {
                 Limit = 10
             });

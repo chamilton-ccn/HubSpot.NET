@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HubSpot.NET.Api.Deal.Dto
 {
-    public class DealRecentRequestOptions : ListRequestOptions
+    public class DealRecentRequestOptions : Core.SearchRequestOptions
     {
         /// <summary>
         /// Used to specify the oldest timestamp to use to retrieve deals

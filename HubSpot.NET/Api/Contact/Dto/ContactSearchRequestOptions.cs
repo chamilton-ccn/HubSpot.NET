@@ -6,7 +6,7 @@ namespace HubSpot.NET.Api.Contact.Dto
     /// Options used when querying for a list matching the query term
     /// </summary>
     // TODO - MARKED FOR REMOVAL
-    public class ContactSearchRequestOptions : ListRequestOptions
+    public class ContactSearchRequestOptions : Core.SearchRequestOptions
     {   
         /// <summary>
         /// Gets or set the query term to use when searching

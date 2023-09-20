@@ -18,7 +18,11 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "filterGroups")]
         public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>();
 
-        private int _limit = 50;
+        /// <summary>
+        /// If limit isn't specified, it to the <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
+        /// maximum allowable number of results per page.</see>
+        /// </summary>        
+        private int _limit = 100;
         private readonly int _upperLimit;
         
         /// <summary>
@@ -46,7 +50,8 @@ namespace HubSpot.NET.Api
         /// Gets or sets the number of items to return.
         /// </summary>
         /// <remarks>
-        /// Defaults to 20 which is also the HubSpot API default. Max value is 100
+        /// Defaults to 100 <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">which is the 
+        /// maximum value.</see>
         /// </remarks>
         /// <value>
         /// The number of items to return.
@@ -59,9 +64,8 @@ namespace HubSpot.NET.Api
             {
                 if (value < 1 || value > _upperLimit)
                 {
-                    throw new ArgumentException(
-                        $"Number of items to return must be a positive integer greater than 0, and less than" +
-                        $" {_upperLimit} - you provided {value}");
+                    throw new ArgumentException($"Number of items to return must be a positive integer " +
+                                                $"greater than 0, and less than {_upperLimit} (you provided {value}).");
                 }
                 _limit = value;
             }
@@ -71,19 +75,16 @@ namespace HubSpot.NET.Api
         /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.SearchRequestOptions"/> class.
         /// </summary>
         /// <param name="upperLimit">Upper limit for the amount of items to request for the list.</param>
-        // TODO - this may not be necessary
         public SearchRequestOptions(int upperLimit)
         {
             _upperLimit = upperLimit;
         }
 
         /// <summary>
-        /// Sets the upper limit to 100 
+        /// Sets the upper limit to 100, which is the
+        /// <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">maximum per page</see>. 
         /// </summary>
-        // TODO - this may not be necessary
-        public SearchRequestOptions() : this(100)
-        {
-        }
+        public SearchRequestOptions() : this(100) { }
 
         /// <summary>
         /// Get or set the continuation offset when calling list many times to enumerate all your items

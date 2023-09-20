@@ -84,10 +84,10 @@ namespace HubSpot.NET.Api.Company
             }
         }
 
-        public CompanyListHubSpotModel<T> List<T>(ListRequestOptions opts = null) where T: CompanyHubSpotModel, new()
+        public CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T: CompanyHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = $"{new CompanyHubSpotModel().RouteBasePath}/companies/paged"
                 .SetQueryParam("count", opts.Limit);
@@ -132,10 +132,10 @@ namespace HubSpot.NET.Api.Company
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
         }
 
-        public CompanySearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
+        public CompanySearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
         {
             if (opts == null)
-                opts = new SearchRequestOptions();
+                opts = new Api.SearchRequestOptions();
 
             var path = "/crm/v3/objects/companies/search";
 

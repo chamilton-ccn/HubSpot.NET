@@ -4,6 +4,7 @@ using HubSpot.NET.Api;
 using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core;
+using SearchRequestOptions = HubSpot.NET.Api.SearchRequestOptions;
 
 namespace HubSpot.NET.Examples
 {

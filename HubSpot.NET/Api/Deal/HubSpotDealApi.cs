@@ -78,10 +78,10 @@
         /// <typeparam name="T">Implementation of DealListHubSpotModel</typeparam>
         /// <param name="opts">Options (limit, offset) relating to request</param>
         /// <returns>List of deals</returns>
-        public DealListHubSpotModel<T> List<T>(bool includeAssociations, ListRequestOptions opts = null) where T : DealHubSpotModel, new()
+        public DealListHubSpotModel<T> List<T>(bool includeAssociations, SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptions(250);
+                opts = new SearchRequestOptions(250);
 
             var path = $"{new DealListHubSpotModel<T>().RouteBasePath}/deal/paged"
                 .SetQueryParam("limit", opts.Limit);
@@ -110,10 +110,10 @@
         /// <param name="objectName">String name of Hubspot object related to deals (contact\account)</param>
         /// <param name="opts">Options (limit, offset) relating to request</param>
         /// <returns>List of deals</returns>
-        public DealListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long hubId, ListRequestOptions opts = null, string objectName = "contact") where T : DealHubSpotModel, new()
+        public DealListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long hubId, SearchRequestOptions opts = null, string objectName = "contact") where T : DealHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = $"{new DealListHubSpotModel<T>().RouteBasePath}/deal/associated/{objectName}/{hubId}/paged"
                 .SetQueryParam("limit", opts.Limit);
@@ -206,10 +206,10 @@
         /// <typeparam name="T">Implementation of <see cref="DealHubSpotModel"/></typeparam>
         /// <param name="opts">Options (limit, offset) and search criteria relating to request</param>
         /// <returns>List of deals</returns>
-        public SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
+        public SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
         {
             if (opts == null)
-                opts = new SearchRequestOptions();
+                opts = new Api.SearchRequestOptions();
 
             var path = "/crm/v3/objects/deals/search";
 

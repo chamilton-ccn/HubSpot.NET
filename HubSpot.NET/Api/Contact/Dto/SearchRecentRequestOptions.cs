@@ -7,7 +7,7 @@ namespace HubSpot.NET.Api.Contact.Dto
     /// Options used when querying for lists of items.
     /// </summary>
     // TODO - MARKED FOR REMOVAL
-    public class ListRecentRequestOptions : ListRequestOptions
+    public class SearchRecentRequestOptions : Core.SearchRequestOptions
     {
         /// <summary>
         /// Used for pagination
@@ -29,7 +29,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// </summary>
         public bool ShowListMemberships { get; set; } = false;
 
-        public ListRecentRequestOptions()
+        public SearchRecentRequestOptions()
 		{
             PropertiesToInclude = new List<string> { "createdate", "lastmodifieddate", "firstname", "lastname", "email", "company" };
 		}

@@ -61,10 +61,10 @@ namespace HubSpot.NET.Api.Task
             }
         }
 
-        public TaskListHubSpotModel<T> List<T>(ListRequestOptions opts = null) where T: TaskHubSpotModel, new()
+        public TaskListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T: TaskHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptions();
+                opts = new SearchRequestOptions();
 
             string path = $"{new T().RouteBasePath}"
                 .SetQueryParam("count", opts.Limit);

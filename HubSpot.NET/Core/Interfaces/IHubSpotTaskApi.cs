@@ -10,7 +10,7 @@ namespace HubSpot.NET.Core.Interfaces
         T GetById<T>(long dealId, List<string> propertiesToInclude = null) where T : TaskHubSpotModel, new();
         T Update<T>(T entity) where T : TaskHubSpotModel, new();
 
-        TaskListHubSpotModel<T> List<T>(ListRequestOptions opts = null)
+        TaskListHubSpotModel<T> List<T>(SearchRequestOptions opts = null)
             where T : TaskHubSpotModel, new();
     }
 }

@@ -10,7 +10,7 @@ namespace HubSpot.NET.Core.Interfaces
         T GetById<T>(long dealId) where T : DealHubSpotModel, new();
         T Update<T>(T entity) where T : DealHubSpotModel, new();
 
-        DealListHubSpotModel<T> List<T>(bool includeAssociations, ListRequestOptions opts = null)
+        DealListHubSpotModel<T> List<T>(bool includeAssociations, SearchRequestOptions opts = null)
             where T : DealHubSpotModel, new();
 
         DealRecentListHubSpotModel<T> RecentlyCreated<T>(DealRecentRequestOptions opts = null)
@@ -18,9 +18,9 @@ namespace HubSpot.NET.Core.Interfaces
 
         DealRecentListHubSpotModel<T> RecentlyUpdated<T>(DealRecentRequestOptions opts = null)
             where T : DealHubSpotModel, new();
-        DealListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long hubId, ListRequestOptions opts = null, string objectName = "contact") where T :DealHubSpotModel, new();
+        DealListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long hubId, SearchRequestOptions opts = null, string objectName = "contact") where T :DealHubSpotModel, new();
 
-        SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null)
+        SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null)
             where T : DealHubSpotModel, new();
 
         T AssociateToCompany<T>(T entity, long companyId)

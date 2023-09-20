@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api
 {
+    [Obsolete("Work on replacing this with the new search method")]
     public class SearchHubSpotModel<T> : IHubSpotModel where T : new()
     {
 

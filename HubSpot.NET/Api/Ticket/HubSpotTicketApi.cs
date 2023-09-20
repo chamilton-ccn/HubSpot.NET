@@ -107,10 +107,10 @@
         /// <param name="objectName">String name of Hubspot object related to tickets</param>
         /// <param name="opts">Options (limit, offset) relating to request</param>
         /// <returns>List of tickets</returns>
-        public TicketListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long ticketId, ListRequestOptions opts = null) where T : TicketHubSpotModel, new()
+        public TicketListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long ticketId, SearchRequestOptions opts = null) where T : TicketHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = $"{new TicketListHubSpotModel<T>().RouteBasePath}/{ticketId}/associations"
                 .SetQueryParam("limit", opts.Limit);
@@ -146,10 +146,10 @@
         /// <typeparam name="T">Implementation of <see cref="TicketHubSpotModel"/></typeparam>
         /// <param name="opts">Options (limit, offset) and search criteria relating to request</param>
         /// <returns>List of tickets</returns>
-        public SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : TicketHubSpotModel, new()
+        public SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : TicketHubSpotModel, new()
         {
             if (opts == null)
-                opts = new SearchRequestOptions();
+                opts = new Api.SearchRequestOptions();
 
             var path = "/crm/v3/objects/tickets/search";
 
