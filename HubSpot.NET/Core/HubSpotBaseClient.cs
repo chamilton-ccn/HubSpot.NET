@@ -96,7 +96,7 @@ namespace HubSpot.NET.Core
         
         public T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            var json = (method == Method.Get || entities == null) // TODO "entities == null" is never true.
+            var json = (method == Method.Get || entities == null) // TODO - this might not be all that useful.
                 ? null
                 : _serializer.SerializeEntity(entities, serialisationType);
             
@@ -133,7 +133,7 @@ namespace HubSpot.NET.Core
             var json = (method == Method.Get || entity == null)
                 ? null
                 : _serializer.SerializeEntity(entity, true);
-
+            
             var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
 
             return data;
@@ -156,8 +156,8 @@ namespace HubSpot.NET.Core
 
             var responseData = response.Content;
             // TODO - remove debugging
-            Console.WriteLine($"Inbound response");
-            Console.WriteLine(responseData);
+            //Console.WriteLine($"Inbound response");
+            //Console.WriteLine(responseData);
             if (!response.IsSuccessful)
                 throw new HubSpotException("Error from HubSpot", new HubSpotError(response.StatusCode, response.StatusDescription), responseData);
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using HubSpot.NET.Core;
+using HubSpot.NET.Api;
 
-namespace HubSpot.NET.Api
+namespace HubSpot.NET.Core
 {
     /// <summary>
     /// Options used when querying for a list matching the query term
@@ -35,8 +35,8 @@ namespace HubSpot.NET.Api
             {
                 new SearchRequestSort
                 {
-                    SortOn = SortBy,
-                    Direction = SortDirection
+                    SortBy = SortBy,
+                    SortDirection = SortDirection
                 }
             };
         
@@ -102,6 +102,6 @@ namespace HubSpot.NET.Api
         /// default values returned by each object type.
         /// </summary>
         [DataMember(Name = "properties")]
-        public virtual List<string> PropertiesToInclude { get; set; }
+        public virtual List<string> PropertiesToInclude { get; set; } = new List<string>();
     }
 }

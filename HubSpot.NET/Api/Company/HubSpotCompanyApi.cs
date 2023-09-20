@@ -132,10 +132,10 @@ namespace HubSpot.NET.Api.Company
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
         }
 
-        public CompanySearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
+        public CompanySearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
         {
             if (opts == null)
-                opts = new Api.SearchRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = "/crm/v3/objects/companies/search";
 

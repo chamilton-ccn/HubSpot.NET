@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using HubSpot.NET.Api;
 using HubSpot.NET.Api.Deal;
 using HubSpot.NET.Api.Deal.Dto;
 using HubSpot.NET.Core;

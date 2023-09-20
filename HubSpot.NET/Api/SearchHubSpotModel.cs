@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api

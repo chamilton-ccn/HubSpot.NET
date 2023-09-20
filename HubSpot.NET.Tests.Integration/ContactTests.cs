@@ -278,7 +278,7 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual("Second Sample Company", contact.Company);
 
 				// Second Act
-				contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email, new ListRequestOptionsV3
+				contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email, new SearchRequestOptions
 				{
 					PropertiesToInclude = new List<string> {"phone", "email", "company"}
 				});
@@ -317,6 +317,7 @@ namespace HubSpot.NET.Tests.Integration
 
 			// Assert
 			contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email);
+			Console.WriteLine();
 			Assert.IsNull(contact, "The contact was searchable and not deleted.");
 		}
 	}

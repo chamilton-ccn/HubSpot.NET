@@ -3,7 +3,6 @@
 namespace HubSpot.NET.Api.Contact
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using Dto;
@@ -102,7 +101,7 @@ namespace HubSpot.NET.Api.Contact
 
             try
             {
-                T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
+                var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
             catch (HubSpotException exception)
@@ -113,28 +112,27 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
-        /// <summary>
-        /// Gets a contact by their email address
-        /// </summary>
+        /// <summary>Gets a contact by their email address</summary>
         /// <param name="email">Email address to search for</param>
-        /// <param name="opts">Request options - used for pagination etc.</param>
+        /// <param name="opts">
+        /// Request options - used to specify properties to return, limiting results, pagination, etc.
+        /// </param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
-        public T GetByEmail<T>(string email, ListRequestOptionsV3 opts = null) where T : ContactHubSpotModel, new()
+        public T GetByEmail<T>(string email, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts == null)
-                opts = new ListRequestOptionsV3(); // TODO - SearchRequestOptions -or- ListRequestOptionsV3; one has to go!
+                opts = new SearchRequestOptions();
             
             var path = $"{new T().RouteBasePath}/{email}"
                 .SetQueryParam("idProperty", "email");
             
             if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParams("properties", opts.PropertiesToInclude); // TODO - This string extension is fragile and temporary.
+                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
             
-            Console.WriteLine(path);
             try
             {
-                T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
+                var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
             catch (HubSpotException exception)
@@ -258,22 +256,38 @@ namespace HubSpot.NET.Api.Contact
                 .SetQueryParam("limit", opts.Limit);
 
             if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("property", opts.PropertiesToInclude); // TODO - this does not result in a correct URL for the V3 API
+                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
 
             if (opts.Offset.HasValue)
                 path = path.SetQueryParam("after", opts.Offset);
-
-            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(
-                path, convertToPropertiesSchema: true);
+            
+            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Get, convertToPropertiesSchema: true);
+            /*
+             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
+             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
+             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
+             * is one).
+             */
+            opts.Offset = data.Offset;
+            data.SearchRequestOptions = opts;
             return data;
         }
         
         public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
-            if (opts == null)
-                return RecentlyCreated<T>();
+            /*
+             * If no search criteria is supplied, default to "RecentlyCreated".
+             */
+            if (opts == null) return RecentlyCreated<T>();
             var path = $"{new T().RouteBasePath}/search";
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
+            /*
+             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
+             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
+             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
+             * is one).
+             */
+            opts.Offset = data.Offset;
             data.SearchRequestOptions = opts;
             return data;
         }
@@ -282,9 +296,11 @@ namespace HubSpot.NET.Api.Contact
         {
             if (opts != null) return Search<T>(opts);
             opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
-            opts.Limit = 100;
             var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            // SearchRequestFilter defaults to "createdate GreaterThanOrEqualTo 7 days ago"
+            /*
+             * SearchRequestFilter defaults to "createdate GreaterThanOrEqualTo 7 days ago", which seems to be a
+             * reasonable default for "RecentlyCreated".
+             */
             var searchRequestFilter = new SearchRequestFilter();
             searchRequestFilterGroup.Filters.Add(searchRequestFilter);
             opts.FilterGroups.Add(searchRequestFilterGroup);
@@ -298,8 +314,10 @@ namespace HubSpot.NET.Api.Contact
             opts.Limit = 100;
             opts.SortBy = "lastmodifieddate";
             var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            var searchRequestFilter = new SearchRequestFilter();
-            searchRequestFilter.PropertyName = "lastmodifieddate";
+            var searchRequestFilter = new SearchRequestFilter
+            {
+                PropertyName = "lastmodifieddate"
+            };
             searchRequestFilterGroup.Filters.Add(searchRequestFilter);
             opts.FilterGroups.Add(searchRequestFilterGroup);
             return Search<T>(opts);

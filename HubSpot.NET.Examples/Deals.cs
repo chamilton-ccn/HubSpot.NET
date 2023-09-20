@@ -3,7 +3,6 @@ using HubSpot.NET.Api.Deal.Dto;
 using HubSpot.NET.Core;
 using System;
 using System.Collections.Generic;
-using SearchRequestOptions = HubSpot.NET.Core.SearchRequestOptions;
 
 namespace HubSpot.NET.Examples
 {
@@ -33,7 +32,7 @@ namespace HubSpot.NET.Examples
             /**
              * Search for a deal
              */
-            var searchedDeal = api.Deal.Search<DealHubSpotModel>(new Api.SearchRequestOptions()
+            var searchedDeal = api.Deal.Search<DealHubSpotModel>(new SearchRequestOptions()
             {
                 FilterGroups = new List<SearchRequestFilterGroup>
                 {

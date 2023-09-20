@@ -1,5 +1,6 @@
 ﻿using HubSpot.NET.Api.Task.Dto;
 using System.Collections.Generic;
+using HubSpot.NET.Api;
 
 namespace HubSpot.NET.Core.Interfaces
 {

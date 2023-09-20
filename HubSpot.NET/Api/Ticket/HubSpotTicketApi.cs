@@ -146,10 +146,10 @@
         /// <typeparam name="T">Implementation of <see cref="TicketHubSpotModel"/></typeparam>
         /// <param name="opts">Options (limit, offset) and search criteria relating to request</param>
         /// <returns>List of tickets</returns>
-        public SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : TicketHubSpotModel, new()
+        public SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : TicketHubSpotModel, new()
         {
             if (opts == null)
-                opts = new Api.SearchRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = "/crm/v3/objects/tickets/search";
 

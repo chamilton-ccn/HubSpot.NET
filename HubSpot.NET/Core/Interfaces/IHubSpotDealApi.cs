@@ -20,7 +20,7 @@ namespace HubSpot.NET.Core.Interfaces
             where T : DealHubSpotModel, new();
         DealListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long hubId, SearchRequestOptions opts = null, string objectName = "contact") where T :DealHubSpotModel, new();
 
-        SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null)
+        SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null)
             where T : DealHubSpotModel, new();
 
         T AssociateToCompany<T>(T entity, long companyId)

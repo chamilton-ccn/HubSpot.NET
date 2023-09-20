@@ -1,14 +1,14 @@
 ﻿using System.Runtime.Serialization;
 
-namespace HubSpot.NET.Api
+namespace HubSpot.NET.Core
 {
     [DataContract]
     public class SearchRequestSort
     {
         [DataMember(Name = "propertyName")]
-        public string SortOn { get; set; } = "createdate";
+        public string SortBy { get; set; } = "createdate";
 
         [DataMember(Name = "direction")]
-        public SearchRequestSortType Direction { get; set; } = SearchRequestSortType.Descending;
+        public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
     }
 }

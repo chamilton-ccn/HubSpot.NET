@@ -6,7 +6,7 @@ using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SearchRequestOptions = HubSpot.NET.Api.SearchRequestOptions;
+using SearchRequestOptions = HubSpot.NET.Core.SearchRequestOptions;
 
 namespace HubSpot.NET.Tests.Integration
 {

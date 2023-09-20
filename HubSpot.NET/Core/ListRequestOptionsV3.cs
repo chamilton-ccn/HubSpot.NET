@@ -6,6 +6,7 @@ namespace HubSpot.NET.Core
     /// <summary>
     /// Options used when querying for lists of items.
     /// </summary>
+    [Obsolete("Use SearchRequestOptions instead")]
     public class ListRequestOptionsV3
     {
         private int _limit = 20;

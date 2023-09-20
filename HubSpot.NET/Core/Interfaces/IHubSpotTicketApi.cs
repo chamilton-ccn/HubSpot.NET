@@ -18,7 +18,7 @@ namespace HubSpot.NET.Core.Interfaces
         T GetById<T>(long ticketId) where T : TicketHubSpotModel, new();
         TicketListHubSpotModel<T> List<T>(ListRequestOptionsV3 opts = null) where T : TicketHubSpotModel, new();
         TicketListHubSpotModel<T> ListAssociated<T>(bool includeAssociations, long ticketId, SearchRequestOptions opts = null) where T : TicketHubSpotModel, new();
-        SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : TicketHubSpotModel, new();
+        SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : TicketHubSpotModel, new();
         T Update<T>(T entity) where T : TicketHubSpotModel, new();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,23 +15,35 @@ namespace HubSpot.NET.Core.Extensions
             return string.IsNullOrEmpty(value);
         }
 
-        // TODO - this is nowhere near complete. We need a generalized version for V3 query parameters. Format:
-        // TODO - ?properties=property1,property2,property3
-        public static string SetQueryParams(this string url, string name, List<string> parameters)
+
+        /// <summary>
+        /// Appends a "properties" query parameter, which is a comma-separated list of HubSpot fields, to a URL/string 
+        /// </summary>
+        /// <param name="url">The URL string</param>
+        /// <param name="properties">An enumerable containing values that will be appended to the URL</param>
+        /// <returns>A URL with a "properties" query parameter appended.</returns>
+        /// <example>
+        /// <code>
+        /// var properties = new List&lt;string&gt; { "firstname", "lastname", "email" };
+        /// "http://example.tld".SetPropertiesListQueryParams(properties)
+        /// </code>
+        /// The above returns: http://example.tld?properties=firstname%2clastname%2cemail
+        /// </example>
+        public static string SetPropertiesListQueryParams(this string url, IEnumerable<string> properties)
         {
-            var urlParams = new StringBuilder();
             var newUrl = new StringBuilder(url);
-            newUrl.Append("&");
-            newUrl.Append($"{name}=");
-            urlParams.Append(WebUtility.UrlEncode(string.Join(",", parameters)));
-            newUrl.Append(urlParams);
+            if (url.IndexOf("?", StringComparison.Ordinal) == -1)
+                newUrl.Append("?");
+            else if (!url.EndsWith("&"))
+                newUrl.Append("&");
+            newUrl.Append($"properties={WebUtility.UrlEncode(string.Join(",", properties))}");
             return newUrl.ToString();
         }
 
         public static string SetQueryParam(this string url, string name, string value)
         {
             var newUrl = new StringBuilder(url);
-            if (url.IndexOf("?") == -1)
+            if (url.IndexOf("?", StringComparison.Ordinal) == -1)
                 newUrl.Append("?");
             else if (!url.EndsWith("&"))
                 newUrl.Append("&");

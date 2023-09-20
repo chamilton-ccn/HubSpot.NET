@@ -12,7 +12,7 @@ namespace HubSpot.NET.Core.Interfaces
         CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         T GetById<T>(long companyId) where T : CompanyHubSpotModel, new();
         T Update<T>(T entity) where T : CompanyHubSpotModel, new();
-        CompanySearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
+        CompanySearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
 
         T GetAssociations<T>(T entity)
             where T : CompanyHubSpotModel, new();

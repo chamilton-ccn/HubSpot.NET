@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -92,8 +89,8 @@ namespace HubSpot.NET.Core.Requests
                  _obj,
                 _jsonSerializerSettings);
             // TODO - remove debugging
-            Console.WriteLine($"Outbound request");
-            Console.WriteLine(json);
+            //Console.WriteLine($"Outbound request");
+            //Console.WriteLine(json);
             return json;
         }
 

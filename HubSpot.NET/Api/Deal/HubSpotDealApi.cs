@@ -206,10 +206,10 @@
         /// <typeparam name="T">Implementation of <see cref="DealHubSpotModel"/></typeparam>
         /// <param name="opts">Options (limit, offset) and search criteria relating to request</param>
         /// <returns>List of deals</returns>
-        public SearchHubSpotModel<T> Search<T>(Api.SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
+        public SearchHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
         {
             if (opts == null)
-                opts = new Api.SearchRequestOptions();
+                opts = new SearchRequestOptions();
 
             var path = "/crm/v3/objects/deals/search";
 
