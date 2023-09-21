@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using System.Collections.Generic;
 
 namespace HubSpot.NET.Api.Contact
 {
@@ -30,6 +31,7 @@ namespace HubSpot.NET.Api.Contact
         public T Create<T>(T entity) where T : ContactHubSpotModel, new()
         {
             var path = $"{entity.RouteBasePath}";
+            // TODO - remove serialisationType parameter
             return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
         }
         
@@ -45,6 +47,7 @@ namespace HubSpot.NET.Api.Contact
                 : (contact.Email != null 
                     ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
                     : throw new ArgumentException("Contact entity must have an id or email set!"));
+            // TODO - remove serialisationType parameter 
             return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
         }
         
@@ -55,6 +58,7 @@ namespace HubSpot.NET.Api.Contact
         public void Delete(long contactId)
         {
             var path = $"{new ContactHubSpotModel().RouteBasePath}/{contactId}";
+            // TODO - remove convertToPropertiesSchema parameter
             _client.Execute(path, method: Method.Delete, convertToPropertiesSchema: true);
         }
         
@@ -101,6 +105,7 @@ namespace HubSpot.NET.Api.Contact
 
             try
             {
+                // TODO - remove convertToPropertiesSchema parameter
                 var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
@@ -132,6 +137,7 @@ namespace HubSpot.NET.Api.Contact
             
             try
             {
+                // TODO - remove convertToPropertiesSchema parameter
                 var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
@@ -155,6 +161,7 @@ namespace HubSpot.NET.Api.Contact
 
             try
             {
+                // TODO - remove convertToPropertiesSchema parameter
                 T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
@@ -166,6 +173,13 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
+        public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
+            where T : ContactHubSpotModel, new()
+        {
+            var path = $"{new T().RouteBasePath}/batch/create";
+            return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
+                serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
+        }
 
         /// <summary>
         /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
@@ -177,14 +191,16 @@ namespace HubSpot.NET.Api.Contact
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
         /// <returns>A list of contacts that were either updated or created</returns>
-        /// TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
-        public ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new() // TODO - rename to "BatchUpdateOrCreate"
+        // TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
+        // TODO - rename to "BatchUpdateOrCreate"
+        public ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
         {
-            var createPath = $"{new ContactListHubSpotModel<T>().RouteBasePath}/batch/create";
-            var updatePath = $"{new ContactListHubSpotModel<T>().RouteBasePath}/batch/update";
+            var createPath = $"{new T().RouteBasePath}/batch/create";
+            var updatePath = $"{new T().RouteBasePath}/batch/update";
 
             var contactsWithId = new ContactListHubSpotModel<T>();
             var contactsWithEmail = new ContactListHubSpotModel<T>();
+            var statuses = new List<string>();
             
             foreach (var contact in contacts.Contacts)
             {
@@ -201,17 +217,21 @@ namespace HubSpot.NET.Api.Contact
 
             var contactsResults = new ContactListHubSpotModel<T>();
             
-            // If the contacts in our batch have Id values, we assume this is an update operation.
+            // If the contacts in our batch have Id values, we assume this is an update operation. We don't catch any
+            // exceptions here because unsuccessful batch updates contain an errors object. The only time this would
+            // raise an exception is if there was something wrong with the request; in that scenario we want the
+            // exception to propagate.
             if (contactsWithId.Contacts.Count != 0)
             {
                 // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
                 //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
                 var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(updatePath, contactsWithId, Method.Post,
-                    serialisationType: SerialisationType.Raw);
+                    serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
                 foreach (var error in data.Errors)
                     contactsResults.Errors.Add(error);
                 foreach (var contact in data.Contacts)
                     contactsResults.Contacts.Add(contact);
+                statuses.Add(data.Status);
             }
             // If the contacts in our batch only have an Email address, we don't know whether or not they need to be
             // created or updated so we try to create the entire batch first, and if it fails (any single contact in the
@@ -224,20 +244,36 @@ namespace HubSpot.NET.Api.Contact
                     // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
                     //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
                     var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
-                        Method.Post, serialisationType: SerialisationType.Raw);
+                        Method.Post, serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
                     foreach (var error in data.Errors)
                         contactsResults.Errors.Add(error);
                     foreach (var contact in data.Contacts) 
                         contactsResults.Contacts.Add(contact);
+                    statuses.Add(data.Status);
                 }
-                catch (HubSpotException e)
+                catch (HubSpotException batchCreateException)
                 {
+                    var batchError = batchCreateException.AsErrorsListItem;
+                    statuses.Add(batchError.Status);
+                    contactsResults.Errors.Add(batchError);
                     foreach (var contactWithEmail in contactsWithEmail.Contacts)
                     {
-                        contactsResults.Contacts.Add(CreateOrUpdate(contactWithEmail));
+                        try
+                        {
+                            contactsResults.Contacts.Add(CreateOrUpdate(contactWithEmail));
+                        }
+                        catch (HubSpotException createOrUpdateException)
+                        {
+                            var error = createOrUpdateException.AsErrorsListItem;
+                            error.Context.Objects.Add(contactsWithEmail);
+                            contactsResults.Errors.Add(error);
+                        }
                     }
                 }
             }
+
+            var s = statuses.Distinct().ToList(); // TEST
+            contactsResults.Status = string.Join(",", statuses);
             return contactsResults;
         }
         

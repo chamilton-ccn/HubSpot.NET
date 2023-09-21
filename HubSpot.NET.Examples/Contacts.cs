@@ -18,7 +18,7 @@ namespace HubSpot.NET.Examples
              * Create a contact
              */
             Console.WriteLine("* Creating a contact ...");
-            var contact = api.Contact.Create(new ContactHubSpotModel()
+            var contact = api.Contact.CreateOrUpdate(new ContactHubSpotModel()
             {
                 Email = "john@squaredup.com",
                 FirstName = "John",
@@ -31,32 +31,40 @@ namespace HubSpot.NET.Examples
             /*
              * Update a contact
              */
-            Console.WriteLine($"* Updating a contact's phone number: '{contact.Phone}' to '111111 11111' ...");
+            Console.WriteLine($"* Updating contact's phone number: '{contact.Phone}' to '111111 11111' ...");
             contact.Phone = "111111 11111";
             api.Contact.Update(contact);
             Console.WriteLine($"-> Contact updated! {contact.FirstName} {contact.LastName} <{contact.Phone}>");
-            
+
             /*
              * Search for a contact
              */
             Console.WriteLine($"* Searching for email addresses matching: '*squaredup*' ...");
-            var searchOptions = new SearchRequestOptions
+            var search = api.Contact.Search<ContactHubSpotModel>(new SearchRequestOptions
             {
                 Limit = 1,
                 SortBy = "createdate",
-                SortDirection = SearchRequestSortType.Descending
-            };
-            var filterGroup = new SearchRequestFilterGroup();
-            
-            var filter = new SearchRequestFilter
-            {
-                Operator = SearchRequestFilterOperatorType.EqualTo,
-                Value = "*squaredup*",
-                PropertyName = "email"
-            };
-            filterGroup.Filters.Add(filter);
-            searchOptions.FilterGroups.Add(filterGroup);
-            var search = api.Contact.Search<ContactHubSpotModel>(searchOptions);
+                SortDirection = SearchRequestSortType.Descending,
+                FilterGroups = new List<SearchRequestFilterGroup>
+                {
+                    new SearchRequestFilterGroup
+                    {
+                        Filters = new List<SearchRequestFilter>
+                        {
+                            new SearchRequestFilter
+                            {
+                                Operator = SearchRequestFilterOperatorType.EqualTo,
+                                Value = "*squaredup*",
+                                PropertyName = "email"
+                            }
+                        }
+                    }
+                },
+                PropertiesToInclude = new List<string>
+                {
+                    "firstname", "lastname", "email", "phone"
+                }
+            });
             var moreResults = true;
             while (moreResults)
             {
@@ -64,19 +72,77 @@ namespace HubSpot.NET.Examples
                 foreach (var searchResult in search.Contacts)
                 {
                     Console.WriteLine(
-                        $"-> Search Result: {searchResult.FirstName} {searchResult.LastName} <{searchResult.Email}> " +
-                        $"Created: {searchResult.CreatedAt} Modified: {searchResult.UpdatedAt}");
+                        $"-> Search Result: #{searchResult.Id} {searchResult.FirstName} {searchResult.LastName} " +
+                        $"<{searchResult.Email}> Created: {searchResult.CreatedAt} Modified: {searchResult.UpdatedAt}");
                 }
                 if (moreResults)
                     search = api.Contact.Search<ContactHubSpotModel>(search.SearchRequestOptions);
                     /* This works too:
                      * search = api.Contact.Search<ContactHubSpotModel>(searchOptions);
                      */
-                    // TODO - There should be no difference between the two; might want to demonstrate that in the examples for documentation sake. 
-                    
+                    // TODO - There should be no difference between the two; might want to demonstrate that in the examples for documentation sake.
+            }
+            
+            /*
+             * Batch create contacts
+             */
+            Console.WriteLine($"* Creating a batch of contacts ...");
+            var batchContacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+            foreach (var i in Enumerable.Range(1, 10))
+            {
+                var batchContact = new ContactHubSpotModel
+                {
+                    FirstName = $"FirstName{i:N0}",
+                    LastName = $"LastName{i:N0}",
+                    Email = $"test.user{i:N0}@example{i:N0}.com",
+                    Phone = $"{i:N0}{i:N0}{i:N0}-{i:N0}{i:N0}{i:N0}-{i:N0}{i:N0}{i:N0}{i:N0}",
+                    Company = $"Test Company {i:N0}"
+                };
+                batchContacts.Contacts.Add(batchContact);
+            }
+            var batchResults = api.Contact.Batch(batchContacts);
+            Console.WriteLine($"-> Status: {batchResults.Status}");
+            Console.WriteLine($"-> Errors:");
+            foreach (var error in batchResults.Errors)
+            {
+                Console.WriteLine($"\tStatus: {error.Status}");
+                Console.WriteLine($"\tCategory: {error.Category}");
+                Console.WriteLine($"\tMessage: {error.Message}");
+                if (error.Context.Ids.Count <= 0) continue;
+                Console.WriteLine($"\tProblematic Objects:");
+                foreach (var id in error.Context.Ids)
+                {
+                    Console.WriteLine($"\t\t* {id}");
+                }
+
+            }
+            
+            /*
+             * Wait a few seconds for HubSpot to update
+             */
+            System.Threading.Thread.Sleep(15 * 1000);
+            
+            /*
+             * Get recently created contacts
+             */
+            Console.WriteLine($"* Retrieving recently created contacts ...");
+            var recent = api.Contact.RecentlyCreated<ContactHubSpotModel>();
+            var recentResults = true;
+            while (recentResults)
+            {
+                recentResults = recent.MoreResultsAvailable;
+                foreach (var searchResult in recent.Contacts)
+                {
+                    Console.WriteLine(
+                        $"-> Search Result: #{searchResult.Id} {searchResult.FirstName} {searchResult.LastName} " +
+                        $"<{searchResult.Email}> Created: {searchResult.CreatedAt} Modified: {searchResult.UpdatedAt}");
+                }
+                if (recentResults)
+                    recent = api.Contact.Search<ContactHubSpotModel>(recent.SearchRequestOptions);
             }
             
             // TODO - Examples have been refactored up to this line.
+            System.Environment.Exit(0);
 
 
 

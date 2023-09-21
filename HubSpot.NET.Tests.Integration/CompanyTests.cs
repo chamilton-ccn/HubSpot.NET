@@ -230,7 +230,8 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual(2, results.Paging.Next.After);
 
 				// Second Act
-				searchOptions.Offset = results.Paging.Next.After; // TODO - fixme (Cannot convert source type 'string' to target type 'System.Nullable<long>')
+				// TODO - fixme (Cannot convert source type 'string' to target type 'System.Nullable<long>')
+				searchOptions.Offset = results.Paging.Next.After; 
 				var results2 = companyApi.Search<CompanyHubSpotModel>(searchOptions);
 
 				Assert.AreEqual(1, results2.Results.Count, "Did not return 1 of the 5 results.");

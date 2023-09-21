@@ -132,7 +132,8 @@ namespace HubSpot.NET.Api.EmailSubscriptions
             }
 
             var path = $"{model.RouteBasePath}/{email}";
-
+            
+            //TODO remove convertToPropertiesSchema parameter
             _client.Execute(path, model, Method.Put, false);
         }
     }

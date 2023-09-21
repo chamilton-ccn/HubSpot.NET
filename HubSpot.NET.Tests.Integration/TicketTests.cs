@@ -327,7 +327,6 @@ namespace HubSpot.NET.Tests.Integration
             var contact = contactApi.Create(sampleContact);
 
             // Act
-            //ticketApi.AssociateToContact(ticket, contact.Id.Value); // TODO - remove
             ticketApi.AssociateToContact(ticket, contact.Id);
 
             var ticketAssociations = ticketApi.GetAssociations(ticket);

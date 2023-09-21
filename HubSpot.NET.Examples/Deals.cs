@@ -29,6 +29,11 @@ namespace HubSpot.NET.Examples
             deal.CloseDate = DateTime.UtcNow;
             deal = api.Deal.Update(deal);
 
+            System.Threading.Thread.Sleep(4 * 1000);
+            
+            // TODO - deal.Name isn't making it back to us in the response
+            Console.WriteLine($">>> DEALNAME: {deal.Name}"); 
+            
             /**
              * Search for a deal
              */

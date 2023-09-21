@@ -66,6 +66,8 @@ namespace HubSpot.NET.Core
                 : _serializer.SerializeEntity(entity, serialisationType);
             
             var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
+            //TODO remove debugging
+            Console.WriteLine($"HubSpotBaseClient line #70");
 
             return data;
         }
@@ -78,6 +80,8 @@ namespace HubSpot.NET.Core
         public T Execute<T>(string absoluteUriPath, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
             var data = SendRequest(absoluteUriPath, method, null, JsonConvert.DeserializeObject<T>);
+            //TODO remove debugging
+            Console.WriteLine($"HubSpotBaseClient line #84");
             return data;
         }
 
@@ -94,9 +98,10 @@ namespace HubSpot.NET.Core
             SendRequest(absoluteUriPath, method, json);
         }
         
+        // TODO - remove serialisationType parameter (eventually)
         public T ExecuteBatch<T>(string absoluteUriPath, object entities, Method method = Method.Get, SerialisationType serialisationType = SerialisationType.PropertyBag) where T : IHubSpotModel, new()
         {
-            var json = (method == Method.Get || entities == null) // TODO - this might not be all that useful.
+            var json = (method == Method.Get || entities == null) // TODO - this might not be all that useful in its current form
                 ? null
                 : _serializer.SerializeEntity(entities, serialisationType);
             
@@ -142,6 +147,8 @@ namespace HubSpot.NET.Core
         protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) where T : IHubSpotModel, new()
         {
             var responseData = SendRequest(path, method, json);
+            // TODO - remove debugging
+            Console.WriteLine($"HubSpotBaseClient line #151");
             return string.IsNullOrWhiteSpace(responseData) ? default : deserializeFunc(responseData);
         }
 
@@ -156,11 +163,10 @@ namespace HubSpot.NET.Core
 
             var responseData = response.Content;
             // TODO - remove debugging
-            //Console.WriteLine($"Inbound response");
-            //Console.WriteLine(responseData);
+            Console.WriteLine($"Inbound response (HubSpotBaseClient line #166)");
+            Console.WriteLine(responseData);
             if (!response.IsSuccessful)
                 throw new HubSpotException("Error from HubSpot", new HubSpotError(response.StatusCode, response.StatusDescription), responseData);
-
             return responseData;
         }
 
@@ -186,7 +192,7 @@ namespace HubSpot.NET.Core
                     break;
             }
 
-            // CEH https://restsharp.dev/serialization.html#json
+            //TODO - investigate this: https://restsharp.dev/serialization.html#json 
             //request.JsonSerializer = new NewtonsoftRestSharpSerializer();
             
             return request;

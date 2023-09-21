@@ -67,10 +67,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "errors")] 
         public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
 
-        public bool ShouldSerializeErrors() //=> Errors.Count > 0; //TODO - reformat this.
-        {
-            return Errors.Count > 0;
-        } 
+        public bool ShouldSerializeErrors() => Errors.Count > 0;
         
         [DataMember(Name = "startedAt", EmitDefaultValue = false)]
         public DateTime StartedAt { get; set; }

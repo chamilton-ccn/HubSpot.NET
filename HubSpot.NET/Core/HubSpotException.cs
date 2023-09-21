@@ -1,6 +1,8 @@
 using System;
 using System.Net;
 using System.Runtime.Serialization;
+using HubSpot.NET.Api;
+using Newtonsoft.Json;
 
 namespace HubSpot.NET.Core
 {
@@ -38,6 +40,9 @@ namespace HubSpot.NET.Core
         {
             RawJsonResponse = responseContent;
         }
+
+        // TODO - not sure how I feel about this just yet...
+        public ErrorsListItem AsErrorsListItem => JsonConvert.DeserializeObject<ErrorsListItem>(RawJsonResponse);
 
         public override string Message => base.Message + $", Response = {(string.IsNullOrWhiteSpace(RawJsonResponse) ? ReturnedError.ToString() : RawJsonResponse)}";
 

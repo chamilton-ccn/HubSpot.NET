@@ -17,7 +17,7 @@ namespace HubSpot.NET.Examples
         internal static IConfigurationRoot Configuration { get; private set; }
 #endif
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
 #if NET461
 #else
@@ -42,15 +42,15 @@ namespace HubSpot.NET.Examples
             var token = new HubSpotToken { AccessToken = privateAppAccessToken };
             var api = new HubSpotApi(token);
 
-            Deals.Example(api);
+            //Deals.Example(api);
 
-            Companies.Example(api);
+            //Companies.Example(api);
 
             Contacts.Example(api);
 
-            CompanyProperties.Example(api);
+            //CompanyProperties.Example(api);
 
-            EmailSubscriptions.Example(api);
+            //EmailSubscriptions.Example(api);
         }
 
         public static string GetAppSetting(string key)

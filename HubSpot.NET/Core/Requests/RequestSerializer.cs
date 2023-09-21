@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using HubSpot.NET.Core.Interfaces;
@@ -54,9 +55,10 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="obj">The entity.</param>
         /// <param name="serialisationType"></param>
         /// <returns>The serialized entity</returns>
+        /// TODO - remove serialisationType parameter (but only after nothing else uses it)
         public virtual string SerializeEntity(object obj, SerialisationType serialisationType = SerialisationType.PropertyBag)
         {
-            if (obj is IHubSpotModel entity && serialisationType == SerialisationType.PropertiesSchema)
+            /*if (obj is IHubSpotModel entity && serialisationType == SerialisationType.PropertiesSchema)
             {
                 var converted = _requestDataConverter.ToHubspotDataEntity(entity);
                 
@@ -65,11 +67,11 @@ namespace HubSpot.NET.Core.Requests
                 return JsonConvert.SerializeObject(
                     converted,
                     _jsonSerializerSettings);
-            }
+            }*/
             
             dynamic _obj = obj;
             
-            if (serialisationType == SerialisationType.PropertyBag)
+            /*if (serialisationType == SerialisationType.PropertyBag)
             {
                 _obj = obj;
                 
@@ -83,14 +85,12 @@ namespace HubSpot.NET.Core.Requests
                     _obj.properties.Id = null;
                     _obj.properties.ObjectId = null;
                 }
-            }
+            }*/
             
-            var json = JsonConvert.SerializeObject(
-                 _obj,
-                _jsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(_obj, _jsonSerializerSettings);
             // TODO - remove debugging
-            //Console.WriteLine($"Outbound request");
-            //Console.WriteLine(json);
+            Console.WriteLine($"HubSpotBaseClient line #92");
+            Console.WriteLine(json);
             return json;
         }
 
