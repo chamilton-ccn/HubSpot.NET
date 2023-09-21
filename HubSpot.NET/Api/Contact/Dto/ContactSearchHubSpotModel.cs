@@ -4,6 +4,7 @@ using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
+    // TODO - this can probably be removed
     public class ContactSearchHubSpotModel<T> : IHubSpotModel where T : ContactHubSpotModel, new()
     {
 
