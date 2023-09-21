@@ -141,9 +141,9 @@ namespace HubSpot.NET.Api.Contact
                 var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
-            catch (HubSpotException exception)
+            catch (HubSpotException e)
             {
-                if (exception.ReturnedError.StatusCode == HttpStatusCode.NotFound)
+                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
                     return null;
                 throw;
             }
@@ -191,9 +191,7 @@ namespace HubSpot.NET.Api.Contact
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
         /// <returns>A list of contacts that were either updated or created</returns>
-        // TODO - Add an "errors" property to ContactListHubSpotModel and ensure this function populates it correctly
-        // TODO - rename to "BatchUpdateOrCreate"
-        public ContactListHubSpotModel<T> Batch<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
+        public ContactListHubSpotModel<T> BatchCreateOrUpdate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
         {
             var createPath = $"{new T().RouteBasePath}/batch/create";
             var updatePath = $"{new T().RouteBasePath}/batch/update";
@@ -204,7 +202,7 @@ namespace HubSpot.NET.Api.Contact
             
             foreach (var contact in contacts.Contacts)
             {
-                // If contact.Id isn't the default value for long, add it to the list of contacts with a valid Id
+                // If contact.Id isn't the default value for long, add it to the list of contacts with id values
                 if (contact.Id != 0L)
                 {
                     contactsWithId.Contacts.Add(contact);
@@ -217,10 +215,7 @@ namespace HubSpot.NET.Api.Contact
 
             var contactsResults = new ContactListHubSpotModel<T>();
             
-            // If the contacts in our batch have Id values, we assume this is an update operation. We don't catch any
-            // exceptions here because unsuccessful batch updates contain an errors object. The only time this would
-            // raise an exception is if there was something wrong with the request; in that scenario we want the
-            // exception to propagate.
+            // If the contacts in our batch have Id values, we assume this is an update operation.
             if (contactsWithId.Contacts.Count != 0)
             {
                 // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
@@ -231,48 +226,21 @@ namespace HubSpot.NET.Api.Contact
                     contactsResults.Errors.Add(error);
                 foreach (var contact in data.Contacts)
                     contactsResults.Contacts.Add(contact);
-                statuses.Add(data.Status);
+                statuses.Add(data.Status += " (batch update)");
             }
-            // If the contacts in our batch only have an Email address, we don't know whether or not they need to be
-            // created or updated so we try to create the entire batch first, and if it fails (any single contact in the
-            // batch can cause the entire operation to fail) we try to CreateOrUpdate each contact in the batch
-            // individually.
+            // If the contacts in our batch do not have Id values, we assume this is a create operation.
             if (contactsWithEmail.Contacts.Count != 0)
             {
-                try
-                {
-                    // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
-                    //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-                    var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
-                        Method.Post, serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
-                    foreach (var error in data.Errors)
-                        contactsResults.Errors.Add(error);
-                    foreach (var contact in data.Contacts) 
-                        contactsResults.Contacts.Add(contact);
-                    statuses.Add(data.Status);
-                }
-                catch (HubSpotException batchCreateException)
-                {
-                    var batchError = batchCreateException.AsErrorsListItem;
-                    statuses.Add(batchError.Status);
-                    contactsResults.Errors.Add(batchError);
-                    foreach (var contactWithEmail in contactsWithEmail.Contacts)
-                    {
-                        try
-                        {
-                            contactsResults.Contacts.Add(CreateOrUpdate(contactWithEmail));
-                        }
-                        catch (HubSpotException createOrUpdateException)
-                        {
-                            var error = createOrUpdateException.AsErrorsListItem;
-                            error.Context.Objects.Add(contactsWithEmail);
-                            contactsResults.Errors.Add(error);
-                        }
-                    }
-                }
+                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
+                //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
+                var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
+                    Method.Post, serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
+                foreach (var error in data.Errors)
+                    contactsResults.Errors.Add(error);
+                foreach (var contact in data.Contacts) 
+                    contactsResults.Contacts.Add(contact);
+                statuses.Add(data.Status += " (batch create)");
             }
-
-            var s = statuses.Distinct().ToList(); // TEST
             contactsResults.Status = string.Join(",", statuses);
             return contactsResults;
         }

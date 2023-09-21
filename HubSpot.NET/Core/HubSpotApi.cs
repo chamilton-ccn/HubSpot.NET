@@ -49,14 +49,12 @@ namespace HubSpot.NET.Core
         public HubSpotApi(string apiKey)
         {
             IHubSpotClient client = new HubSpotBaseClient(apiKey);
-
             Initialise(client);
         }
 
         public HubSpotApi(HubSpotToken token)
         {
             IHubSpotClient client = new HubSpotBaseClient(token);
-
             Initialise(client);
         }
     }

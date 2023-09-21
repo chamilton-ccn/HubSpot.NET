@@ -3,7 +3,7 @@ using HubSpot.NET.Api.ContactList.Dto;
 using HubSpot.NET.Core.Extensions;
 using HubSpot.NET.Core.Interfaces;
 using RestSharp;
-
+// TODO - refactor
 namespace HubSpot.NET.Api.ContactList
 {
     /// <summary>

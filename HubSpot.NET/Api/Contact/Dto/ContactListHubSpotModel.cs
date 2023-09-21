@@ -4,6 +4,8 @@ using System.Runtime.Serialization;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
 
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+
 namespace HubSpot.NET.Api.Contact.Dto
 {
     /// <summary>
@@ -66,7 +68,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// </summary>
         [DataMember(Name = "errors")] 
         public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
-
+        
         public bool ShouldSerializeErrors() => Errors.Count > 0;
         
         [DataMember(Name = "startedAt", EmitDefaultValue = false)]

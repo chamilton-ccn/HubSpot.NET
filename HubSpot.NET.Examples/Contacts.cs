@@ -84,11 +84,11 @@ namespace HubSpot.NET.Examples
             }
             
             /*
-             * Batch create contacts
+             * Batch create or update contacts
              */
             Console.WriteLine($"* Creating a batch of contacts ...");
             var batchContacts = new ContactListHubSpotModel<ContactHubSpotModel>();
-            foreach (var i in Enumerable.Range(1, 10))
+            foreach (var i in Enumerable.Range(1, 5))
             {
                 var batchContact = new ContactHubSpotModel
                 {
@@ -100,7 +100,9 @@ namespace HubSpot.NET.Examples
                 };
                 batchContacts.Contacts.Add(batchContact);
             }
-            var batchResults = api.Contact.Batch(batchContacts);
+            batchContacts.Contacts[2].Id = 999999999999; // This ID does not (should not) exist
+            batchContacts.Contacts[4].Id = 888888888888; // This ID does not (should not) exist
+            var batchResults = api.Contact.BatchCreateOrUpdate(batchContacts);
             Console.WriteLine($"-> Status: {batchResults.Status}");
             Console.WriteLine($"-> Errors:");
             foreach (var error in batchResults.Errors)
@@ -112,7 +114,7 @@ namespace HubSpot.NET.Examples
                 Console.WriteLine($"\tProblematic Objects:");
                 foreach (var id in error.Context.Ids)
                 {
-                    Console.WriteLine($"\t\t* {id}");
+                    Console.WriteLine($"\t\t* id: {id}");
                 }
 
             }
