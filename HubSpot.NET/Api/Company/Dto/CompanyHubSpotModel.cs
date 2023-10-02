@@ -17,25 +17,74 @@ namespace HubSpot.NET.Api.Company.Dto
         {
             Associations = new CompanyHubSpotAssociations();
         }
-        [DataMember(Name = "companyId")]
+
+        /// <summary>
+        /// Company unique ID in HubSpot
+        /// </summary>
+        /// <remarks>
+        /// If this value is 0L (default value for long) then we don't want it serialized at all
+        /// </remarks>
+        [DataMember(Name = "id", EmitDefaultValue = false)]
         [IgnoreDataMember]
-        public long? Id { get; set; }
+        public long Id { get; set; }
+        
+        [DataMember(Name = "properties")]
+        private CompanyPropertiesModel Properties { get; set; } = new CompanyPropertiesModel();
 
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string Name
+        {
+            get => Properties.Name;
+            set => Properties.Name = value;
+        }
 
-        [DataMember(Name = "domain")]
-        public string Domain { get; set; }
+        public string Domain
+        {
+            get => Properties.Domain;
+            set => Properties.Domain = value;
+        }
 
-        [DataMember(Name = "website")]
-        public string Website { get; set; }
+        public string Website
+        {
+            get => Properties.Website;
+            set => Properties.Website = value;
+        }
 
-        [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string Description
+        {
+            get => Properties.Description;
+            set => Properties.Description = value;
+        }
 
-        [DataMember(Name = "country")]
-        public string Country { get; set; }
+        public string About
+        {
+            get => Properties.About;
+            set => Properties.About = value;
+        }
 
+        public string City
+        {
+            get => Properties.City;
+            set => Properties.City = value;
+        }
+
+        public string State
+        {
+            get => Properties.State;
+            set => Properties.State = value;
+        }
+
+        public string ZipCode
+        {
+            get => Properties.ZipCode;
+            set => Properties.ZipCode = value;
+        }
+
+        public string Country
+        {
+            get => Properties.Country;
+            set => Properties.Country = value;
+        }
+        
         [DataMember(Name = "createdAt")]
         [IgnoreDataMember]
         public DateTime? CreatedAt { get; set; }
@@ -44,12 +93,14 @@ namespace HubSpot.NET.Api.Company.Dto
         [IgnoreDataMember]
         public DateTime? UpdatedAt { get; set; }
 
-        public string RouteBasePath => "/companies/v2";
+        public string RouteBasePath => "/crm/v3/objects/companies";
         public bool IsNameValue => true;
 
         [IgnoreDataMember]
         public CompanyHubSpotAssociations Associations { get; }
-
+        
+        
+        // TODO - not sure if this is going to be necessary anymore
         public virtual void ToHubSpotDataEntity(ref dynamic converted)
         {
         }

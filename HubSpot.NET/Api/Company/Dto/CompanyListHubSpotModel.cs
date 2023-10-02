@@ -5,25 +5,130 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using HubSpot.NET.Core;
 
 namespace HubSpot.NET.Api.Company.Dto
 {
     public class CompanyListHubSpotModel<T> : IHubSpotModel where T: CompanyHubSpotModel, new()
     {
-        [DataMember(Name = "companies")]
-        public IList<T> Companies { get; set; } = new List<T>();
+        /// <summary>
+        /// List request status
+        /// </summary>
+        [DataMember(Name = "status", EmitDefaultValue = false)]
+        public string Status { get; set; }
+        
+        /// <summary>
+        /// Total number of companies in the Companies list.
+        /// </summary>
+        [DataMember(Name = "total", EmitDefaultValue = false)]
+        public long? Total { get; set; }
+        
+        /// <summary>
+        /// This is a backing property for both Companies and Results
+        /// </summary>
+        private IList<T> CompaniesList { get; set; } = new List<T>();
+        
+        /// <summary>
+        /// Gets or sets the list of companies.
+        /// </summary>
+        /// <value>
+        /// The list of companies. Serialized as "inputs" in batch requests.
+        /// </value>
+        [DataMember(Name = "inputs")]
+        public IList<T> Companies
+        {
+            get => CompaniesList;
+            set => CompaniesList = value;
+        }
+        
+        /// <summary>
+        /// Gets or sets the list of companies.
+        /// </summary>
+        /// <value>
+        /// Also the list of companies. Serialized as "results" in batch responses.
+        /// </value>        
+        [DataMember(Name = "results")]
+        public IList<T> Results
+        {
+            get => CompaniesList;
+            set => CompaniesList = value;
+        }
+        
+        /// <summary>
+        /// A count of errors returned in the response
+        /// </summary>
+        [DataMember(Name = "numErrors", EmitDefaultValue = false)]
+        public long? TotalErrors { get; set; }
 
+        /// <summary>
+        /// A list of errors returned in the response
+        /// </summary>
+        [DataMember(Name = "errors")] 
+        public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
+        
+        public bool ShouldSerializeErrors() => Errors.Count > 0;
+        
+        [DataMember(Name = "startedAt", EmitDefaultValue = false)]
+        public DateTime StartedAt { get; set; }
+        
+        [DataMember(Name = "completedAt", EmitDefaultValue = false)]
+        public DateTime CompletedAt { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether more results are available.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [more results available]; otherwise, <c>false</c>.
+        /// </value>
+        [IgnoreDataMember]
+        public bool MoreResultsAvailable => Paging != null;
+        
+        /// <summary>
+        /// Gets the continuation offset.
+        /// </summary>
+        /// <value>
+        /// The continuation offset.
+        /// </value>
+        /// <remarks>
+        /// If the company list is the result of a search and the SearchRequestOptions member has been populated, set
+        /// the SearchRequestOptions offset to match the Paging offset.
+        /// </remarks>
+        [IgnoreDataMember]
+        public long? Offset {
+            get
+            {
+                try
+                {
+                    if (SearchRequestOptions != null)
+                        SearchRequestOptions.Offset = Paging.Next.After;
+                    return Paging.Next.After;
+                }
+                catch (NullReferenceException)
+                {
+                    return null;
+                }
+            }
+        }
+        
+        [DataMember(Name = "paging")]
+        public PagingModel Paging { get; set; }
+        
+        /// <summary>
+        /// Set the default search behavior.
+        /// </summary>
+        private SearchRequestOptions _searchRequestOptions = null;
+        private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
+        [IgnoreDataMember]
+        public SearchRequestOptions SearchRequestOptions {
+            get => _searchRequestOptions ?? _defaultSearchRequestOptions;
+            set => _searchRequestOptions = value;
+        }        
+        
+        public string RouteBasePath => "/crm/v3/objects/companies";
+        
         public bool IsNameValue => false;
 
-        public string RouteBasePath => "/companies/v2";
-
-        [DataMember(Name = "has-more")]
-        public bool MoreResultsAvailable { get; set; }
-
-        [DataMember(Name = "offset")]
-        public long ContinuationOffset { get; set; }
-
-
+        // TODO - not sure if this is going to be necessary anymore
         public void FromHubSpotDataEntity(dynamic hubspotData)
         {
         }

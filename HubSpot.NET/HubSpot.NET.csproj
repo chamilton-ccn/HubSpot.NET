@@ -84,9 +84,9 @@
 		<LangVersion>7.1</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="Api\Company\Dto\CompanySearchRequestOptions.cs" />
 	  <Compile Remove="Api\Company\Dto\SearchRequestFilter.cs" />
 	  <Compile Remove="Api\Company\Dto\SearchRequestFilterGroup.cs" />
+	  <Compile Remove="Api\Company\Dto\CompanySearchResultModel.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

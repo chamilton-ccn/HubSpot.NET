@@ -32,10 +32,10 @@ namespace HubSpot.NET.Core.Extensions
         public static string SetPropertiesListQueryParams(this string url, IEnumerable<string> properties)
         {
             var newUrl = new StringBuilder(url);
-            if (url.IndexOf("?", StringComparison.Ordinal) == -1)
-                newUrl.Append("?");
+            if (!url.Contains('?'))
+                newUrl.Append('?');
             else if (!url.EndsWith("&"))
-                newUrl.Append("&");
+                newUrl.Append('&');
             newUrl.Append($"properties={WebUtility.UrlEncode(string.Join(",", properties))}");
             return newUrl.ToString();
         }
@@ -43,10 +43,10 @@ namespace HubSpot.NET.Core.Extensions
         public static string SetQueryParam(this string url, string name, string value)
         {
             var newUrl = new StringBuilder(url);
-            if (url.IndexOf("?", StringComparison.Ordinal) == -1)
-                newUrl.Append("?");
+            if (!url.Contains('?'))
+                newUrl.Append('?');
             else if (!url.EndsWith("&"))
-                newUrl.Append("&");
+                newUrl.Append('&');
 
             newUrl.Append($"{name}={WebUtility.UrlEncode(value)}");
 

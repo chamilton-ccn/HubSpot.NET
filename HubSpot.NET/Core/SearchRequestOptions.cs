@@ -20,7 +20,7 @@ namespace HubSpot.NET.Core
 
         /// <summary>
         /// If limit isn't specified, it to the <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
-        /// maximum allowable number of results per page.</see>
+        /// maximum allowable number</see>
         /// </summary>        
         private int _limit = 100;
         private readonly int _upperLimit;
@@ -50,8 +50,10 @@ namespace HubSpot.NET.Core
         /// Gets or sets the number of items to return.
         /// </summary>
         /// <remarks>
-        /// Defaults to 100 <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">which is the 
-        /// maximum value.</see>
+        /// Defaults to 100. We're assuming 100 is the maximum value because  
+        /// <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
+        /// that is the maximum value for Contacts objects</see>. The documentation for Companies does not list a
+        /// maximum value and 100 seems reasonable anyway.
         /// </remarks>
         /// <value>
         /// The number of items to return.

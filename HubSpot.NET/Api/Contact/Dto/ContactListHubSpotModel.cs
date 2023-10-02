@@ -32,10 +32,10 @@ namespace HubSpot.NET.Api.Contact.Dto
         private IList<T> ContactsList { get; set; } = new List<T>();
         
         /// <summary>
-        /// Gets or sets the contacts.
+        /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// The contacts. Serialized as "inputs" in batch requests.
+        /// The list of contacts. Serialized as "inputs" in batch requests.
         /// </value>
         [DataMember(Name = "inputs")]
         public IList<T> Contacts
@@ -45,10 +45,10 @@ namespace HubSpot.NET.Api.Contact.Dto
         }
         
         /// <summary>
-        /// Gets or sets the contacts.
+        /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// Also the contacts. Serialized as "results" in batch responses.
+        /// Also the list of contacts. Serialized as "results" in batch responses.
         /// </value>        
         [DataMember(Name = "results")]
         public IList<T> Results

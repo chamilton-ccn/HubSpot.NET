@@ -26,9 +26,9 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// </summary>
         /// <see href="https://www.newtonsoft.com/json/help/html/P_Newtonsoft_Json_Serialization_JsonProperty_ShouldSerialize.htm">ShouldDeserialize</see>
         /// <returns>
-        /// talse
+        /// false
         /// </returns>
-        public bool ShouldSerializeEmailDomain() => false;
+        public static bool ShouldSerializeEmailDomain() => false;
         
         /// <summary>
         /// Enables deserialization of the EmailDomain field. This is necessary to ensure the EmailDomain property
@@ -38,7 +38,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <returns>
         /// true
         /// </returns>
-        public bool ShouldDeserializeEmailDomain() => true;
+        public static bool ShouldDeserializeEmailDomain() => true;
         
         [DataMember(Name = "company")]
         public string Company { get; set; }
@@ -57,7 +57,5 @@ namespace HubSpot.NET.Api.Contact.Dto
         
         [DataMember(Name = "zip")]
         public string ZipCode { get; set; }
-        
-        // TODO - should we add "createdate" / "lastmodifieddate" from properties here as well?
     }
 }

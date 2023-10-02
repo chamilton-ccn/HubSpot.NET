@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HubSpot.NET.Api;
+using HubSpot.NET.Core.Utilities;
 
 namespace HubSpot.NET.Examples
 {
@@ -122,7 +123,7 @@ namespace HubSpot.NET.Examples
             /*
              * Wait a few seconds for HubSpot to update
              */
-            System.Threading.Thread.Sleep(15 * 1000);
+            Utilities.Sleep(15);
             
             /*
              * Get recently created contacts
@@ -140,7 +141,7 @@ namespace HubSpot.NET.Examples
                         $"<{searchResult.Email}> Created: {searchResult.CreatedAt} Modified: {searchResult.UpdatedAt}");
                 }
                 if (recentResults)
-                    recent = api.Contact.Search<ContactHubSpotModel>(recent.SearchRequestOptions);
+                    recent = api.Contact.RecentlyCreated<ContactHubSpotModel>(recent.SearchRequestOptions);
             }
             
             // TODO - Examples have been refactored up to this line.

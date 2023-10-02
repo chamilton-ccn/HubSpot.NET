@@ -1,17 +1,15 @@
-﻿
+﻿using System;
+using System.Linq;
+using System.Net;
+using RestSharp;
 using System.Collections.Generic;
+using HubSpot.NET.Api.Contact.Dto;
+using HubSpot.NET.Core;
+using HubSpot.NET.Core.Extensions;
+using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api.Contact
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using Dto;
-    using Core;
-    using Core.Extensions;
-    using Core.Interfaces;
-    using RestSharp;
-
    public class HubSpotContactApi : IHubSpotContactApi
     {
         private readonly IHubSpotClient _client;
@@ -27,7 +25,6 @@ namespace HubSpot.NET.Api.Contact
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="entity">The entity</param>
         /// <returns>The created entity (with ID set)</returns>
-        /// <exception cref="NotImplementedException"></exception>
         public T Create<T>(T entity) where T : ContactHubSpotModel, new()
         {
             var path = $"{entity.RouteBasePath}";
@@ -79,25 +76,25 @@ namespace HubSpot.NET.Api.Contact
         /// Creates or Updates a contact entity based on the Entity Email
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="entity">The entity</param>
-        /// <returns>The created entity (with ID set)</returns>
-        public T CreateOrUpdate<T>(T entity) where T : ContactHubSpotModel, new()
+        /// <param name="contact">The contact object to create or update</param>
+        /// <returns>The created contact (with ID set)</returns>
+        public T CreateOrUpdate<T>(T contact) where T : ContactHubSpotModel, new()
         {
             try
             {
-                return Create(entity);
+                return Create(contact);
             }
             catch (HubSpotException e)
             {
-                return Update(entity);
+                return Update(contact);
             }
         }
 
         /// <summary>
         /// Gets a single contact by ID from hubspot
         /// </summary>
-        /// <param name="contactId">ID of the contact</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <param name="contactId">The ID of the contact</param>
         /// <returns>The contact entity or null if the contact does not exist</returns>
         public T GetById<T>(long contactId) where T : ContactHubSpotModel, new()
         {
@@ -109,9 +106,9 @@ namespace HubSpot.NET.Api.Contact
                 var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
-            catch (HubSpotException exception)
+            catch (HubSpotException e)
             {
-                if (exception.ReturnedError.StatusCode == HttpStatusCode.NotFound)
+                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
                     return null;
                 throw;
             }
@@ -173,6 +170,7 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
+        // TODO - Documentation
         public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
             where T : ContactHubSpotModel, new()
         {
@@ -284,6 +282,7 @@ namespace HubSpot.NET.Api.Contact
              */
             if (opts == null) return RecentlyCreated<T>();
             var path = $"{new T().RouteBasePath}/search";
+            // TODO - remove convertToPropertiesSchema parameter
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
             /*
              * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
@@ -299,6 +298,7 @@ namespace HubSpot.NET.Api.Contact
         public ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts != null) return Search<T>(opts);
+            // TODO - this 
             opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
             var searchRequestFilterGroup = new SearchRequestFilterGroup();
             /*
