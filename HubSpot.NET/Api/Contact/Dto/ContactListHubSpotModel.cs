@@ -119,7 +119,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// Set the default search behavior.
         /// </summary>
-        private SearchRequestOptions _searchRequestOptions = null;
+        private SearchRequestOptions _searchRequestOptions;
         private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
         [IgnoreDataMember]
         public SearchRequestOptions SearchRequestOptions {
