@@ -1,14 +1,12 @@
 ﻿using HubSpot.NET.Core.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using HubSpot.NET.Core;
 
 namespace HubSpot.NET.Api.Company.Dto
 {
+    [DataContract]
     public class CompanyListHubSpotModel<T> : IHubSpotModel where T: CompanyHubSpotModel, new()
     {
         /// <summary>
@@ -126,6 +124,7 @@ namespace HubSpot.NET.Api.Company.Dto
         
         public string RouteBasePath => "/crm/v3/objects/companies";
         
+        // TODO - not sure if this is going to be necessary anymore
         public bool IsNameValue => false;
 
         // TODO - not sure if this is going to be necessary anymore
@@ -133,6 +132,7 @@ namespace HubSpot.NET.Api.Company.Dto
         {
         }
 
+        // TODO - not sure if this is going to be necessary anymore
         public void ToHubSpotDataEntity(ref dynamic dataEntity)
         {
         }

@@ -170,7 +170,12 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
-        // TODO - Documentation
+        /// <summary>
+        /// Creates a batch of Contact objects
+        /// </summary>
+        /// <param name="contacts"></param>
+        /// <typeparam name="T">A ContactHubSpotModel instance</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
         public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
             where T : ContactHubSpotModel, new()
         {
@@ -183,8 +188,7 @@ namespace HubSpot.NET.Api.Contact
         /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
         /// Batch operations are <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">limited to 100
         /// records per batch</see>. This method will determine whether a contact in the batch needs to be updated or
-        /// created, and in the latter case, it will try to create them as a batch, but if that fails, it will execute
-        /// CreateOrUpdate for each contact in the batch. 
+        /// created.
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
@@ -231,6 +235,7 @@ namespace HubSpot.NET.Api.Contact
             {
                 // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
                 //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
+                // TODO - We should use BatchCreate here instead of _client.ExecuteBatch
                 var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
                     Method.Post, serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
                 foreach (var error in data.Errors)

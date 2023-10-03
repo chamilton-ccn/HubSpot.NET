@@ -129,11 +129,15 @@ namespace HubSpot.NET.Api.Contact.Dto
         
         public string RouteBasePath => "/crm/v3/objects/contacts";
         
+        // TODO - not sure if this is going to be necessary anymore
         public bool IsNameValue => false;
+        
+        // TODO - not sure if this is going to be necessary anymore
         public virtual void ToHubSpotDataEntity(ref dynamic converted)
         {
         }
 
+        // TODO - not sure if this is going to be necessary anymore
         public virtual void FromHubSpotDataEntity(dynamic hubspotData)
         {
         }

@@ -78,10 +78,6 @@ namespace HubSpot.NET.Examples
                 }
                 if (moreResults)
                     search = api.Contact.Search<ContactHubSpotModel>(search.SearchRequestOptions);
-                    /* This works too:
-                     * search = api.Contact.Search<ContactHubSpotModel>(searchOptions);
-                     */
-                    // TODO - There should be no difference between the two; might want to demonstrate that in the examples for documentation sake.
             }
             
             /*

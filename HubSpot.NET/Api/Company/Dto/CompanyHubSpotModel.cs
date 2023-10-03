@@ -94,8 +94,12 @@ namespace HubSpot.NET.Api.Company.Dto
         public DateTime? UpdatedAt { get; set; }
 
         public string RouteBasePath => "/crm/v3/objects/companies";
+        
+        
+        // TODO - not sure if this is going to be necessary anymore
         public bool IsNameValue => true;
-
+        
+        // TODO - not sure if this is going to be necessary anymore
         [IgnoreDataMember]
         public CompanyHubSpotAssociations Associations { get; }
         

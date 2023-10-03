@@ -89,7 +89,7 @@ namespace HubSpot.NET.Core.Requests
             
             var json = JsonConvert.SerializeObject(_obj, _jsonSerializerSettings);
             // TODO - remove debugging
-            Console.WriteLine($"HubSpotBaseClient line #92");
+            Console.WriteLine($"RequestSerializer line #92");
             Console.WriteLine(json);
             return json;
         }
@@ -130,6 +130,7 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="json">The json data returned by HubSpot that should be converted</param>
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns>The deserialized entity</returns>
+        // TODO - marked for removal
         public virtual IHubSpotModel DeserializeEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
         {
             if (deserializeAsProperties)
@@ -153,6 +154,7 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="json">The JSON data returned from a List request to HubSpot</param>
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns></returns>
+        // TODO - marked for removal
         public virtual IHubSpotModel DeserializeListEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
         {
             if (deserializeAsProperties)

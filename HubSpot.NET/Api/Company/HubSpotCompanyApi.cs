@@ -89,6 +89,79 @@ namespace HubSpot.NET.Api.Company
                 return Update(company);
             }
         }
+        
+        /// <summary>
+        /// Creates a batch of Company objects
+        /// </summary>
+        /// <param name="companies"></param>
+        /// <typeparam name="T">A CompanyHubSpotModel instance</typeparam>
+        /// <returns>CompanyListHubSpotModel</returns>
+        public CompanyListHubSpotModel<T> BatchCreate<T>(CompanyListHubSpotModel<T> companies)
+            where T : CompanyHubSpotModel, new()
+        {
+            var path = $"{new T().RouteBasePath}/batch/create";
+            return _client.ExecuteBatch<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
+                serialisationType: SerialisationType.Raw); // TODO - remove serializationType parameter
+        }
+        
+        // TODO - Add a BatchDelete method
+        
+        /// <summary>
+        /// Update or create a set of companies, this is the preferred method when creating/updating in bulk.
+        /// This method will determine whether a company in the batch needs to be updated or created.
+        /// </summary>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <param name="companies">The set of companies to update/create</param>
+        /// <returns>A list of companies that were either updated or created</returns>
+        public CompanyListHubSpotModel<T> BatchCreateOrUpdate<T>(CompanyListHubSpotModel<T> companies)
+            where T : CompanyHubSpotModel, new()
+        {
+            var updatePath = $"{new T().RouteBasePath}/batch/update";
+            
+            var companiesWithId = new CompanyListHubSpotModel<T>();
+            var companiesWithOutId = new CompanyListHubSpotModel<T>();
+            var statuses = new List<string>();
+            
+            foreach (var company in companies.Companies)
+            {
+                // If company.Id isn't the default value for long, add it to the list of companies with id values
+                if (company.Id != 0L)
+                {
+                    companiesWithId.Companies.Add(company);
+                }
+                else
+                {
+                    companiesWithOutId.Companies.Add(company);
+                }
+            }
+            var companiesResults = new CompanyListHubSpotModel<T>();
+            
+            // If the companies in our batch have Id values, we assume this is an update operation.
+            if (companiesWithId.Companies.Count != 0)
+            {
+                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
+                //return _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
+                var data = _client.ExecuteBatch<CompanyListHubSpotModel<T>>(updatePath, companiesWithId, Method.Post,
+                    serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
+                foreach (var error in data.Errors)
+                    companiesResults.Errors.Add(error);
+                foreach (var company in data.Companies)
+                    companiesResults.Companies.Add(company);
+                statuses.Add(data.Status += " (batch update)");
+            }
+            // If the companies in our batch do not have Id values, we assume this is a create operation.
+            if (companiesWithOutId.Companies.Count != 0)
+            {
+                var data = BatchCreate(companiesWithOutId);
+                foreach (var error in data.Errors)
+                    companiesResults.Errors.Add(error);
+                foreach (var company in data.Companies)
+                    companiesResults.Companies.Add(company);
+                statuses.Add(data.Status += " (batch create)");
+            }
+            companiesResults.Status = string.Join(",", statuses);
+            return companiesResults;
+        }
 
         /// <summary>
         /// Gets a single company by ID from hubspot

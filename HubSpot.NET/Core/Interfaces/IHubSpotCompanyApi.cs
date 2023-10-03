@@ -11,8 +11,8 @@ namespace HubSpot.NET.Core.Interfaces
         void Delete(long companyId);
         void Delete(CompanyHubSpotModel company);
         T CreateOrUpdate<T>(T company) where T : CompanyHubSpotModel, new();
-        /*CompanyListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new();
-        CompanyListHubSpotModel<T> BatchCreateOrUpdate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new();*/        
+        CompanyListHubSpotModel<T> BatchCreate<T>(CompanyListHubSpotModel<T> companies) where T : CompanyHubSpotModel, new();
+        CompanyListHubSpotModel<T> BatchCreateOrUpdate<T>(CompanyListHubSpotModel<T> companies) where T : CompanyHubSpotModel, new();        
         T GetById<T>(long companyId) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
