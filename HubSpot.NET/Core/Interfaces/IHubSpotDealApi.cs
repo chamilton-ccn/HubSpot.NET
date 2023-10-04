@@ -1,5 +1,6 @@
 ﻿using HubSpot.NET.Api;
 using HubSpot.NET.Api.Deal.Dto;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Core.Interfaces
 {

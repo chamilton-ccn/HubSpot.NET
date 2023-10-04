@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Paging;
 
 namespace HubSpot.NET.Api.Task.Dto
 {

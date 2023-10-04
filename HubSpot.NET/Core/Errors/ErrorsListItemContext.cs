@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
-namespace HubSpot.NET.Api
+namespace HubSpot.NET.Core.Errors
 {
     public class ErrorsListItemContext
     {

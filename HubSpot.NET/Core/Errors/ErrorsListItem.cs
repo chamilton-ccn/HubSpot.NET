@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace HubSpot.NET.Api
+namespace HubSpot.NET.Core.Errors
 {
     public class ErrorsListItem
     {

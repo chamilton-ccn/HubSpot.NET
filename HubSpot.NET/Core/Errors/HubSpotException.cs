@@ -1,10 +1,9 @@
 using System;
 using System.Net;
 using System.Runtime.Serialization;
-using HubSpot.NET.Api;
 using Newtonsoft.Json;
 
-namespace HubSpot.NET.Core
+namespace HubSpot.NET.Core.Errors
 {
     [Serializable]
     public class HubSpotException : Exception

@@ -5,6 +5,8 @@ using System.Runtime.Serialization;
 
 namespace HubSpot.NET.Core
 {
+    // TODO - marked for removal.
+    [Obsolete("ReflectionExtensions is deprecated and will be removed soon.")]
     internal static class ReflectionExtensions
     {
         /// <summary>

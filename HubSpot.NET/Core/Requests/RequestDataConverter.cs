@@ -9,6 +9,7 @@ using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core.Attributes;
 using HubSpot.NET.Core.Extensions;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Paging;
 
 namespace HubSpot.NET.Core.Requests
 {

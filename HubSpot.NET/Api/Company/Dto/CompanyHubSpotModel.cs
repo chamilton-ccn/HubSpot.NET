@@ -13,11 +13,6 @@ namespace HubSpot.NET.Api.Company.Dto
     [DataContract]
     public class CompanyHubSpotModel : IHubSpotModel
     {
-        public CompanyHubSpotModel()
-        {
-            Associations = new CompanyHubSpotAssociations();
-        }
-
         /// <summary>
         /// Company unique ID in HubSpot
         /// </summary>
@@ -98,11 +93,6 @@ namespace HubSpot.NET.Api.Company.Dto
         
         // TODO - not sure if this is going to be necessary anymore
         public bool IsNameValue => true;
-        
-        // TODO - not sure if this is going to be necessary anymore
-        [IgnoreDataMember]
-        public CompanyHubSpotAssociations Associations { get; }
-        
         
         // TODO - not sure if this is going to be necessary anymore
         public virtual void ToHubSpotDataEntity(ref dynamic converted)

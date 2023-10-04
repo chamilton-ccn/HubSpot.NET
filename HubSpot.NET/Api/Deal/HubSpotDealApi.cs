@@ -1,4 +1,7 @@
-﻿namespace HubSpot.NET.Api.Deal
+﻿using HubSpot.NET.Core.Errors;
+using HubSpot.NET.Core.Search;
+
+namespace HubSpot.NET.Api.Deal
 {
     using System;
     using System.Collections.Generic;

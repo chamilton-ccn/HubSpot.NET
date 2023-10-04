@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using HubSpot.NET.Core;
+using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Paging;
+using HubSpot.NET.Core.Search;
 
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 
@@ -21,7 +23,8 @@ namespace HubSpot.NET.Api.Contact.Dto
         public string Status { get; set; }
         
         /// <summary>
-        /// Total number of contacts in the Contacts list.
+        /// Total number of contacts in the Contacts list. This is not always populated! For example: batch operations
+        /// do not return a total but search operations do. 
         /// </summary>
         [DataMember(Name = "total", EmitDefaultValue = false)]
         public long? Total { get; set; }

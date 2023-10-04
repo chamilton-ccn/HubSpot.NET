@@ -1,4 +1,6 @@
-﻿namespace HubSpot.NET.Api.Engagement
+﻿using HubSpot.NET.Core.Errors;
+
+namespace HubSpot.NET.Api.Engagement
 {
     using System;
     using System.Net;

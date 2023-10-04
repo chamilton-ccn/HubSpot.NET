@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HubSpot.NET.Api;
 using HubSpot.NET.Api.Deal;
 using HubSpot.NET.Api.Deal.Dto;
-using HubSpot.NET.Core;
+using HubSpot.NET.Core.Search;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HubSpot.NET.Tests.Integration

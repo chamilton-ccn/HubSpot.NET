@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
-using HubSpot.NET.Api;
 
-namespace HubSpot.NET.Core
+namespace HubSpot.NET.Core.Paging
 {
 	[DataContract]
     public class PagingModel

@@ -1,6 +1,7 @@
 ﻿using HubSpot.NET.Api;
 using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Company.Dto;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Core.Interfaces
 {
@@ -19,6 +20,7 @@ namespace HubSpot.NET.Core.Interfaces
         CompanyListHubSpotModel<T> GetByDomain<T>(string domain, SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
-        T GetAssociations<T>(T entity) where T : CompanyHubSpotModel, new();
+        // TODO - Decouple Associations
+        //T GetAssociations<T>(T entity) where T : CompanyHubSpotModel, new();
     }
 }

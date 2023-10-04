@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HubSpot.NET.Api;
-using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core;
+using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;
 
 namespace HubSpot.NET.Examples
@@ -127,12 +126,6 @@ namespace HubSpot.NET.Examples
                 Console.WriteLine($"-> Found: {c.Name}");
             }
             
-            
-            /*
-             * Get Associations
-             */
-            company = api.Company.GetAssociations(company);
-           
             /*
              * Delete a company
              */
@@ -201,7 +194,7 @@ namespace HubSpot.NET.Examples
              */
             foreach (var c in companiesBatch.Companies)
                 c.Name += " UPDATE ME!";
-            for (var i = 34; i <= 66; i++)
+            foreach (var i in Enumerable.Range(34, 66))
             {
                 companiesBatch.Companies.Add(new CompanyHubSpotModel()
                 {
@@ -212,6 +205,7 @@ namespace HubSpot.NET.Examples
             
             companiesBatch = api.Company.BatchCreateOrUpdate(companiesBatch);
             Console.WriteLine($"-> {companiesBatch.Total} Companies were created or updated");
+            Console.WriteLine($"-> Status: {companiesBatch.Status}");
             
             // Wait for HubSpot to catch up
             Utilities.Sleep(20);

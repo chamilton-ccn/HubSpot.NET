@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core;
+using HubSpot.NET.Core.Errors;
+using HubSpot.NET.Core.Paging;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Api.Company.Dto
 {
@@ -16,7 +19,8 @@ namespace HubSpot.NET.Api.Company.Dto
         public string Status { get; set; }
         
         /// <summary>
-        /// Total number of companies in the Companies list.
+        /// Total number of companies in the Companies list. This is not always populated! For example: batch operations
+        /// do not return a total but search operations do.
         /// </summary>
         [DataMember(Name = "total", EmitDefaultValue = false)]
         public long? Total { get; set; }

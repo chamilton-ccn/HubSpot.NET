@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using HubSpot.NET.Api;
 using HubSpot.NET.Api.Contact.Dto;
+using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.OAuth.Dto;
 using HubSpot.NET.Core.Requests;

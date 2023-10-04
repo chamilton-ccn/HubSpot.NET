@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using HubSpot.NET.Core.Errors;
 
 namespace HubSpot.NET.Core.OAuth
 {

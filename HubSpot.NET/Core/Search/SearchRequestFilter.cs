@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using HubSpot.NET.Core;
 
-namespace HubSpot.NET.Api
+namespace HubSpot.NET.Core.Search
 {
     /// <summary>
     /// Search request filter; by default, this will filter for records created within the last 7 days (inclusive).

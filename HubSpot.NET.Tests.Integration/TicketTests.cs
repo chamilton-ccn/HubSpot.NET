@@ -262,7 +262,7 @@ namespace HubSpot.NET.Tests.Integration
             var company = companyApi.Create(sampleCompany);
 
             // Act
-            ticketApi.AssociateToCompany(ticket, company.Id.Value);
+            ticketApi.AssociateToCompany(ticket, company.Id);
 
             var ticketAssociations = ticketApi.GetAssociations(ticket);
 
@@ -276,7 +276,7 @@ namespace HubSpot.NET.Tests.Integration
             {
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
-                companyApi.Delete(company.Id.Value);
+                companyApi.Delete(company.Id);
             }
         }
 
@@ -342,7 +342,7 @@ namespace HubSpot.NET.Tests.Integration
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
                 contactApi.Delete(contact.Id);
-                companyApi.Delete(company.Id.Value);                               
+                companyApi.Delete(company.Id);                               
             }
         }
 
@@ -432,9 +432,9 @@ namespace HubSpot.NET.Tests.Integration
             var company = companyApi.Create(sampleCompany);
 
             // Act
-            ticketApi.AssociateToCompany(ticket, company.Id.Value);
+            ticketApi.AssociateToCompany(ticket, company.Id);
 
-            ticketApi.DeleteCompanyAssociation(ticket.Id.Value, company.Id.Value);
+            ticketApi.DeleteCompanyAssociation(ticket.Id.Value, company.Id);
 
             var ticketAssociations = ticketApi.GetAssociations(ticket);
 
@@ -447,7 +447,7 @@ namespace HubSpot.NET.Tests.Integration
             {
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
-                companyApi.Delete(company.Id.Value);
+                companyApi.Delete(company.Id);
             }
         }
 
@@ -513,7 +513,7 @@ namespace HubSpot.NET.Tests.Integration
                 // Clean-up
                 ticketApi.Delete(ticket.Id.Value);
                 contactApi.Delete(contact.Id);
-                companyApi.Delete(company.Id.Value);
+                companyApi.Delete(company.Id);
             }
         }
     }

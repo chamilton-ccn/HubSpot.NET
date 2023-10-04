@@ -7,6 +7,8 @@ using RestSharp;
 
 namespace HubSpot.NET.Core
 {
+    // TODO - marked for removal.
+    [Obsolete("RestSharpExtensions is deprecated and will be removed soon.")]
     public static class RestSharpExtensions
     {
         public static bool IsSuccessful(this RestResponse response)

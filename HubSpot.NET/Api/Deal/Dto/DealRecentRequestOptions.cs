@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Api.Deal.Dto
 {

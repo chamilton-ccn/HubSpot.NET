@@ -1,4 +1,5 @@
 ﻿using HubSpot.NET.Api.Contact.Dto;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Core.Interfaces
 {

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using HubSpot.NET.Api;
 
-namespace HubSpot.NET.Core
+namespace HubSpot.NET.Core.Search
 {
     /// <summary>
     /// Options used when querying for a list matching the query term
@@ -74,7 +73,7 @@ namespace HubSpot.NET.Core
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.SearchRequestOptions"/> class.
+        /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.Search.SearchRequestOptions"/> class.
         /// </summary>
         /// <param name="upperLimit">Upper limit for the amount of items to request for the list.</param>
         public SearchRequestOptions(int upperLimit)

@@ -46,7 +46,7 @@ namespace HubSpot.NET.Examples
 
             Companies.Example(api);
 
-            //Contacts.Example(api);
+            Contacts.Example(api);
 
             //CompanyProperties.Example(api);
 

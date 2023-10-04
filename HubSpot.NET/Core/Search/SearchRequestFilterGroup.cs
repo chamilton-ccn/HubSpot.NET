@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using HubSpot.NET.Api;
 
-namespace HubSpot.NET.Core
+namespace HubSpot.NET.Core.Search
 {
     [DataContract]
     public class SearchRequestFilterGroup

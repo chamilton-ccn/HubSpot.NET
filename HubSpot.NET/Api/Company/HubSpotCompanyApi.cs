@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core;
+using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Extensions;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Search;
 using RestSharp;
 
 namespace HubSpot.NET.Api.Company
@@ -147,7 +149,8 @@ namespace HubSpot.NET.Api.Company
                     companiesResults.Errors.Add(error);
                 foreach (var company in data.Companies)
                     companiesResults.Companies.Add(company);
-                statuses.Add(data.Status += " (batch update)");
+                statuses.Add(data.Status += $" ({data.Companies.Count} companies updated)");
+                companiesResults.Total = data.Companies.Count;
             }
             // If the companies in our batch do not have Id values, we assume this is a create operation.
             if (companiesWithOutId.Companies.Count != 0)
@@ -157,7 +160,8 @@ namespace HubSpot.NET.Api.Company
                     companiesResults.Errors.Add(error);
                 foreach (var company in data.Companies)
                     companiesResults.Companies.Add(company);
-                statuses.Add(data.Status += " (batch create)");
+                statuses.Add(data.Status += $" ({data.Companies.Count} companies created)");
+                companiesResults.Total += data.Companies.Count;
             }
             companiesResults.Status = string.Join(",", statuses);
             return companiesResults;
@@ -311,7 +315,7 @@ namespace HubSpot.NET.Api.Company
         /// <typeparam name="T">Implementation of <see cref="CompanyHubSpotModel"/></typeparam>
         /// <param name="entity">The deal to get associations for</param>
         // TODO - refactor
-        public T GetAssociations<T>(T entity) where T : CompanyHubSpotModel, new()
+        /*public T GetAssociations<T>(T entity) where T : CompanyHubSpotModel, new()
         {
             // see https://legacydocs.hubspot.com/docs/methods/crm-associations/crm-associations-overview
             var companyPath = $"/crm-associations/v1/associations/{entity.Id}/HUBSPOT_DEFINED/6";
@@ -353,6 +357,6 @@ namespace HubSpot.NET.Api.Company
                 entity.Associations.AssociatedContacts = null;
 
             return entity;
-        }
+        }*/
     }
 }

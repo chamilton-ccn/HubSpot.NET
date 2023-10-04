@@ -1,8 +1,8 @@
-﻿namespace HubSpot.NET.Core
-{
-    using System.Net;
-    using System.Runtime.Serialization;
+﻿using System.Net;
+using System.Runtime.Serialization;
 
+namespace HubSpot.NET.Core.Errors
+{
     [DataContract]
     public class HubSpotError
     {

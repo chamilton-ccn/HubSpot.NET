@@ -1,6 +1,7 @@
 ﻿using HubSpot.NET.Api.Task.Dto;
 using System.Collections.Generic;
 using HubSpot.NET.Api;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Core.Interfaces
 {

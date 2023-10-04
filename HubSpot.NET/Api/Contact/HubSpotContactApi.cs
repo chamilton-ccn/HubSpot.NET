@@ -5,8 +5,10 @@ using RestSharp;
 using System.Collections.Generic;
 using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core;
+using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Extensions;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Api.Contact
 {
@@ -228,7 +230,8 @@ namespace HubSpot.NET.Api.Contact
                     contactsResults.Errors.Add(error);
                 foreach (var contact in data.Contacts)
                     contactsResults.Contacts.Add(contact);
-                statuses.Add(data.Status += " (batch update)");
+                statuses.Add(data.Status += $" ({data.Contacts.Count} contacts updated)");
+                contactsResults.Total = data.Contacts.Count;
             }
             // If the contacts in our batch do not have Id values, we assume this is a create operation.
             if (contactsWithEmail.Contacts.Count != 0)
@@ -242,7 +245,8 @@ namespace HubSpot.NET.Api.Contact
                     contactsResults.Errors.Add(error);
                 foreach (var contact in data.Contacts) 
                     contactsResults.Contacts.Add(contact);
-                statuses.Add(data.Status += " (batch create)");
+                statuses.Add(data.Status += $" ({data.Contacts.Count} contacts created)");
+                contactsResults.Total += data.Contacts.Count;
             }
             contactsResults.Status = string.Join(",", statuses);
             return contactsResults;

@@ -6,7 +6,7 @@ using HubSpot.NET.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HubSpot.NET.Api;
+using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;
 
 namespace HubSpot.NET.Examples
@@ -35,7 +35,12 @@ namespace HubSpot.NET.Examples
             Console.WriteLine($"* Updating contact's phone number: '{contact.Phone}' to '111111 11111' ...");
             contact.Phone = "111111 11111";
             api.Contact.Update(contact);
-            Console.WriteLine($"-> Contact updated! {contact.FirstName} {contact.LastName} <{contact.Phone}>");
+            Console.WriteLine($"-> Contact updated! {contact.FirstName} {contact.LastName} {contact.Phone}");
+            
+            /*
+             * Wait for HubSpot to catch up
+             */
+            Utilities.Sleep(15);
 
             /*
              * Search for a contact
@@ -85,7 +90,7 @@ namespace HubSpot.NET.Examples
              */
             Console.WriteLine($"* Creating a batch of contacts ...");
             var batchContacts = new ContactListHubSpotModel<ContactHubSpotModel>();
-            foreach (var i in Enumerable.Range(1, 5))
+            foreach (var i in Enumerable.Range(1, 10))
             {
                 var batchContact = new ContactHubSpotModel
                 {
@@ -96,6 +101,11 @@ namespace HubSpot.NET.Examples
                     Company = $"Test Company {i:N0}"
                 };
                 batchContacts.Contacts.Add(batchContact);
+            }
+            foreach (var updateContact in search.Contacts)
+            {
+                updateContact.LastName += " UPDATE ME!";
+                batchContacts.Contacts.Add(updateContact);
             }
             batchContacts.Contacts[2].Id = 999999999999; // This ID does not (should not) exist
             batchContacts.Contacts[4].Id = 888888888888; // This ID does not (should not) exist
@@ -117,7 +127,7 @@ namespace HubSpot.NET.Examples
             }
             
             /*
-             * Wait a few seconds for HubSpot to update
+             * Wait for HubSpot to catch up
              */
             Utilities.Sleep(15);
             
@@ -140,10 +150,20 @@ namespace HubSpot.NET.Examples
                     recent = api.Contact.RecentlyCreated<ContactHubSpotModel>(recent.SearchRequestOptions);
             }
             
+            /*
+             * Delete recently created contacts
+             */
+            Console.WriteLine($"* Deleting recently created contacts ...");
+            foreach (var recentContact in recent.Contacts)
+            {
+                Console.WriteLine($"-> Deleting: {recentContact.FirstName} {recentContact.LastName} " +
+                                  $"<{recentContact.Email}>");
+                api.Contact.Delete(recentContact);
+            }
+                
+            
             // TODO - Examples have been refactored up to this line.
             System.Environment.Exit(0);
-
-
 
 
             /*

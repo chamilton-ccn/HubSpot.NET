@@ -1,4 +1,7 @@
-﻿namespace HubSpot.NET.Api.Ticket
+﻿using HubSpot.NET.Core.Errors;
+using HubSpot.NET.Core.Search;
+
+namespace HubSpot.NET.Api.Ticket
 {
     using HubSpot.NET.Api.Ticket.Dto;
     using HubSpot.NET.Core;
