@@ -13,6 +13,8 @@ using HubSpot.NET.Core.Paging;
 
 namespace HubSpot.NET.Core.Requests
 {
+    // TODO - remove
+    [Obsolete("This will be going away soon.")]
     public class RequestDataConverter
     {
         /// <summary>
@@ -21,6 +23,7 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="entity">The entity.</param>
         /// <param name="batchMode">If we're operating in batch mode the email must be specified outside of the props</param>
         /// <returns></returns>
+        [Obsolete("This will be going away soon.")]
         public dynamic ToHubspotDataEntity(IHubSpotModel entity, bool batchMode = false)
         {
             dynamic mapped = new ExpandoObject();
@@ -93,7 +96,7 @@ namespace HubSpot.NET.Core.Requests
             var data = (T)ConvertSingleEntity(dynamicObject, new T());
             return data;
         }
-
+        
         public T FromHubSpotListResponse<T>(ExpandoObject dynamicObject) where T : IHubSpotModel, new()
         {
             // get a handle to the underlying dictionary values of the ExpandoObject

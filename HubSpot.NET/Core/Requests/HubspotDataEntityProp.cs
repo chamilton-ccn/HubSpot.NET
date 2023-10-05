@@ -1,8 +1,11 @@
-﻿namespace HubSpot.NET.Core.Requests
+﻿using System;
+
+namespace HubSpot.NET.Core.Requests
 {
     /// <summary>
     /// Represents a property value instance that can be sent to HubSpot
     /// </summary>
+    [Obsolete("This will be going away soon.")]
     public class HubspotDataEntityProp
     {
         /// <summary>

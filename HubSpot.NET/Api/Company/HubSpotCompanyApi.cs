@@ -190,23 +190,30 @@ namespace HubSpot.NET.Api.Company
             }
         }
 
-        //TODO - refactor
         public CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T: CompanyHubSpotModel, new()
         {
             if (opts == null)
                 opts = new SearchRequestOptions();
 
-            var path = $"{new CompanyHubSpotModel().RouteBasePath}/companies/paged"
-                .SetQueryParam("count", opts.Limit);
+            var path = $"{new T().RouteBasePath}"
+                .SetQueryParam("limit", opts.Limit);
 
             if (opts.PropertiesToInclude.Any())
-                path = path.SetQueryParam("properties", opts.PropertiesToInclude);
+                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
 
             if (opts.Offset.HasValue)
-                path = path.SetQueryParam("offset", opts.Offset);
+                path = path.SetQueryParam("after", opts.Offset);
 
-			CompanyListHubSpotModel<T> data = _client.ExecuteList<CompanyListHubSpotModel<T>>(path, convertToPropertiesSchema: true);
-
+            // TODO - remove convertToPropertiesSchema parameter
+			var data = _client.ExecuteList<CompanyListHubSpotModel<T>>(path, convertToPropertiesSchema: true);
+            /*
+             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
+             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
+             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
+             * is one).
+             */
+            opts.Offset = data.Offset;
+            data.SearchRequestOptions = opts;
             return data;
         }
 
@@ -278,7 +285,8 @@ namespace HubSpot.NET.Api.Company
             return Search<T>(opts);
         }
         
-        public CompanyListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
+        public CompanyListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) 
+            where T : CompanyHubSpotModel, new()
         {
             if (opts != null) return Search<T>(opts);
             opts = new CompanyListHubSpotModel<T>().SearchRequestOptions;
@@ -293,7 +301,8 @@ namespace HubSpot.NET.Api.Company
             return Search<T>(opts);
         }
         
-        public CompanyListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
+        public CompanyListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) 
+            where T : CompanyHubSpotModel, new()
         {
             if (opts != null) return Search<T>(opts);
             opts = new CompanyListHubSpotModel<T>().SearchRequestOptions;

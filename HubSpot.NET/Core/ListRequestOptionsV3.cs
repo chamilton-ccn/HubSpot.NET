@@ -6,6 +6,7 @@ namespace HubSpot.NET.Core
     /// <summary>
     /// Options used when querying for lists of items.
     /// </summary>
+    // TODO - marked for removal
     [Obsolete("Use SearchRequestOptions instead")]
     public class ListRequestOptionsV3
     {

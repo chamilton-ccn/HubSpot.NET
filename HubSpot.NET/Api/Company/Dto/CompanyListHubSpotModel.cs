@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using HubSpot.NET.Core;
 using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Paging;
 using HubSpot.NET.Core.Search;

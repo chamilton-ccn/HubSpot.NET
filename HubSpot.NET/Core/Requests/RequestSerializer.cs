@@ -32,6 +32,8 @@ namespace HubSpot.NET.Core.Requests
         /// </summary>
         /// <remarks>Use this constructor if you wish to override dependencies</remarks>
         /// <param name="requestDataConverter">The request data converter.</param>
+        // TODO - remove
+        [Obsolete("This will be going away soon.")]
         public RequestSerializer(
             RequestDataConverter requestDataConverter) : this()
         {
@@ -58,35 +60,7 @@ namespace HubSpot.NET.Core.Requests
         /// TODO - remove serialisationType parameter (but only after nothing else uses it)
         public virtual string SerializeEntity(object obj, SerialisationType serialisationType = SerialisationType.PropertyBag)
         {
-            /*if (obj is IHubSpotModel entity && serialisationType == SerialisationType.PropertiesSchema)
-            {
-                var converted = _requestDataConverter.ToHubspotDataEntity(entity);
-                
-                entity.ToHubSpotDataEntity(ref converted);
-                
-                return JsonConvert.SerializeObject(
-                    converted,
-                    _jsonSerializerSettings);
-            }*/
-            
             dynamic _obj = obj;
-            
-            /*if (serialisationType == SerialisationType.PropertyBag)
-            {
-                _obj = obj;
-                
-                //_obj = new { properties = obj };
-                if (obj is Api.Task.Dto.TaskHubSpotModel)
-                {
-                    _obj.properties.Id = null;
-                }
-                else if (obj is Api.Ticket.Dto.TicketHubSpotModel)
-                {
-                    _obj.properties.Id = null;
-                    _obj.properties.ObjectId = null;
-                }
-            }*/
-            
             var json = JsonConvert.SerializeObject(_obj, _jsonSerializerSettings);
             // TODO - remove debugging
             Console.WriteLine($"RequestSerializer line #92");
@@ -101,6 +75,8 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="obj">The entity.</param>
         /// <param name="convertToPropertiesSchema"></param>
         /// <returns>The serialized entity</returns>
+        // TODO - remove
+        [Obsolete("This will be going away soon.")]
         public virtual string SerializeEntity(List<object> obj, bool convertToPropertiesSchema = true)
         {
             if (convertToPropertiesSchema)
@@ -130,7 +106,8 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="json">The json data returned by HubSpot that should be converted</param>
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns>The deserialized entity</returns>
-        // TODO - marked for removal
+        // TODO - remove
+        [Obsolete("This will be going away soon.")]
         public virtual IHubSpotModel DeserializeEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
         {
             if (deserializeAsProperties)
@@ -154,7 +131,8 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="json">The JSON data returned from a List request to HubSpot</param>
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns></returns>
-        // TODO - marked for removal
+        // TODO - remove
+        [Obsolete("This will be going away soon.")]
         public virtual IHubSpotModel DeserializeListEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
         {
             if (deserializeAsProperties)

@@ -272,6 +272,7 @@ namespace HubSpot.NET.Api.Contact
             if (opts.Offset.HasValue)
                 path = path.SetQueryParam("after", opts.Offset);
             
+            // TODO - remove convertToPropertiesSchema parameter
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Get, convertToPropertiesSchema: true);
             /*
              * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the

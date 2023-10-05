@@ -210,6 +210,22 @@ namespace HubSpot.NET.Examples
             // Wait for HubSpot to catch up
             Utilities.Sleep(20);
             
+            /*
+             * List companies (using default search options)
+             */
+            Console.WriteLine($"* Listing all companies using the default sorting options (sort by createdate, " +
+                              $"descending) ...");
+            var companiesList = api.Company.List<CompanyHubSpotModel>();
+            moreResults = true;
+            while (moreResults)
+            {
+                moreResults = companiesList.MoreResultsAvailable;
+                foreach (var listResult in companiesList.Companies)
+                    Console.WriteLine($"-> Found: {listResult.Name} - Created: {listResult.CreatedAt}");
+                if (moreResults)
+                    companiesList = api.Company.List<CompanyHubSpotModel>(companiesList.SearchRequestOptions);
+            }
+            
             Console.WriteLine($"* Deleting all previously created companies ...");
             reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "domain";
             reusableSearchFilter.FilterGroups[0].Filters[0].Value = "squaredup.com";
@@ -227,7 +243,6 @@ namespace HubSpot.NET.Examples
                 if (moreResults)
                     searchedCompanies = api.Company.Search<CompanyHubSpotModel>(searchedCompany.SearchRequestOptions);
             }
-
         }
     }
 }
