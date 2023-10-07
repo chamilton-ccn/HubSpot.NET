@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
@@ -37,7 +38,9 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         public void FromHubSpotDataEntity(dynamic hubspotData)
         {
         }
-
+        
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
         /// <summary>
         /// Gets the value of the route base path
         /// </summary>

@@ -1,4 +1,6 @@
-﻿using HubSpot.NET.Api.Company;
+﻿using System.Dynamic;
+using HubSpot.NET.Api.Associations;
+using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Contact;
 using HubSpot.NET.Api.ContactList;
 using HubSpot.NET.Api.Deal;
@@ -30,6 +32,7 @@ namespace HubSpot.NET.Core
         public IHubSpotContactListApi ContactLists { get; protected set; }
         public IHubSpotEmailSubscriptionsApi EmailSubscriptions { get; protected set; }
         public IHubSpotTicketApi Ticket { get; protected set; }
+        public IHubSpotAssociationsApi Associations { get; protected set; }
 
         protected virtual void Initialise(IHubSpotClient client)
 		{
@@ -44,6 +47,7 @@ namespace HubSpot.NET.Core
             EmailSubscriptions = new HubSpotEmailSubscriptionsApi(client);
             ContactLists = new HubSpotContactListApi(client);
             Ticket = new HubSpotTicketApi(client);
+            Associations = new HubSpotAssociationsApi(client);
         }
 
         public HubSpotApi(string apiKey)

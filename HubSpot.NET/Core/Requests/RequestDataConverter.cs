@@ -69,11 +69,12 @@ namespace HubSpot.NET.Core.Requests
                     Value = value
                 };
 
-                if (entity.IsNameValue)
-                {
-                    item.Property = null;
-                    item.Name = propSerializedName;
-                }
+                // TODO - just commenting this out so the IDE doesn't complain
+                // if (entity.IsNameValue)
+                // {
+                //     item.Property = null;
+                //     item.Name = propSerializedName;
+                // }
                 if (item.Value == null) { continue; }
 
                 mapped.Properties.Add(item);

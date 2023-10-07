@@ -16,6 +16,7 @@ namespace HubSpot.NET.Core
 {
     public class HubSpotBaseClient : IHubSpotClient
     {
+        // TODO - marked for removal
         protected readonly RequestSerializer _serializer = new RequestSerializer(new RequestDataConverter());
         private RestClient _client;
 

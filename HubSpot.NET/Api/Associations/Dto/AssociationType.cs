@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace HubSpot.NET.Api.Association.Dto
+namespace HubSpot.NET.Api.Associations.Dto
 {
     /// <summary>
     /// See: <a href="https://developers.hubspot.com/docs/api/crm/associations#association-type-id-values">

@@ -11,6 +11,7 @@ namespace HubSpot.NET.Core.Requests
 {
     public class RequestSerializer
     {
+        // TODO - marked for removal
         private readonly RequestDataConverter _requestDataConverter;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
@@ -33,7 +34,7 @@ namespace HubSpot.NET.Core.Requests
         /// <remarks>Use this constructor if you wish to override dependencies</remarks>
         /// <param name="requestDataConverter">The request data converter.</param>
         // TODO - remove
-        [Obsolete("This will be going away soon.")]
+        //[Obsolete("This will be going away soon.")]
         public RequestSerializer(
             RequestDataConverter requestDataConverter) : this()
         {
@@ -76,8 +77,8 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="convertToPropertiesSchema"></param>
         /// <returns>The serialized entity</returns>
         // TODO - remove
-        [Obsolete("This will be going away soon.")]
-        public virtual string SerializeEntity(List<object> obj, bool convertToPropertiesSchema = true)
+        //[Obsolete("This will be going away soon.")]
+        /*public virtual string SerializeEntity(List<object> obj, bool convertToPropertiesSchema = true)
         {
             if (convertToPropertiesSchema)
             {
@@ -98,7 +99,7 @@ namespace HubSpot.NET.Core.Requests
             return JsonConvert.SerializeObject(
                 obj,
                 _jsonSerializerSettings);
-        }
+        }*/
 
         /// <summary>
         /// Deserialize the given JSON into a <see cref="IHubSpotModel"/>
@@ -107,8 +108,8 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns>The deserialized entity</returns>
         // TODO - remove
-        [Obsolete("This will be going away soon.")]
-        public virtual IHubSpotModel DeserializeEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
+        //[Obsolete("This will be going away soon.")]
+        /*public virtual IHubSpotModel DeserializeEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
         {
             if (deserializeAsProperties)
             {
@@ -123,7 +124,7 @@ namespace HubSpot.NET.Core.Requests
             {
                 return JsonConvert.DeserializeObject<T>(json, _jsonSerializerSettings);
             }
-        }
+        }*/
 
         /// <summary>
         /// Deserialize the given JSON from a List request into a <see cref="IHubSpotModel"/>
@@ -132,17 +133,17 @@ namespace HubSpot.NET.Core.Requests
         /// <param name="deserializeAsProperties">Does this entity use the properties schema (contacts, deals, companies)</param>
         /// <returns></returns>
         // TODO - remove
-        [Obsolete("This will be going away soon.")]
-        public virtual IHubSpotModel DeserializeListEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
-        {
-            if (deserializeAsProperties)
-            {
-                var expandoObject = JsonConvert.DeserializeObject<ExpandoObject>(json);
-                
-                var converted = _requestDataConverter.FromHubSpotListResponse<T>(expandoObject);
-                return converted;
-            }
-            return JsonConvert.DeserializeObject<T>(json, _jsonSerializerSettings);
-        }
+        //[Obsolete("This will be going away soon.")]
+        // public virtual IHubSpotModel DeserializeListEntity<T>(string json, bool deserializeAsProperties = true) where T : IHubSpotModel, new()
+        // {
+        //     if (deserializeAsProperties)
+        //     {
+        //         var expandoObject = JsonConvert.DeserializeObject<ExpandoObject>(json);
+        //         
+        //         var converted = _requestDataConverter.FromHubSpotListResponse<T>(expandoObject);
+        //         return converted;
+        //     }
+        //     return JsonConvert.DeserializeObject<T>(json, _jsonSerializerSettings);
+        // }
     }
 }

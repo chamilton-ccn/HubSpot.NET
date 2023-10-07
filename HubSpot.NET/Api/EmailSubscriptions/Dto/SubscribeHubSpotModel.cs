@@ -54,6 +54,9 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         {
         }
 
+        public string HubSpotObjectTypeId => "subscription";
+        public string HubSpotObjectTypeIdPlural => "subscriptions";
+        
         [IgnoreDataMember]
         public string RouteBasePath => "/email/public/v1/subscriptions";
     }

@@ -21,16 +21,9 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "results")]
         public IList<long> Results { get; set; } = new List<long>();
 
+        public string HubSpotObjectTypeId => "associations";
+        public string HubSpotObjectTypeIdPlural => "associations";
+        //public string RouteBasePath => "/crm/v4";
         public string RouteBasePath => "/crm/v3/objects";
-
-        public bool IsNameValue => false;
-
-        public virtual void ToHubSpotDataEntity(ref dynamic converted)
-        {
-        }
-
-        public virtual void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
     }
 }

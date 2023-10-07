@@ -6,6 +6,8 @@ using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Paging;
 using HubSpot.NET.Core.Search;
 
+// ReSharper disable InconsistentNaming
+
 namespace HubSpot.NET.Api.Company.Dto
 {
     [DataContract]
@@ -27,7 +29,8 @@ namespace HubSpot.NET.Api.Company.Dto
         /// <summary>
         /// This is a backing property for both Companies and Results
         /// </summary>
-        private IList<T> CompaniesList { get; set; } = new List<T>();
+        [IgnoreDataMember]
+        private IList<T> _companiesList { get; set; } = new List<T>();
         
         /// <summary>
         /// Gets or sets the list of companies.
@@ -38,8 +41,8 @@ namespace HubSpot.NET.Api.Company.Dto
         [DataMember(Name = "inputs")]
         public IList<T> Companies
         {
-            get => CompaniesList;
-            set => CompaniesList = value;
+            get => _companiesList;
+            set => _companiesList = value;
         }
         
         /// <summary>
@@ -51,8 +54,8 @@ namespace HubSpot.NET.Api.Company.Dto
         [DataMember(Name = "results")]
         public IList<T> Results
         {
-            get => CompaniesList;
-            set => CompaniesList = value;
+            get => _companiesList;
+            set => _companiesList = value;
         }
         
         /// <summary>
@@ -117,27 +120,25 @@ namespace HubSpot.NET.Api.Company.Dto
         /// <summary>
         /// Set the default search behavior.
         /// </summary>
+        [IgnoreDataMember]
         private SearchRequestOptions _searchRequestOptions = null;
+        
+        [IgnoreDataMember]
         private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
+        
         [IgnoreDataMember]
         public SearchRequestOptions SearchRequestOptions {
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;
             set => _searchRequestOptions = value;
         }        
         
-        public string RouteBasePath => "/crm/v3/objects/companies";
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeId => "company";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public bool IsNameValue => false;
-
-        // TODO - not sure if this is going to be necessary anymore
-        public void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
-
-        // TODO - not sure if this is going to be necessary anymore
-        public void ToHubSpotDataEntity(ref dynamic dataEntity)
-        {
-        }
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeIdPlural => "companies";
+        
+        [IgnoreDataMember]
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
@@ -22,6 +23,9 @@ namespace HubSpot.NET.Api.Files.Dto
         {
         }
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public string RouteBasePath => "";
     }
 }

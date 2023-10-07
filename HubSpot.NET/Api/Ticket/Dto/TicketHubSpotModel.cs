@@ -56,6 +56,9 @@ namespace HubSpot.NET.Api.Ticket.Dto
 
         public bool IsNameValue => true;
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public string RouteBasePath => "/crm/v3/objects/tickets";
 
         public virtual void FromHubSpotDataEntity(dynamic hubspotData)

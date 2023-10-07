@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HubSpot.NET.Api.Company.Dto;
+using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;

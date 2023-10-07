@@ -32,6 +32,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// This is a backing property for both Contacts and Results
         /// </summary>
+        [IgnoreDataMember]
         private IList<T> ContactsList { get; set; } = new List<T>();
         
         /// <summary>
@@ -130,19 +131,13 @@ namespace HubSpot.NET.Api.Contact.Dto
             set => _searchRequestOptions = value;
         }
         
-        public string RouteBasePath => "/crm/v3/objects/contacts";
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeId => "contact";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public bool IsNameValue => false;
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeIdPlural => "contacts";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public virtual void ToHubSpotDataEntity(ref dynamic converted)
-        {
-        }
-
-        // TODO - not sure if this is going to be necessary anymore
-        public virtual void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
+        [IgnoreDataMember]
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
     }
 }

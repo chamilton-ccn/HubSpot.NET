@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api.Owner.Dto
@@ -25,6 +26,9 @@ namespace HubSpot.NET.Api.Owner.Dto
         [DataMember(Name = "type")]
         public string Type { get; set; }
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public string RouteBasePath => "/owners/v2";
         public bool IsNameValue => true;
 

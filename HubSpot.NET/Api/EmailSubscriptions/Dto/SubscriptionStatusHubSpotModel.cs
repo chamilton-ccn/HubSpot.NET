@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
@@ -35,6 +36,8 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         {
         }
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
         [IgnoreDataMember]
         public string RouteBasePath => "/email/public/v1";
     }

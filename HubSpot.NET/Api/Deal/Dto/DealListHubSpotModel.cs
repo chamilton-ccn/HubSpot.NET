@@ -44,6 +44,9 @@ namespace HubSpot.NET.Api.Deal.Dto
         [DataMember(Name = "offset")]
         public long ContinuationOffset { get; set; }
 
+        public string HubSpotObjectTypeId => "deal";
+        public string HubSpotObjectTypeIdPlural => "deals";
+        
         public string RouteBasePath => "/deals/v1";
 
         public bool IsNameValue => false;

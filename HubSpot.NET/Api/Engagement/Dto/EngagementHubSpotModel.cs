@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
@@ -30,6 +31,9 @@ namespace HubSpot.NET.Api.Engagement.Dto
         public virtual void FromHubSpotDataEntity(dynamic hubspotData)
         {
         }
+
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
 
         public string RouteBasePath => "/engagements/v1";
 

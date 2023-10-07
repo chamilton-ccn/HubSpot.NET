@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Api.EmailSubscriptions.Dto;
@@ -12,6 +13,9 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         [DataMember(Name = "subscriptionDefinitions")]
         public IList<SubscriptionTypeHubSpotModel> Types { get; set; } = new List<SubscriptionTypeHubSpotModel>();
         
+        
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
         public string RouteBasePath => "/email/public/v1";
 
         public bool IsNameValue => false;

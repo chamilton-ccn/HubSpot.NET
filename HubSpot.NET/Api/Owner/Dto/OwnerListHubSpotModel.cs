@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
@@ -60,6 +61,9 @@ namespace HubSpot.NET.Api.Owner.Dto
             return Owners.Remove(item);
         }
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public int Count => Owners.Count;
         public bool IsReadOnly => false;
     }

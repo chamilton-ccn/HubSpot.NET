@@ -6,6 +6,8 @@ using HubSpot.NET.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HubSpot.NET.Api.Associations.Dto;
+using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;
 
@@ -149,6 +151,88 @@ namespace HubSpot.NET.Examples
                 if (recentResults)
                     recent = api.Contact.RecentlyCreated<ContactHubSpotModel>(recent.SearchRequestOptions);
             }
+            
+            /*
+             * Associate a contact with a company
+             */
+            Console.WriteLine("* Creating a company so we can associate a contact with it ...");
+            var company = api.Company.Create(new CompanyHubSpotModel()
+            {
+                Domain = "squaredup.com",
+                Name = "Squared Up"
+            });
+            Console.WriteLine($"-> Company created: {company.Name} ...");
+            /*
+             * Wait for HubSpot to catch up
+             */
+            Utilities.Sleep(15);
+            
+            Console.WriteLine($"* Randomly selecting a contact from previously created contacts ...");
+            var randomNumber = new Random();
+            var randomContact = recent.Contacts[randomNumber.Next(0, recent.Contacts.Count)];
+            Console.WriteLine($"-> Randomly selected contact: {randomContact.FirstName} {randomContact.LastName} " +
+                              $"<{randomContact.Email}>");
+            Console.WriteLine("* Creating a single custom association label: 'TEST LABEL'...");
+            var customAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
+            {
+                Name = "TEST LABEL",
+                Label = "TEST LABEL",
+                AssociationCategory = AssociationCategory.UserDefined
+            }, randomContact.HubSpotObjectTypeIdPlural, 
+                company.HubSpotObjectTypeIdPlural).SortedByTypeId;
+            
+            foreach (var i in customAssociationLabel)
+                Console.WriteLine($"### TEST {i.AssociationTypeId} {i.AssociationCategory}");
+
+            var customAssociationLabel1 = customAssociationLabel[0];
+            
+            Console.WriteLine($"-> Association label created! Name: '{customAssociationLabel1.Name}' " +
+                              $"Label: {customAssociationLabel1.Label}, " +
+                              $"TypeID: {customAssociationLabel1.AssociationTypeId}");
+            
+            Console.WriteLine($"* Creating an association with multiple labels ({customAssociationLabel1.Name}, " +
+                              $"ContactToCompany) between company: '{company.Name}' and '{randomContact.FirstName} " +
+                              $"{randomContact.LastName}' ...");
+
+            var singleAssociation = new AssociationHubSpotModel
+            {
+                AssociationTypes = new List<AssociationTypeHubSpotModel>
+                {
+                    customAssociationLabel1,
+                    new AssociationTypeHubSpotModel
+                    {
+                        AssociationTypeId = AssociationType.ContactToCompany
+                    }
+                },
+                FromObject = new AssociationObjectIdModel
+                {
+                    Id = randomContact.Id,
+                    HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectTypeIdPlural
+                },
+                ToObject = new AssociationObjectIdModel
+                {
+                    Id = company.Id,
+                    HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectTypeIdPlural
+                }
+            };
+            
+            var association = api.Associations.CreateAssociation(singleAssociation);
+            
+            Console.WriteLine($"-> Association created! The following custom labels were applied to the association " +
+                              $"between '{randomContact.FirstName} {randomContact.LastName}' and '{company.Name}': " +
+                              $"{string.Join(", ", association.Result.Labels)}");
+            
+            // Wait for HubSpot to catch up
+            Utilities.Sleep(15);
+            
+            /*
+             * Delete the previously created company (cleanup)
+             */
+            Console.WriteLine($"* Deleting company with ID: {company.Id}");
+            api.Company.Delete(company.Id);
+            
+            // TODO - add the ability to delete labels
+            
             
             /*
              * Delete recently created contacts

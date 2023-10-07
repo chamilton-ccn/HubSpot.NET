@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
@@ -24,6 +25,9 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "results")]
         public IList<long> Results { get; set; } = new List<long>();
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public string RouteBasePath => "/crm/v3/objects";
 
         public bool IsNameValue => false;

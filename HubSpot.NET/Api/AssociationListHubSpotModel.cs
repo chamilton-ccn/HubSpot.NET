@@ -22,12 +22,7 @@ namespace HubSpot.NET.Api
 
         public string RouteBasePath => throw new System.NotImplementedException();
 
-        public void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
-
-        public void ToHubSpotDataEntity(ref dynamic dataEntity)
-        {
-        }
+        public string HubSpotObjectTypeId => "associations";
+        public string HubSpotObjectTypeIdPlural => "associations";
     }
 }

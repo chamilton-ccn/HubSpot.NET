@@ -40,6 +40,10 @@ namespace HubSpot.NET.Api.Task.Dto
 		[DataMember(Name = "hs_timestamp")]
 		public DateTime DueDate { get; set; }
 
+		
+		public string HubSpotObjectTypeId => throw new NotImplementedException();
+		public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+		
 		public string RouteBasePath => "/crm/v3/objects/tasks";
 		public bool IsNameValue => true;
 

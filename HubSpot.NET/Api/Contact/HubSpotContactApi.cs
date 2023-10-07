@@ -22,23 +22,23 @@ namespace HubSpot.NET.Api.Contact
         }
 
         /// <summary>
-        /// Creates a contact entity
+        /// Create a contact
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="entity">The entity</param>
+        /// <param name="contact">The contact object</param>
         /// <returns>The created entity (with ID set)</returns>
-        public T Create<T>(T entity) where T : ContactHubSpotModel, new()
+        public T Create<T>(T contact) where T : ContactHubSpotModel, new()
         {
-            var path = $"{entity.RouteBasePath}";
+            var path = $"{contact.RouteBasePath}";
             // TODO - remove serialisationType parameter
-            return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
+            return _client.Execute<T>(path, contact, Method.Post, SerialisationType.PropertyBag);
         }
         
         /// <summary>
         /// Updates a given contact
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contact">The contact entity</param>
+        /// <param name="contact">The contact object</param>
         public T Update<T>(T contact) where T : ContactHubSpotModel, new()
         {
             var path = contact.Id != 0L
@@ -181,7 +181,7 @@ namespace HubSpot.NET.Api.Contact
         public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
             where T : ContactHubSpotModel, new()
         {
-            var path = $"{new T().RouteBasePath}/batch/create";
+            var path = $"{contacts.RouteBasePath}/batch/create";
             return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
                 serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
         }
@@ -197,8 +197,8 @@ namespace HubSpot.NET.Api.Contact
         /// <returns>A list of contacts that were either updated or created</returns>
         public ContactListHubSpotModel<T> BatchCreateOrUpdate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
         {
-            var createPath = $"{new T().RouteBasePath}/batch/create";
-            var updatePath = $"{new T().RouteBasePath}/batch/update";
+            var createPath = $"{contacts.RouteBasePath}/batch/create";
+            var updatePath = $"{contacts.RouteBasePath}/batch/update";
 
             var contactsWithId = new ContactListHubSpotModel<T>();
             var contactsWithEmail = new ContactListHubSpotModel<T>();

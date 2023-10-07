@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Interfaces;
@@ -24,6 +25,9 @@ namespace HubSpot.NET.Api.Ticket.Dto
         [DataMember(Name = "results")]
         public IList<T> Tickets { get; set; } = new List<T>();
 
+        
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
         public string RouteBasePath => "/crm/v3/objects/tickets";
 
         public bool IsNameValue => false;

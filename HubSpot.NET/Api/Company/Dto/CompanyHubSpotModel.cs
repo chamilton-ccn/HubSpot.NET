@@ -2,6 +2,8 @@
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
+// ReSharper disable InconsistentNaming
+
 namespace HubSpot.NET.Api.Company.Dto
 {
 
@@ -20,64 +22,73 @@ namespace HubSpot.NET.Api.Company.Dto
         /// If this value is 0L (default value for long) then we don't want it serialized at all
         /// </remarks>
         [DataMember(Name = "id", EmitDefaultValue = false)]
-        [IgnoreDataMember]
+        //[IgnoreDataMember] // TODO - What was the point of this again?
         public long Id { get; set; }
         
         [DataMember(Name = "properties")]
-        private CompanyPropertiesModel Properties { get; set; } = new CompanyPropertiesModel();
+        private CompanyPropertiesModel _properties { get; set; } = new CompanyPropertiesModel();
 
+        [IgnoreDataMember]
         public string Name
         {
-            get => Properties.Name;
-            set => Properties.Name = value;
+            get => _properties.Name;
+            set => _properties.Name = value;
         }
-
+        
+        [IgnoreDataMember]
         public string Domain
         {
-            get => Properties.Domain;
-            set => Properties.Domain = value;
+            get => _properties.Domain;
+            set => _properties.Domain = value;
         }
 
+        [IgnoreDataMember]
         public string Website
         {
-            get => Properties.Website;
-            set => Properties.Website = value;
+            get => _properties.Website;
+            set => _properties.Website = value;
         }
 
+        [IgnoreDataMember]
         public string Description
         {
-            get => Properties.Description;
-            set => Properties.Description = value;
+            get => _properties.Description;
+            set => _properties.Description = value;
         }
 
+        [IgnoreDataMember]
         public string About
         {
-            get => Properties.About;
-            set => Properties.About = value;
+            get => _properties.About;
+            set => _properties.About = value;
         }
 
+        [IgnoreDataMember]
         public string City
         {
-            get => Properties.City;
-            set => Properties.City = value;
+            get => _properties.City;
+            set => _properties.City = value;
         }
 
+        [IgnoreDataMember]
         public string State
         {
-            get => Properties.State;
-            set => Properties.State = value;
+            get => _properties.State;
+            set => _properties.State = value;
         }
 
+        [IgnoreDataMember]
         public string ZipCode
         {
-            get => Properties.ZipCode;
-            set => Properties.ZipCode = value;
+            get => _properties.ZipCode;
+            set => _properties.ZipCode = value;
         }
 
+        [IgnoreDataMember]
         public string Country
         {
-            get => Properties.Country;
-            set => Properties.Country = value;
+            get => _properties.Country;
+            set => _properties.Country = value;
         }
         
         [DataMember(Name = "createdAt")]
@@ -88,19 +99,13 @@ namespace HubSpot.NET.Api.Company.Dto
         [IgnoreDataMember]
         public DateTime? UpdatedAt { get; set; }
 
-        public string RouteBasePath => "/crm/v3/objects/companies";
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeId => "company";
         
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeIdPlural => "companies";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public bool IsNameValue => true;
-        
-        // TODO - not sure if this is going to be necessary anymore
-        public virtual void ToHubSpotDataEntity(ref dynamic converted)
-        {
-        }
-
-        public virtual void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
+        [IgnoreDataMember]
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
     }
 }

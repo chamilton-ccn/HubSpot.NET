@@ -2,6 +2,8 @@
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
+// ReSharper disable once InconsistentNaming
+
 namespace HubSpot.NET.Api.Contact.Dto
 {
     /// <summary>
@@ -22,7 +24,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         public long Id { get; set; }
         
         [DataMember(Name = "properties")]
-        private ContactPropertiesModel Properties { get; set; } = new ContactPropertiesModel();
+        private ContactPropertiesModel _properties { get; set; } = new ContactPropertiesModel();
         
         // TODO - Associations List
         // See: https://developers.hubspot.com/docs/api/crm/contacts (Create a batch of contacts)
@@ -39,71 +41,81 @@ namespace HubSpot.NET.Api.Contact.Dto
         //     }
         //     ]
         
+        [IgnoreDataMember]
         public string Email
         {
-            get => Properties.Email;
-            set => Properties.Email = value;
+            get => _properties.Email;
+            set => _properties.Email = value;
         }
 
+        [IgnoreDataMember]
         public string FirstName
         {
-            get => Properties.FirstName;
-            set => Properties.FirstName = value;
+            get => _properties.FirstName;
+            set => _properties.FirstName = value;
         }
-
+        
+        [IgnoreDataMember]
         public string LastName
         {
-            get => Properties.LastName;
-            set => Properties.LastName = value;
+            get => _properties.LastName;
+            set => _properties.LastName = value;
         }
         
+        [IgnoreDataMember]
         public string Website
         {
-            get => Properties.Website;
-            set => Properties.Website = value;
+            get => _properties.Website;
+            set => _properties.Website = value;
         }
         
+        [IgnoreDataMember]
         public string EmailDomain
         {
-            get => Properties.EmailDomain;
-            set => Properties.EmailDomain = value;
+            get => _properties.EmailDomain;
+            set => _properties.EmailDomain = value;
         }        
         
+        [IgnoreDataMember]
         public string Company
         {
-            get => Properties.Company;
-            set => Properties.Company = value;
+            get => _properties.Company;
+            set => _properties.Company = value;
         }
         
+        [IgnoreDataMember]
         public string Phone
         {
-            get => Properties.Phone;
-            set => Properties.Phone = value;
+            get => _properties.Phone;
+            set => _properties.Phone = value;
         }
         
+        [IgnoreDataMember]
         public string Address
         {
-            get => Properties.Address;
-            set => Properties.Address = value;
+            get => _properties.Address;
+            set => _properties.Address = value;
         }
         
-        
+        [IgnoreDataMember]
         public string City
         {
-            get => Properties.City;
-            set => Properties.City = value;
+            get => _properties.City;
+            set => _properties.City = value;
         }
         
+        [IgnoreDataMember]
         public string State
         {
-            get => Properties.State;
-            set => Properties.State = value;
+            get => _properties.State;
+            set => _properties.State = value;
         }
         
+        [IgnoreDataMember]
         public string ZipCode
         {
-            get => Properties.ZipCode;
-            set => Properties.ZipCode = value;
+            get => _properties.ZipCode;
+            set => _properties.ZipCode = value;
         }
         
         // TODO - does this "fit" anymore?
@@ -120,19 +132,15 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "updatedAt", EmitDefaultValue = false)]
         public DateTime? UpdatedAt { get; set; }
 
-        public string RouteBasePath => "/crm/v3/objects/contacts";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public bool IsNameValue => false;
+        // TODO - There may not be a need for the singular version of the HubSpot object name/ID
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeId => "contact";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public virtual void ToHubSpotDataEntity(ref dynamic converted)
-        {
-        }
+        [IgnoreDataMember]
+        public string HubSpotObjectTypeIdPlural => "contacts";
         
-        // TODO - not sure if this is going to be necessary anymore
-        public virtual void FromHubSpotDataEntity(dynamic hubspotData)
-        {
-        }
+        [IgnoreDataMember]
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
     }
 }

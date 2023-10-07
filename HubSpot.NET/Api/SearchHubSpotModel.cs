@@ -25,6 +25,9 @@ namespace HubSpot.NET.Api
         /// </value>
         [DataMember(Name = "results")]
         public IList<T> Results { get; set; } = new List<T>();
+        
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
 
         public string RouteBasePath => "/crm/v3/objects";
 

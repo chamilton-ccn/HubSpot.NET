@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api.Files.Dto
@@ -39,6 +40,9 @@ namespace HubSpot.NET.Api.Files.Dto
         {
         }
 
+        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        
         public string RouteBasePath => "/filemanager/api/v2";
     }
 }
