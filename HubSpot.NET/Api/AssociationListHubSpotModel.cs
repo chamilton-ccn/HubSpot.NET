@@ -1,9 +1,12 @@
-﻿using HubSpot.NET.Core.Interfaces;
+﻿using System;
+using HubSpot.NET.Core.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace HubSpot.NET.Api
 {
+    //TODO - marked for removal
+    [Obsolete("This will be replaced via the new Associations models & API")]
     public class AssociationListHubSpotModel : IHubSpotModel
     {
         [DataMember(Name = "hasMore")]
@@ -17,12 +20,11 @@ namespace HubSpot.NET.Api
 
         [DataMember(Name = "results")]
         public List<AssociationResult> Results { get; set; }
-
-        public bool IsNameValue => throw new System.NotImplementedException();
-
+        
+        [IgnoreDataMember]
+        public string HubSpotObjectType => "associations";
+        
+        [IgnoreDataMember]
         public string RouteBasePath => throw new System.NotImplementedException();
-
-        public string HubSpotObjectTypeId => "associations";
-        public string HubSpotObjectTypeIdPlural => "associations";
     }
 }

@@ -44,8 +44,8 @@ namespace HubSpot.NET.Api.Engagement.Dto
         [DataMember(Name = "offset")]
         public long ContinuationOffset { get; set; }
 
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         public string RouteBasePath => "";
 

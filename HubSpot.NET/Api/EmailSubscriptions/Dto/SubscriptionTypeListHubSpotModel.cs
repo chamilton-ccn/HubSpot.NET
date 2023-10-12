@@ -14,8 +14,8 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         public IList<SubscriptionTypeHubSpotModel> Types { get; set; } = new List<SubscriptionTypeHubSpotModel>();
         
         
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         public string RouteBasePath => "/email/public/v1";
 
         public bool IsNameValue => false;

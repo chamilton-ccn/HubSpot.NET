@@ -11,10 +11,7 @@ namespace HubSpot.NET.Api.Associations.Dto
         public IList<T> Associations { get; set; } = new List<T>();
             
         [IgnoreDataMember]
-        public string HubSpotObjectTypeId => "associations";
-        
-        [IgnoreDataMember]
-        public string HubSpotObjectTypeIdPlural => "associations";
+        public string HubSpotObjectType => "associations";
         
         [IgnoreDataMember]
         public string RouteBasePath => $"/crm/v4"; 

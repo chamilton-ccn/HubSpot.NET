@@ -5,16 +5,8 @@
     /// </summary>
     public interface IHubSpotModel
     {
-        // bool IsNameValue { get; }
-        //
-        // void ToHubSpotDataEntity(ref dynamic dataEntity);
-        //
-        // void FromHubSpotDataEntity(dynamic hubspotData);
-
         string RouteBasePath { get; }
 
-        string HubSpotObjectTypeId { get; }
-        string HubSpotObjectTypeIdPlural { get; }
-        
+        string HubSpotObjectType { get; }
     }
 }

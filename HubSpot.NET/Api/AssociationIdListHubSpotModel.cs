@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api
 {
+    // TODO - marked for removal
+    [Obsolete("This will be replaced via the new Associations models & API")]
     public class AssociationIdListHubSpotModel : IHubSpotModel
     {
         [DataMember(Name = "hasMore")]
@@ -21,8 +24,7 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "results")]
         public IList<long> Results { get; set; } = new List<long>();
 
-        public string HubSpotObjectTypeId => "associations";
-        public string HubSpotObjectTypeIdPlural => "associations";
+        public string HubSpotObjectType => "associations";
         //public string RouteBasePath => "/crm/v4";
         public string RouteBasePath => "/crm/v3/objects";
     }

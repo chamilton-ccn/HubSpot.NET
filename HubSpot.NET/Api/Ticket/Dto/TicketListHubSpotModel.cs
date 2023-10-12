@@ -26,8 +26,8 @@ namespace HubSpot.NET.Api.Ticket.Dto
         public IList<T> Tickets { get; set; } = new List<T>();
 
         
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         public string RouteBasePath => "/crm/v3/objects/tickets";
 
         public bool IsNameValue => false;

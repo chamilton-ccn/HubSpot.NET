@@ -132,12 +132,9 @@ namespace HubSpot.NET.Api.Contact.Dto
         }
         
         [IgnoreDataMember]
-        public string HubSpotObjectTypeId => "contact";
+        public string HubSpotObjectType => "contacts";
         
         [IgnoreDataMember]
-        public string HubSpotObjectTypeIdPlural => "contacts";
-        
-        [IgnoreDataMember]
-        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectType}";
     }
 }

@@ -39,8 +39,8 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         {
         }
         
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         /// <summary>
         /// Gets the value of the route base path
         /// </summary>

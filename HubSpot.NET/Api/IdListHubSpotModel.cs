@@ -7,6 +7,8 @@ using HubSpot.NET.Core.Paging;
 
 namespace HubSpot.NET.Api
 {
+    // TODO - marked for removal
+    [Obsolete("This will be replaced soon")]
     public class IdListHubSpotModel : IHubSpotModel
     {
 
@@ -25,8 +27,7 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "results")]
         public IList<long> Results { get; set; } = new List<long>();
 
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
         
         public string RouteBasePath => "/crm/v3/objects";
 

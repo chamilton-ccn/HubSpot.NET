@@ -22,5 +22,8 @@ namespace HubSpot.NET.Api.Associations.Dto
             set => AssociationTypeId = value;
         }
         
+        [IgnoreDataMember]
+        public new AssociationCategory AssociationCategory { get; set; } = AssociationCategory.UserDefined;
+        
     }
 }

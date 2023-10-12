@@ -8,6 +8,8 @@ using System.Xml.Linq;
 
 namespace HubSpot.NET.Api
 {
+    // TODO - marked for removal
+    [Obsolete("This will be replaced via the new Associations models & API")]
     public class AssociationResult
     {
         [DataMember(Name = "toObjectId")]

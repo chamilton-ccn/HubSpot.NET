@@ -59,8 +59,8 @@ namespace HubSpot.NET.Api.Associations.Dto
             set => AssociationCategory = value;
         }
         
-        public string HubSpotObjectTypeId => "associations";
-        public string HubSpotObjectTypeIdPlural => "associations";
+        public string HubSpotObjectType => "associations";
+        
         public string RouteBasePath => "/crm/v4";
     }
 }

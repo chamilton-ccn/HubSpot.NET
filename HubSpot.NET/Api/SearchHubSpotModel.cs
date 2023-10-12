@@ -7,6 +7,7 @@ using HubSpot.NET.Core.Paging;
 
 namespace HubSpot.NET.Api
 {
+    // TODO - marked for removal
     [Obsolete("Work on replacing this with the new search method")]
     public class SearchHubSpotModel<T> : IHubSpotModel where T : new()
     {
@@ -26,8 +27,8 @@ namespace HubSpot.NET.Api
         [DataMember(Name = "results")]
         public IList<T> Results { get; set; } = new List<T>();
         
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
 
         public string RouteBasePath => "/crm/v3/objects";
 

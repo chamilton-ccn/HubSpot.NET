@@ -25,10 +25,10 @@ namespace HubSpot.NET.Api.Associations.Dto
         public IList<string> Labels { get; set; } = new List<string>();
 
         [IgnoreDataMember]
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
         
         [IgnoreDataMember]
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         [IgnoreDataMember]
         public string RouteBasePath => throw new NotImplementedException();

@@ -100,12 +100,9 @@ namespace HubSpot.NET.Api.Company.Dto
         public DateTime? UpdatedAt { get; set; }
 
         [IgnoreDataMember]
-        public string HubSpotObjectTypeId => "company";
+        public string HubSpotObjectType => "companies";
         
         [IgnoreDataMember]
-        public string HubSpotObjectTypeIdPlural => "companies";
-        
-        [IgnoreDataMember]
-        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectTypeIdPlural}";
+        public string RouteBasePath => $"/crm/v3/objects/{HubSpotObjectType}";
     }
 }

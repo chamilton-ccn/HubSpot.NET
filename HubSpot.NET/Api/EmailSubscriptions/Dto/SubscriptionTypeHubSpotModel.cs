@@ -32,8 +32,8 @@ namespace HubSpot.NET.Api.EmailSubscriptions.Dto
         {
         }
         
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
 
         public string RouteBasePath => "/email/public/v1";
     }

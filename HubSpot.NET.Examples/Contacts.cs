@@ -131,7 +131,7 @@ namespace HubSpot.NET.Examples
             /*
              * Wait for HubSpot to catch up
              */
-            Utilities.Sleep(15);
+            Utilities.Sleep(30);
             
             /*
              * Get recently created contacts
@@ -172,25 +172,20 @@ namespace HubSpot.NET.Examples
             var randomContact = recent.Contacts[randomNumber.Next(0, recent.Contacts.Count)];
             Console.WriteLine($"-> Randomly selected contact: {randomContact.FirstName} {randomContact.LastName} " +
                               $"<{randomContact.Email}>");
-            Console.WriteLine("* Creating a single custom association label: 'TEST LABEL'...");
-            var customAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
-            {
-                Name = "TEST LABEL",
-                Label = "TEST LABEL",
-                AssociationCategory = AssociationCategory.UserDefined
-            }, randomContact.HubSpotObjectTypeIdPlural, 
-                company.HubSpotObjectTypeIdPlural).SortedByTypeId;
+            Console.WriteLine("* Creating a single custom association label: 'TEST LABEL #1'...");
+            var firstCustomAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
+                {
+                    Name = "TEST LABEL #1",
+                    Label = "TEST LABEL #1"
+                }, randomContact.HubSpotObjectType,
+                company.HubSpotObjectType).AssociationLabels
+                .OrderBy(label => label.AssociationTypeId).ToList()[0];
             
-            foreach (var i in customAssociationLabel)
-                Console.WriteLine($"### TEST {i.AssociationTypeId} {i.AssociationCategory}");
-
-            var customAssociationLabel1 = customAssociationLabel[0];
+            Console.WriteLine($"-> Association label created! Name: '{firstCustomAssociationLabel.Name}' " +
+                              $"Label: {firstCustomAssociationLabel.Label}, " +
+                              $"TypeID: {firstCustomAssociationLabel.AssociationTypeId}");
             
-            Console.WriteLine($"-> Association label created! Name: '{customAssociationLabel1.Name}' " +
-                              $"Label: {customAssociationLabel1.Label}, " +
-                              $"TypeID: {customAssociationLabel1.AssociationTypeId}");
-            
-            Console.WriteLine($"* Creating an association with multiple labels ({customAssociationLabel1.Name}, " +
+            Console.WriteLine($"* Creating an association with multiple labels ({firstCustomAssociationLabel.Name}, " +
                               $"ContactToCompany) between company: '{company.Name}' and '{randomContact.FirstName} " +
                               $"{randomContact.LastName}' ...");
 
@@ -198,7 +193,7 @@ namespace HubSpot.NET.Examples
             {
                 AssociationTypes = new List<AssociationTypeHubSpotModel>
                 {
-                    customAssociationLabel1,
+                    firstCustomAssociationLabel,
                     new AssociationTypeHubSpotModel
                     {
                         AssociationTypeId = AssociationType.ContactToCompany
@@ -207,12 +202,12 @@ namespace HubSpot.NET.Examples
                 FromObject = new AssociationObjectIdModel
                 {
                     Id = randomContact.Id,
-                    HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectTypeIdPlural
+                    HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectType
                 },
                 ToObject = new AssociationObjectIdModel
                 {
                     Id = company.Id,
-                    HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectTypeIdPlural
+                    HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectType
                 }
             };
             
@@ -222,8 +217,76 @@ namespace HubSpot.NET.Examples
                               $"between '{randomContact.FirstName} {randomContact.LastName}' and '{company.Name}': " +
                               $"{string.Join(", ", association.Result.Labels)}");
             
+            Console.WriteLine("* Creating another custom association label: 'TEST LABEL #2'...");
+            var secondCustomAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
+                {
+                    Name = "TEST LABEL #2",
+                    Label = "TEST LABEL #2"
+                }, randomContact.HubSpotObjectType,
+                company.HubSpotObjectType).AssociationLabels
+                .OrderBy(label => label.AssociationTypeId).ToList()[0];
+            
+            Console.WriteLine($"-> Association label created! Name: '{secondCustomAssociationLabel.Name}' " +
+                              $"Label: {secondCustomAssociationLabel.Label}, " +
+                              $"TypeID: {secondCustomAssociationLabel.AssociationTypeId}");
+            Console.WriteLine($"* Creating another association ({secondCustomAssociationLabel.Name}, " +
+                              $"ContactToCompany) between company: '{company.Name}' and '{randomContact.FirstName} " +
+                              $"{randomContact.LastName}' ...");
+            
+            singleAssociation.AssociationTypes.Add(secondCustomAssociationLabel);
+
+            association = api.Associations.CreateAssociation(singleAssociation);
+            
+            Console.WriteLine($"-> Association created! The following custom labels were applied to the association " +
+                              $"between '{randomContact.FirstName} {randomContact.LastName}' and '{company.Name}': " +
+                              $"{string.Join(", ", association.Result.Labels)}");            
+            
             // Wait for HubSpot to catch up
             Utilities.Sleep(15);
+            
+           
+            /*
+             * Delete specific association labels
+             */
+            Console.WriteLine($"* Batch deleting previously created associations by explicitly specifying which to " +
+                              $"delete");
+            var associationList = new AssociationListHubSpotModel<AssociationHubSpotModel>
+            {
+                Associations = new List<AssociationHubSpotModel>
+                {
+                    new AssociationHubSpotModel
+                    {
+                        AssociationTypes = new List<AssociationTypeHubSpotModel>
+                        {
+                            firstCustomAssociationLabel,
+                            secondCustomAssociationLabel
+                        },
+                        FromObject = new AssociationObjectIdModel
+                        {
+                            Id = randomContact.Id,
+                            HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectType
+                        },
+                        ToObject = new AssociationObjectIdModel
+                        {
+                            Id = company.Id,
+                            HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectType
+                        }                        
+                    }
+                }
+            };
+            var batchDeletedAssociations = api.Associations
+                .BatchDeleteAssociations(associationList);
+            
+            
+            /*
+             * Delete all associations between the previously created contact & company
+             */
+            Console.WriteLine($"* Deleting all associations between '{randomContact.FirstName} " +
+                              $"{randomContact.LastName}' and '{company.Name}'");
+            var deletedAssociation = api.Associations.DeleteAllAssociations(association);
+            Console.WriteLine($"-> All associations deleted between: '{deletedAssociation.FromObject.Id}' and " +
+                              $"'{deletedAssociation.ToObject.Id}'");
+            
             
             /*
              * Delete the previously created company (cleanup)

@@ -62,8 +62,8 @@ namespace HubSpot.NET.Api.Deal.Dto
         [IgnoreDataMember]
         public DealHubSpotAssociations Associations { get; }
 
-        public string HubSpotObjectTypeId => "deal";
-        public string HubSpotObjectTypeIdPlural => "deals";
+        public string HubSpotObjectType => "deal";
+        
         
         public string RouteBasePath => "/deals/v1";
         public bool IsNameValue => true;

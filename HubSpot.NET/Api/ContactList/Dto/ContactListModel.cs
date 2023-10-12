@@ -32,8 +32,8 @@ namespace HubSpot.NET.Api.ContactList.Dto
         {
         }
 
-        public string HubSpotObjectTypeId => "list";
-        public string HubSpotObjectTypeIdPlural => "lists";
+        public string HubSpotObjectType => "list";
+        
 
         [IgnoreDataMember]
         public string RouteBasePath => "/contacts/v1/lists";

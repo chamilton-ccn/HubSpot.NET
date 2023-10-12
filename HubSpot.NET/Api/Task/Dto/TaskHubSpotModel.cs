@@ -41,8 +41,8 @@ namespace HubSpot.NET.Api.Task.Dto
 		public DateTime DueDate { get; set; }
 
 		
-		public string HubSpotObjectTypeId => throw new NotImplementedException();
-		public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+		public string HubSpotObjectType => throw new NotImplementedException();
+		public string HubSpotObjectTypePlural => throw new NotImplementedException();
 		
 		public string RouteBasePath => "/crm/v3/objects/tasks";
 		public bool IsNameValue => true;

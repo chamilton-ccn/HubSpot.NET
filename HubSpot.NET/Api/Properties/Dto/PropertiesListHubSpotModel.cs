@@ -68,8 +68,8 @@ namespace HubSpot.NET.Api.Properties.Dto
             return Properties.Remove(item);
         }
 
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         public int Count => Properties.Count;
         public bool IsReadOnly => false;

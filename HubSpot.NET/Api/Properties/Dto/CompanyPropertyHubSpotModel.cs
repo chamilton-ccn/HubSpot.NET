@@ -42,8 +42,8 @@ namespace HubSpot.NET.Api.Properties.Dto
         {
         }
 
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         public string RouteBasePath => "/companies/properties";
     }

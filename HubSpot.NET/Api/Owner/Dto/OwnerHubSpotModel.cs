@@ -26,8 +26,8 @@ namespace HubSpot.NET.Api.Owner.Dto
         [DataMember(Name = "type")]
         public string Type { get; set; }
 
-        public string HubSpotObjectTypeId => throw new NotImplementedException();
-        public string HubSpotObjectTypeIdPlural => throw new NotImplementedException();
+        public string HubSpotObjectType => throw new NotImplementedException();
+        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         public string RouteBasePath => "/owners/v2";
         public bool IsNameValue => true;
