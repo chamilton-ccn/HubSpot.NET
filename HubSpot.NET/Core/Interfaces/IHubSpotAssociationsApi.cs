@@ -4,8 +4,10 @@ namespace HubSpot.NET.Core.Interfaces
 {
     public interface IHubSpotAssociationsApi
     {
-        AssociationTypeListHubSpotModel<T> CreateLabel<T>(T label, string fromObjectType, string toObjectType) 
-            where T : AssociationTypeHubSpotModel, new();
+        CustomAssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
+            string toObjectType, T label = null) where T : CustomAssociationTypeHubSpotModel, new();
+
+        void DeleteAssociationType(string fromObjectType, string toObjectType, long associationTypeId);
 
         T CreateAssociation<T>(T association) where T : AssociationHubSpotModel, new();
 

@@ -1,5 +1,51 @@
-[![NuGet](https://img.shields.io/nuget/v/Chinchilla.HubSpot.NET.svg)](https://www.nuget.org/packages/Chinchilla.HubSpot.NET/)
+# Before you proceed ...
 
+_This is a work in progress!_ It is not ready for production use. What you are looking at is an ambitious re-write
+of the most recent fork of this library. 
+
+## Main goals for this fork:
+
+* Upgrading from `RestSharp` 105.2.3 -> 110.2.0
+* Updating to V3/V4 API endpoints
+* Simplify serialization/deserialization by modifying models to closely resemble HubSpot requests/responses.
+  * This is a bigger issue than it sounds. With the V3/V4 API, HubSpot's API has become more standardized with respect 
+    to the structure of requests and responses, so objects are being refactored to more closely match that structure,
+    which will (hopefully) result in a lot less jiggery-pokery when serializing/deserializing. (see [RequestDataConverter.cs](https://github.com/chamilton-ccn/HubSpot.NET/blob/trunk/HubSpot.NET/Core/Requests/RequestDataConverter.cs)
+    for a good example of what I mean -- no disrespect toward the original author(s); earlier versions of HubSpot's API were all over the place; see [this](https://developers.hubspot.com/blog/building-the-next-generation-of-hubspots-apis) for more details.)
+
+## To-do list
+
+#### This list is subject to change as progress continues
+
+* [ ] Refactoring existing objects
+  * [x] Company
+  * [x] Contacts
+  * [ ] ContactList
+  * [ ] Deal
+  * [ ] EmailSubscription
+  * [ ] Engagement
+  * [ ] Files
+  * [ ] Owner
+  * [ ] Task
+  * [ ] Ticket
+  * [ ] Properties
+* [ ] Adding new(-ish) objects; _Note:_ Some of these may have existed in one way or another but were either incomplete 
+      or in need of updating for the V3/V4 API. 
+  * [ ] Associations (new-ish)
+    * A word on "types" vs "labels": All of HubSpot's default association types are "unlabeled" types, however you can 
+      create your own custom association _types_ that can be either labeled or unlabeled. A _label_ merely describes the 
+      association. A _type_ represents an association that _could_ exist between two object types. So when creating a 
+      `CustomAssociationTypeHubSpotModel` instance, if you _do not want_ it to be labeled, set the `Label` property to 
+      `null`. Creating an unlabeled custom association type is analogous to "enabling" an association type from within 
+      the __Associations__ tab of an object's settings. Probably the only time you want to do this is when creating an
+      association _type_ between two objects where either one or both of those objects are _custom objects_. 
+  * [x] Search (new-ish)
+* [ ] Refactor unit tests
+* [ ] Refactor HubSpot.NET.Examples
+* [ ] Custom object types
+* [ ] Object Properties/Schema
+* [ ] Comprehensive documentation (XML comments, examples, etc.)
+ 
 # HubSpot.NET
 C# .NET Wrapper around the common HubSpot APIs:
 
@@ -9,12 +55,6 @@ C# .NET Wrapper around the common HubSpot APIs:
 * Engagement
 * Owners
 * COS Files API (adds the ability to upload files to use as attachments to engagements)
-
-## Goals for this fork:
-
-* Upgrading from `RestSharp` 105.2.3 -> 110.2.0
-* Updating to V3/V4 API endpoints
-* Simplify serialization/deserialization by modifying models to closely resemble HubSpot requests/responses.
 
 ## Getting Started
 To get started, install the [Nuget package](https://www.nuget.org/packages/Chinchilla.HubSpot.NET/) and create a instance of `HubSpotApi` passing your API Key as the only parameter. 

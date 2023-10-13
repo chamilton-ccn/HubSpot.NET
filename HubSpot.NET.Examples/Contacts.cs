@@ -173,13 +173,15 @@ namespace HubSpot.NET.Examples
             Console.WriteLine($"-> Randomly selected contact: {randomContact.FirstName} {randomContact.LastName} " +
                               $"<{randomContact.Email}>");
             Console.WriteLine("* Creating a single custom association label: 'TEST LABEL #1'...");
-            var firstCustomAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
-                {
-                    Name = "TEST LABEL #1",
-                    Label = "TEST LABEL #1"
-                }, randomContact.HubSpotObjectType,
-                company.HubSpotObjectType).AssociationLabels
-                .OrderBy(label => label.AssociationTypeId).ToList()[0];
+            var firstCustomAssociationLabel = api.Associations
+                .CreateCustomAssociationType(
+                    randomContact.HubSpotObjectType, 
+                    company.HubSpotObjectType, 
+                    new CustomAssociationTypeHubSpotModel
+                    {
+                        Name = "TEST LABEL #1", 
+                        Label = "TEST LABEL #1"
+                    }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{firstCustomAssociationLabel.Name}' " +
                               $"Label: {firstCustomAssociationLabel.Label}, " +
@@ -202,12 +204,12 @@ namespace HubSpot.NET.Examples
                 FromObject = new AssociationObjectIdModel
                 {
                     Id = randomContact.Id,
-                    HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectType
+                    HubSpotObjectType = randomContact.HubSpotObjectType
                 },
                 ToObject = new AssociationObjectIdModel
                 {
                     Id = company.Id,
-                    HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectType
+                    HubSpotObjectType = company.HubSpotObjectType
                 }
             };
             
@@ -218,13 +220,15 @@ namespace HubSpot.NET.Examples
                               $"{string.Join(", ", association.Result.Labels)}");
             
             Console.WriteLine("* Creating another custom association label: 'TEST LABEL #2'...");
-            var secondCustomAssociationLabel = api.Associations.CreateLabel(new CustomAssociationTypeHubSpotModel
-                {
-                    Name = "TEST LABEL #2",
-                    Label = "TEST LABEL #2"
-                }, randomContact.HubSpotObjectType,
-                company.HubSpotObjectType).AssociationLabels
-                .OrderBy(label => label.AssociationTypeId).ToList()[0];
+            var secondCustomAssociationLabel = api.Associations
+                .CreateCustomAssociationType(
+                    randomContact.HubSpotObjectType, 
+                    company.HubSpotObjectType, 
+                    new CustomAssociationTypeHubSpotModel
+                    {
+                        Name = "TEST LABEL #2",
+                        Label = "TEST LABEL #2"
+                    }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{secondCustomAssociationLabel.Name}' " +
                               $"Label: {secondCustomAssociationLabel.Label}, " +
@@ -246,7 +250,7 @@ namespace HubSpot.NET.Examples
             
            
             /*
-             * Delete specific association labels
+             * Batch delete specific associations (labeled or unlabeled)
              */
             Console.WriteLine($"* Batch deleting previously created associations by explicitly specifying which to " +
                               $"delete");
@@ -264,19 +268,18 @@ namespace HubSpot.NET.Examples
                         FromObject = new AssociationObjectIdModel
                         {
                             Id = randomContact.Id,
-                            HubSpotObjectType = new ContactHubSpotModel().HubSpotObjectType
+                            HubSpotObjectType = randomContact.HubSpotObjectType
                         },
                         ToObject = new AssociationObjectIdModel
                         {
                             Id = company.Id,
-                            HubSpotObjectType = new CompanyHubSpotModel().HubSpotObjectType
+                            HubSpotObjectType = company.HubSpotObjectType
                         }                        
                     }
                 }
             };
             var batchDeletedAssociations = api.Associations
                 .BatchDeleteAssociations(associationList);
-            
             
             /*
              * Delete all associations between the previously created contact & company
@@ -286,6 +289,17 @@ namespace HubSpot.NET.Examples
             var deletedAssociation = api.Associations.DeleteAllAssociations(association);
             Console.WriteLine($"-> All associations deleted between: '{deletedAssociation.FromObject.Id}' and " +
                               $"'{deletedAssociation.ToObject.Id}'");
+            
+            /*
+             * Delete the previously created association types
+             */
+            Console.WriteLine($"* Deleting previously created association types: '{firstCustomAssociationLabel.Label}' " +
+                              $"and '{secondCustomAssociationLabel.Label}'");
+            api.Associations.DeleteAssociationType(randomContact.HubSpotObjectType, 
+                company.HubSpotObjectType, firstCustomAssociationLabel.AssociationTypeId);
+            
+            api.Associations.DeleteAssociationType(randomContact.HubSpotObjectType, 
+                company.HubSpotObjectType, secondCustomAssociationLabel.AssociationTypeId);
             
             
             /*

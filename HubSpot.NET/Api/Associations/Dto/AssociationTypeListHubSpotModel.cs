@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
@@ -14,19 +15,27 @@ namespace HubSpot.NET.Api.Associations.Dto
         public IList<T> AssociationLabels { get; set; } = new List<T>();
 
         /// <summary>
-        /// So here's the thing: Whenever a new label is created, HubSpot returns two label objects: The one with the
-        /// lowest `typeId` represents the relationship between the source object and the destination object, and the
-        /// other one represents the reverse of that relationship. The following methods are intended to help
-        /// differentiate between the two.
+        /// Whenever a new custom label is created, HubSpot returns two label objects: The one with the lowest `typeId`
+        /// represents the relationship between the source object and the destination object, and the other one
+        /// represents the reverse of that relationship. But! For non-CustomAssociationType* models, the
+        /// AssociationTypeId of an AssociationTypeHubSpotModel instance is a predetermined enum value that corresponds
+        /// to a standard, unlabeled, HubSpot association type. See:
+        /// <a href="https://developers.hubspot.com/docs/api/crm/associations#association-type-id-values"> for more
+        /// information</a>. We never have to create those types manually, which means we never have to worry about
+        /// grabbing the right one after creation, so the following three properties are intended to be overridden in
+        /// in the CustomAssociationTypeListHubSpotModel class.
         /// </summary>
         [IgnoreDataMember]
-        public IList<T> SortedByTypeId => AssociationLabels.OrderBy(label => label.AssociationTypeId).ToList();
+        public virtual IList<T> SortedByTypeId => throw new NotImplementedException(
+            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
 
         [IgnoreDataMember]
-        public T GetSourceToDestLabel => SortedByTypeId[0];
+        public virtual T GetSourceToDestLabel => throw new NotImplementedException(
+            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
         
         [IgnoreDataMember]
-        public T GetDestToSourceLabel => SortedByTypeId[1];
+        public virtual T GetDestToSourceLabel => throw new NotImplementedException(
+            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
         
         
         [DataMember(Name = "results")]

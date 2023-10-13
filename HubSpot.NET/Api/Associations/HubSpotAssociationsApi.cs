@@ -18,22 +18,42 @@ namespace HubSpot.NET.Api.Associations
         }
 
         /// <summary>
-        /// Creates a single association type/label
+        /// Creates a single custom association type/label
         /// </summary>
-        /// <param name="label">The name of the label</param>
         /// <param name="fromObjectType">The source object type</param>
         /// <param name="toObjectType">The destination object type</param>
+        /// <param name="associationType">The name of the label</param>
         /// <typeparam name="T">AssociationHubSpotModel</typeparam>
         /// <returns>An AssociationTypeListHubSpotModel instance</returns>
-        public AssociationTypeListHubSpotModel<T> CreateLabel<T>(T label, string fromObjectType, 
-            string toObjectType) where T : AssociationTypeHubSpotModel, new()
+        /// <remarks>This is used to create a custom association type/label that can be used when creating the actual
+        /// association between two objects. It does not create an association on its own.</remarks>
+        public CustomAssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
+            string toObjectType, T associationType = null) where T : CustomAssociationTypeHubSpotModel, new()
         {
-            var path = $"{label.RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
+            associationType = associationType ?? new T();
+            var path = $"{associationType.RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
             // TODO - remove debugging
             Console.WriteLine($"### PATH: {path}");
             // TODO - remove serialisationType parameter
-            return _client.Execute<AssociationTypeListHubSpotModel<T>>(path, label, Method.Post, SerialisationType.PropertyBag);
+            return _client.Execute<CustomAssociationTypeListHubSpotModel<T>>(path, associationType, Method.Post, 
+                SerialisationType.PropertyBag);
         }
+
+        public void DeleteAssociationType(string fromObjectType, string toObjectType, long associationTypeId)
+        {
+            var path = $"{new AssociationTypeHubSpotModel().RouteBasePath}/associations/{fromObjectType}/" +
+                       $"{toObjectType}/labels/{associationTypeId}";
+            // TODO - remove serialisationType parameter
+            _client.Execute(path, null, Method.Delete, SerialisationType.PropertyBag);
+        }
+        
+        // TODO - List association types/labels between two object types
+        // Example URL: GET /crm/v4/associations/{fromObjectType}/{toObjectType}/labels
+        
+        // TODO - List all associations for a given object instance to another object type
+        // Example URL: GET /crm/v4/objects/{fromObjectType}/{fromObject.Id}/associations/{toObjectType}?limit=500
+        
+        
 
         /// <summary>
         /// Creates a single association with potentially multiple labels/association types between two objects
