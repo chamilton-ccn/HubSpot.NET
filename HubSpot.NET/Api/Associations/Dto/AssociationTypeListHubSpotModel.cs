@@ -26,19 +26,6 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// grabbing the right one after creation, so the following three properties are intended to be overridden in
         /// in the CustomAssociationTypeListHubSpotModel class.
         /// </summary>
-        /// TODO - cleanup
-        // [IgnoreDataMember]
-        // public virtual IList<T> SortedByTypeId => throw new NotImplementedException(
-        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
-        //
-        // [IgnoreDataMember]
-        // public virtual T GetSourceToDestLabel => throw new NotImplementedException(
-        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
-        //
-        // [IgnoreDataMember]
-        // public virtual T GetDestToSourceLabel => throw new NotImplementedException(
-        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
-        
         [IgnoreDataMember]
         public IList<T> SortedByTypeId => AssociationTypes
             .OrderBy(label => (int)label.AssociationTypeId).ToList();
