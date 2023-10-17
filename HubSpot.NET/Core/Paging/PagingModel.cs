@@ -7,5 +7,8 @@ namespace HubSpot.NET.Core.Paging
     {
         [DataMember(Name = "next")]
         public NextModel Next { get; set; }
+        
+        [DataMember(Name = "prev")]
+        public PreviousModel Previous { get; set; }
     }
 }

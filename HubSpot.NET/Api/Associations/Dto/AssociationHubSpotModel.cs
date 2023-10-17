@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Paging;
 
 // ReSharper disable InconsistentNaming
 
@@ -10,7 +13,8 @@ namespace HubSpot.NET.Api.Associations.Dto
     public class AssociationHubSpotModel : IHubSpotModel
     {
         [IgnoreDataMember]
-        public IList<AssociationTypeHubSpotModel> AssociationTypes = new List<AssociationTypeHubSpotModel>();
+        public IList<AssociationTypeHubSpotModel> AssociationTypes { get; set; }
+        public bool ShouldSerializeAssociationTypes() => false; // TODO - not sure if we need to keep this
 
         [DataMember(Name = "types", EmitDefaultValue = false)]
         private IList<AssociationTypeHubSpotModel> _types
@@ -25,8 +29,15 @@ namespace HubSpot.NET.Api.Associations.Dto
             get => AssociationTypes;
             set => AssociationTypes = value;
         }
+        public bool ShouldSerialize_associationTypes() => false;
         
-        public bool ShouldSerializeAssociationTypes() => false; // TODO - not sure if we need to keep this
+        [DataMember(Name = "associationSpec", EmitDefaultValue = false)]
+        private IList<AssociationTypeHubSpotModel> _associationSpec
+        {
+            get => AssociationTypes;
+            set => AssociationTypes = value;
+        }
+        public bool ShouldSerialize_associationSpec() => false;
         
         [DataMember(Name = "from", EmitDefaultValue = false)]
         public AssociationObjectIdModel FromObject { get; set; } = new AssociationObjectIdModel();
@@ -47,6 +58,11 @@ namespace HubSpot.NET.Api.Associations.Dto
             get => ToObject.Id;
             set => ToObject.Id = value;
         }
+        
+        [DataMember(Name = "paging", EmitDefaultValue = false)]
+        public PagingModel Paging { get; set; }
+        public bool ShouldSerializePaging() => false;
+        
         
         [IgnoreDataMember]
         public AssociationResultModel Result { get; set; } = new AssociationResultModel();

@@ -162,6 +162,7 @@ namespace HubSpot.NET.Examples
                 Name = "Squared Up"
             });
             Console.WriteLine($"-> Company created: {company.Name} ...");
+            
             /*
              * Wait for HubSpot to catch up
              */
@@ -251,19 +252,84 @@ namespace HubSpot.NET.Examples
             Utilities.Sleep(15);
             
             /*
+             * Batch creating associations for multiple objects with multiple association types
+             */
+            Console.WriteLine($"* Batch creating associations ...");
+            var batchCreateAssociations = new AssociationListHubSpotModel<AssociationHubSpotModel>();
+            foreach (var recentContact in recent.Contacts)
+            {
+                Console.WriteLine($"-> Associating contact: '{recentContact.FirstName} {recentContact.LastName}' to " +
+                                  $"company: '{company.Name}' via the following association types:");
+                var batchAssociation = new AssociationHubSpotModel
+                {
+                    AssociationTypes = new List<AssociationTypeHubSpotModel>
+                    {
+                        firstCustomAssociationLabel,
+                        secondCustomAssociationLabel,
+                        new AssociationTypeHubSpotModel
+                        {
+                            AssociationTypeId = AssociationType.ContactToCompany
+                        }
+                    },
+                    FromObject = new AssociationObjectIdModel
+                    {
+                        Id = recentContact.Id,
+                        HubSpotObjectType = recentContact.HubSpotObjectType
+                    },
+                    ToObject = new AssociationObjectIdModel
+                    {
+                        Id = company.Id,
+                        HubSpotObjectType = company.HubSpotObjectType
+                    }
+                };
+                foreach (var associationType in batchAssociation.AssociationTypes)
+                {
+                    Console.WriteLine($"\t-> Association Type: {associationType.AssociationTypeId}");
+                    Console.WriteLine($"\t-> Label: {associationType.Label}");
+                    Console.WriteLine($"\t-> Category: {associationType.AssociationCategory}\n");
+                }
+                batchCreateAssociations.Associations.Add(batchAssociation);
+            }
+            var batchCreationResults = api.Associations.BatchCreateAssociations(batchCreateAssociations);
+            foreach (var batchCreationResult in batchCreationResults)
+            {
+                Console.WriteLine($"Batch creation details:");
+                Console.WriteLine($"\t-> Status: {batchCreationResult.Status}");
+                Console.WriteLine($"\t-> Requested At: {batchCreationResult.RequestedAt}");
+                Console.WriteLine($"\t-> Started At: {batchCreationResult.StartedAt}");
+                Console.WriteLine($"\t-> Completed At: {batchCreationResult.CompletedAt}");
+                Console.WriteLine($"\t-> Results:");
+                foreach (var result in batchCreationResult.Results)
+                {
+                    Console.WriteLine($"\t\t-> FromObjectTypeId: {result.FromObjectTypeId}");
+                    Console.WriteLine($"\t\t-> FromObjectId: {result.FromObjectId}");
+                    Console.WriteLine($"\t\t-> ToObjectTypeId: {result.ToObjectTypeId}");
+                    Console.WriteLine($"\t\t-> ToObjectId: {result.ToObjectId}");
+                    Console.WriteLine("\t\t-> Labels:");
+                    foreach (var label in result.Labels)
+                        Console.WriteLine($"\t\t\t-> {label}");
+                }
+            }
+
+            
+            // Wait for HubSpot to catch up
+            Utilities.Sleep(30);
+            
+            /*
              * List association types between contacts and companies
              */
             Console.WriteLine($"* Listing association types between '{randomContact.HubSpotObjectType}' and " +
                               $"'{company.HubSpotObjectType}'");
             var associationTypes =
                 api.Associations.ListAssociationTypes<AssociationTypeHubSpotModel>(randomContact.HubSpotObjectType, 
-                    company.HubSpotObjectType);
-            foreach (var associationType in associationTypes.AssociationTypes)
+                    company.HubSpotObjectType).SortedByTypeId;
+            foreach (var associationType in associationTypes)
             {
                 Console.WriteLine($"-> Association type found: '{randomContact.HubSpotObjectType}' -> " +
                                   $"'{company.HubSpotObjectType}'");
                 Console.WriteLine($"\t -> Label: {associationType.Label}");
-                Console.WriteLine($"\t -> TypeId: {associationType.AssociationTypeId}");
+                Console.WriteLine($"\t -> TypeId: {associationType.AssociationTypeId} " +
+                                  $"({(int)associationType.AssociationTypeId}[int])");
                 Console.WriteLine($"\t -> Category: {associationType.AssociationCategory}");
             }
             
@@ -282,7 +348,8 @@ namespace HubSpot.NET.Examples
                 Console.WriteLine($"-> Association Types:\n");
                 foreach (var associationType in associationByObjectType.AssociationTypes)
                 {
-                    Console.WriteLine($"\t-> Association Type Id: {associationType.AssociationTypeId}");
+                    Console.WriteLine($"\t-> Association Type Id: {associationType.AssociationTypeId} " +
+                                      $"({(int)associationType.AssociationTypeId}[int])");
                     Console.WriteLine($"\t-> Label: {associationType.Label}");
                     Console.WriteLine($"\t-> Name: {associationType.Name}");
                     Console.WriteLine($"\t-> Category: {associationType.AssociationCategory}\n");
@@ -320,7 +387,7 @@ namespace HubSpot.NET.Examples
                 }
             };
             var batchDeletedAssociations = api.Associations
-                .BatchDeleteAssociations(associationList);
+                .BatchDeleteAssociationLabels(associationList);
             
             /*
              * Delete all associations between the previously created contact & company
@@ -405,11 +472,6 @@ namespace HubSpot.NET.Examples
                     }
                 }
             });
-
-            /*
-             * Delete a contact
-             */
-            api.Contact.Delete(contact.Id);
 
             /*
              * Get all contacts with specific properties

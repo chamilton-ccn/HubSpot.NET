@@ -17,13 +17,13 @@ namespace HubSpot.NET.Api.Associations.Dto
             get
             {
                 if (AssociationCategory == AssociationCategory.UserDefined)
-                    return AssociationTypeId;
+                    return (int?)AssociationTypeId;
                 return (AssociationType)AssociationTypeId;
             }
             set
             {
                 if (AssociationCategory == AssociationCategory.UserDefined)
-                    AssociationTypeId = value;
+                    AssociationTypeId = (int?)value;
                 else
                     AssociationTypeId = (AssociationType)value;
             } 
@@ -35,13 +35,13 @@ namespace HubSpot.NET.Api.Associations.Dto
             get
             {
                 if (AssociationCategory == AssociationCategory.UserDefined)
-                    return AssociationTypeId;
+                    return (int?)AssociationTypeId;
                 return (AssociationType)AssociationTypeId;
             }
             set
             {
                 if (AssociationCategory == AssociationCategory.UserDefined)
-                    AssociationTypeId = value;
+                    AssociationTypeId = (int?)value;
                 else
                     AssociationTypeId = (AssociationType)value;
             } 

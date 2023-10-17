@@ -40,6 +40,9 @@ namespace HubSpot.NET.Api.Associations.Dto
         [DataMember(Name = "paging")]
         public PagingModel Paging { get; set; }
         
+        [IgnoreDataMember]
+        public AssociationBatchResultModel BatchResults { get; set; }
+        
         /// <summary>
         /// Gets or sets a value indicating whether more results are available.
         /// </summary>

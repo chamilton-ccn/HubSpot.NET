@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
-using HubSpot.NET.Core.Paging;
 
 // ReSharper disable InconsistentNaming
 
@@ -16,15 +14,15 @@ namespace HubSpot.NET.Api.Associations.Dto
         public IList<T> AssociationTypes { get; set; } = new List<T>();
 
         /// <summary>
-        /// Whenever a new custom label is created, HubSpot returns two label objects: The one with the lowest `typeId`
-        /// represents the relationship between the source object and the destination object, and the other one
-        /// represents the reverse of that relationship. But! For non-CustomAssociationType* models, the
-        /// AssociationTypeId of an AssociationTypeHubSpotModel instance is a predetermined enum value that corresponds
-        /// to a standard, unlabeled, HubSpot association type. See:
+        /// Whenever a new custom ("USER_DEFINED") association type is created, HubSpot returns two type objects: The
+        /// one with the lowest `typeId` represents the relationship between the source (from) object and the
+        /// destination (to) object, and the other one represents the reverse of that relationship. For non-custom
+        /// association types, the AssociationTypeId of an AssociationTypeHubSpotModel instance is a predetermined enum
+        /// value that corresponds to a standard, unlabeled, HubSpot association type. See:
         /// <a href="https://developers.hubspot.com/docs/api/crm/associations#association-type-id-values"> for more
         /// information</a>. We never have to create those types manually, which means we never have to worry about
-        /// grabbing the right one after creation, so the following three properties are intended to be overridden in
-        /// in the CustomAssociationTypeListHubSpotModel class.
+        /// grabbing the right one after creation, but for custom types, we often need to create it then use it directly
+        /// afterwards. The following three properties are intended to assist with that.
         /// </summary>
         [IgnoreDataMember]
         public IList<T> SortedByTypeId => AssociationTypes

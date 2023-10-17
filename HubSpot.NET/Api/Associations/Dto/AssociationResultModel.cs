@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
@@ -26,9 +25,6 @@ namespace HubSpot.NET.Api.Associations.Dto
 
         [IgnoreDataMember]
         public string HubSpotObjectType => throw new NotImplementedException();
-        
-        [IgnoreDataMember]
-        public string HubSpotObjectTypePlural => throw new NotImplementedException();
         
         [IgnoreDataMember]
         public string RouteBasePath => throw new NotImplementedException();
