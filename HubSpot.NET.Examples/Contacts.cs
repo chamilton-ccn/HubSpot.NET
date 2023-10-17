@@ -177,10 +177,11 @@ namespace HubSpot.NET.Examples
                 .CreateCustomAssociationType(
                     randomContact.HubSpotObjectType, 
                     company.HubSpotObjectType, 
-                    new CustomAssociationTypeHubSpotModel
+                    new AssociationTypeHubSpotModel
                     {
                         Name = "TEST LABEL #1", 
-                        Label = "TEST LABEL #1"
+                        Label = "TEST LABEL #1",
+                        AssociationCategory = AssociationCategory.UserDefined
                     }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{firstCustomAssociationLabel.Name}' " +
@@ -224,10 +225,11 @@ namespace HubSpot.NET.Examples
                 .CreateCustomAssociationType(
                     randomContact.HubSpotObjectType, 
                     company.HubSpotObjectType, 
-                    new CustomAssociationTypeHubSpotModel
+                    new AssociationTypeHubSpotModel
                     {
                         Name = "TEST LABEL #2",
-                        Label = "TEST LABEL #2"
+                        Label = "TEST LABEL #2",
+                        AssociationCategory = AssociationCategory.UserDefined
                     }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{secondCustomAssociationLabel.Name}' " +
@@ -248,7 +250,46 @@ namespace HubSpot.NET.Examples
             // Wait for HubSpot to catch up
             Utilities.Sleep(15);
             
-           
+            /*
+             * List association types between contacts and companies
+             */
+            Console.WriteLine($"* Listing association types between '{randomContact.HubSpotObjectType}' and " +
+                              $"'{company.HubSpotObjectType}'");
+            var associationTypes =
+                api.Associations.ListAssociationTypes<AssociationTypeHubSpotModel>(randomContact.HubSpotObjectType, 
+                    company.HubSpotObjectType);
+            foreach (var associationType in associationTypes.AssociationTypes)
+            {
+                Console.WriteLine($"-> Association type found: '{randomContact.HubSpotObjectType}' -> " +
+                                  $"'{company.HubSpotObjectType}'");
+                Console.WriteLine($"\t -> Label: {associationType.Label}");
+                Console.WriteLine($"\t -> TypeId: {associationType.AssociationTypeId}");
+                Console.WriteLine($"\t -> Category: {associationType.AssociationCategory}");
+            }
+            
+            /*
+             * List associations of an object by object type
+             */
+            Console.WriteLine($"* Listing associations of a contact object: '{randomContact.FirstName} " +
+                              $"{randomContact.LastName}' by its associated object type: '{company.HubSpotObjectType}'");
+            var associationsByObjectType = api.Associations
+                .ListAssociationsByObjectType<AssociationHubSpotModel>(randomContact.HubSpotObjectType,
+                    randomContact.Id, company.HubSpotObjectType);
+            foreach (var associationByObjectType in associationsByObjectType.Associations)
+            {
+                Console.WriteLine($"-> To Object Type: {company.HubSpotObjectType}");
+                Console.WriteLine($"-> To Object Id: {associationByObjectType.ToObject.Id}");
+                Console.WriteLine($"-> Association Types:\n");
+                foreach (var associationType in associationByObjectType.AssociationTypes)
+                {
+                    Console.WriteLine($"\t-> Association Type Id: {associationType.AssociationTypeId}");
+                    Console.WriteLine($"\t-> Label: {associationType.Label}");
+                    Console.WriteLine($"\t-> Name: {associationType.Name}");
+                    Console.WriteLine($"\t-> Category: {associationType.AssociationCategory}\n");
+                }
+            }
+            
+            
             /*
              * Batch delete specific associations (labeled or unlabeled)
              */

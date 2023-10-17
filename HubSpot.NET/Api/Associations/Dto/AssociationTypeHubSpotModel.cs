@@ -9,20 +9,42 @@ namespace HubSpot.NET.Api.Associations.Dto
     public class AssociationTypeHubSpotModel : IHubSpotModel
     {
         [IgnoreDataMember]
-        public AssociationType AssociationTypeId { get; set; }
+        public dynamic AssociationTypeId { get; set; }
 
         [DataMember(Name = "associationTypeId", EmitDefaultValue = false)]
-        private AssociationType _labelAssociationTypeId
+        private dynamic _labelAssociationTypeId
         {
-            get => AssociationTypeId;
-            set => AssociationTypeId = value;
+            get
+            {
+                if (AssociationCategory == AssociationCategory.UserDefined)
+                    return AssociationTypeId;
+                return (AssociationType)AssociationTypeId;
+            }
+            set
+            {
+                if (AssociationCategory == AssociationCategory.UserDefined)
+                    AssociationTypeId = value;
+                else
+                    AssociationTypeId = (AssociationType)value;
+            } 
         }
         
         [DataMember(Name = "typeId", EmitDefaultValue = false)]
-        private AssociationType _labelTypeId
+        private dynamic _labelTypeId
         {
-            get => AssociationTypeId;
-            set => AssociationTypeId = value;
+            get
+            {
+                if (AssociationCategory == AssociationCategory.UserDefined)
+                    return AssociationTypeId;
+                return (AssociationType)AssociationTypeId;
+            }
+            set
+            {
+                if (AssociationCategory == AssociationCategory.UserDefined)
+                    AssociationTypeId = value;
+                else
+                    AssociationTypeId = (AssociationType)value;
+            } 
         }
 
         /// <summary>
@@ -33,7 +55,7 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// Specifying a value for either one, will specify the same value for both. 
         /// </summary>
         [IgnoreDataMember]
-        private string _associationLabelAndName { get; set; } = "";
+        private string _associationLabelAndName { get; set; }
         
         [DataMember(Name = "label")]
         public string Label
@@ -65,9 +87,11 @@ namespace HubSpot.NET.Api.Associations.Dto
             get => AssociationCategory;
             set => AssociationCategory = value;
         }
-        
+       
+        [IgnoreDataMember]
         public string HubSpotObjectType => "associations";
         
+        [IgnoreDataMember]
         public string RouteBasePath => "/crm/v4";
     }
 }

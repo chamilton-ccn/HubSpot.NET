@@ -14,14 +14,14 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// other one represents the reverse of that relationship. The following methods are intended to help
         /// differentiate between the two.
         /// </summary>
-        [IgnoreDataMember]
-        public override IList<T> SortedByTypeId => AssociationLabels
-            .OrderBy(label => label.AssociationTypeId).ToList();
-
-        [IgnoreDataMember]
-        public override T GetSourceToDestLabel => SortedByTypeId[0];
-        
-        [IgnoreDataMember]
-        public override T GetDestToSourceLabel => SortedByTypeId[1];
+        // [IgnoreDataMember]
+        // public override IList<T> SortedByTypeId => AssociationTypes
+        //     .OrderBy(label => label.AssociationTypeId).ToList();
+        //
+        // [IgnoreDataMember]
+        // public override T GetSourceToDestLabel => SortedByTypeId[0];
+        //
+        // [IgnoreDataMember]
+        // public override T GetDestToSourceLabel => SortedByTypeId[1];
     }
 }

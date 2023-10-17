@@ -50,7 +50,8 @@ namespace HubSpot.NET.Api.Company.Dto
         /// </summary>
         /// <value>
         /// Also the list of companies. Serialized as "results" in batch responses.
-        /// </value>        
+        /// </value>
+        /// TODO - set ShouldSerialize/ShouldDeserialize for inputs and results? 
         [DataMember(Name = "results")]
         public IList<T> Results
         {

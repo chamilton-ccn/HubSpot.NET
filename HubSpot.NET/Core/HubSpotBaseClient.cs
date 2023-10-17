@@ -1,7 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Text.Json;
+//using System.Text.Json;
 using HubSpot.NET.Api;
 using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core.Errors;
@@ -11,6 +11,7 @@ using HubSpot.NET.Core.Requests;
 using HubSpot.NET.Core.Serializers;
 using Newtonsoft.Json;
 using RestSharp;
+//using Formatting = System.Xml.Formatting;
 
 namespace HubSpot.NET.Core
 {
@@ -70,7 +71,6 @@ namespace HubSpot.NET.Core
             var data = SendRequest(absoluteUriPath, method, json, JsonConvert.DeserializeObject<T>);
             //TODO remove debugging
             Console.WriteLine($"HubSpotBaseClient line #70");
-
             return data;
         }
 
@@ -146,7 +146,8 @@ namespace HubSpot.NET.Core
             return data;
         }
 
-        protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) where T : IHubSpotModel, new()
+        protected virtual T SendRequest<T>(string path, Method method, string json, Func<string, T> deserializeFunc) 
+            where T : IHubSpotModel, new()
         {
             var responseData = SendRequest(path, method, json);
             // TODO - remove debugging
@@ -164,9 +165,12 @@ namespace HubSpot.NET.Core
             var response = _client.Execute(request);
 
             var responseData = response.Content;
-            // TODO - remove debugging
+            // TODO - remove debugging (begin)
+            var jsonSerializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented };
             Console.WriteLine($"Inbound response (HubSpotBaseClient line #166)");
-            Console.WriteLine(responseData);
+            if (responseData != null)
+                Console.WriteLine(JsonConvert.DeserializeObject(responseData, jsonSerializerSettings));
+            // TODO - remove debugging (end)
             if (!response.IsSuccessful)
                 throw new HubSpotException("Error from HubSpot", new HubSpotError(response.StatusCode, response.StatusDescription), responseData);
             return responseData;

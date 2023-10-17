@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
+using HubSpot.NET.Core.Paging;
 
 // ReSharper disable InconsistentNaming
 
@@ -12,7 +13,7 @@ namespace HubSpot.NET.Api.Associations.Dto
     public class AssociationTypeListHubSpotModel<T> : IHubSpotModel where T : AssociationTypeHubSpotModel
     {
         [IgnoreDataMember]
-        public IList<T> AssociationLabels { get; set; } = new List<T>();
+        public IList<T> AssociationTypes { get; set; } = new List<T>();
 
         /// <summary>
         /// Whenever a new custom label is created, HubSpot returns two label objects: The one with the lowest `typeId`
@@ -25,24 +26,34 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// grabbing the right one after creation, so the following three properties are intended to be overridden in
         /// in the CustomAssociationTypeListHubSpotModel class.
         /// </summary>
+        /// TODO - cleanup
+        // [IgnoreDataMember]
+        // public virtual IList<T> SortedByTypeId => throw new NotImplementedException(
+        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
+        //
+        // [IgnoreDataMember]
+        // public virtual T GetSourceToDestLabel => throw new NotImplementedException(
+        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
+        //
+        // [IgnoreDataMember]
+        // public virtual T GetDestToSourceLabel => throw new NotImplementedException(
+        //     "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
+        
         [IgnoreDataMember]
-        public virtual IList<T> SortedByTypeId => throw new NotImplementedException(
-            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
+        public IList<T> SortedByTypeId => AssociationTypes
+            .OrderBy(label => (int)label.AssociationTypeId).ToList();
 
         [IgnoreDataMember]
-        public virtual T GetSourceToDestLabel => throw new NotImplementedException(
-            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
+        public T GetSourceToDestLabel => SortedByTypeId[0];
         
         [IgnoreDataMember]
-        public virtual T GetDestToSourceLabel => throw new NotImplementedException(
-            "This is only intended for use with instances of CustomAssociationTypeListHubSpotModel.");
-        
+        public T GetDestToSourceLabel => SortedByTypeId[1];
         
         [DataMember(Name = "results")]
         private IList<T> _results
         {
-            get => AssociationLabels;
-            set => AssociationLabels = value;
+            get => AssociationTypes;
+            set => AssociationTypes = value;
         }
 
         public bool ShouldSerialize_results() => false;
@@ -50,8 +61,8 @@ namespace HubSpot.NET.Api.Associations.Dto
         [DataMember(Name = "types")]
         private IList<T> _types
         { 
-            get => AssociationLabels;
-            set => AssociationLabels = value;
+            get => AssociationTypes;
+            set => AssociationTypes = value;
         }
         
         [IgnoreDataMember]

@@ -24,7 +24,8 @@ namespace HubSpot.NET.Core.Requests
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 Converters = new List<JsonConverter> { new StringEnumConverter() },
-                NullValueHandling = NullValueHandling.Ignore
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented //TODO - remove debugging
             };
         }
 

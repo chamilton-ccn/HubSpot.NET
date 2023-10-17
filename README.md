@@ -5,9 +5,9 @@ of the most recent fork of this library.
 
 ## Main goals for this fork:
 
-* Upgrading from `RestSharp` 105.2.3 -> 110.2.0
-* Updating to V3/V4 API endpoints
-* Simplify serialization/deserialization by modifying models to closely resemble HubSpot requests/responses.
+* [x] Upgrading from `RestSharp` 105.2.3 -> 110.2.0
+* [ ] Updating to V3/V4 API endpoints
+* [ ] Simplify serialization/deserialization by modifying models to closely resemble HubSpot requests/responses.
   * This is a bigger issue than it sounds. With the V3/V4 API, HubSpot's API has become more standardized with respect 
     to the structure of requests and responses, so objects are being refactored to more closely match that structure,
     which will (hopefully) result in a lot less jiggery-pokery when serializing/deserializing. (see [RequestDataConverter.cs](https://github.com/chamilton-ccn/HubSpot.NET/blob/trunk/HubSpot.NET/Core/Requests/RequestDataConverter.cs)
@@ -89,7 +89,7 @@ As HubSpot lets you create and add custom properties to your contacts, companies
   }
 ```
 ### Using checkbox/radio properties
-These properties should be of type `string` and set as a semicolon delimitered list of values, e.g. "value1;value2". This is required by HubSpot, see [here](https://developers.hubspot.com/docs/faq/how-do-i-set-multiple-values-for-checkbox-properties) for more details.
+These properties should be of type `string` and set as a semicolon delimited list of values, e.g. "value1;value2". This is required by HubSpot, see [here](https://developers.hubspot.com/docs/faq/how-do-i-set-multiple-values-for-checkbox-properties) for more details.
 
 ## Contributing
 Please read [CONTRIBUTING.md](https://github.com/squaredup/HubSpot.NET/blob/master/CONTRIBUTING.md) for more information on how to contribute. PRs welcome!

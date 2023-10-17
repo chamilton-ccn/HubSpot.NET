@@ -27,15 +27,18 @@ namespace HubSpot.NET.Api.Associations
         /// <returns>An AssociationTypeListHubSpotModel instance</returns>
         /// <remarks>This is used to create a custom association type/label that can be used when creating the actual
         /// association between two objects. It does not create an association on its own.</remarks>
-        public CustomAssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
-            string toObjectType, T associationType = null) where T : CustomAssociationTypeHubSpotModel, new()
+        /// TODO - needs cleanup
+        //public CustomAssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
+        //string toObjectType, T associationType = null) where T : CustomAssociationTypeHubSpotModel, new()
+        public AssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
+            string toObjectType, T associationType = null) where T : AssociationTypeHubSpotModel, new()
         {
             associationType = associationType ?? new T();
             var path = $"{associationType.RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
             // TODO - remove debugging
             Console.WriteLine($"### PATH: {path}");
             // TODO - remove serialisationType parameter
-            return _client.Execute<CustomAssociationTypeListHubSpotModel<T>>(path, associationType, Method.Post, 
+            return _client.Execute<AssociationTypeListHubSpotModel<T>>(path, associationType, Method.Post, 
                 SerialisationType.PropertyBag);
         }
 
@@ -46,9 +49,40 @@ namespace HubSpot.NET.Api.Associations
             // TODO - remove serialisationType parameter
             _client.Execute(path, null, Method.Delete, SerialisationType.PropertyBag);
         }
+
+        /// <summary>
+        /// List association types between two object types.
+        /// <a href="https://developers.hubspot.com/docs/api/crm/associations#:~:text=Retrieve%20association%20types">
+        /// See the documentation
+        /// </a> for more details.
+        /// </summary>
+        /// <param name="fromObjectType"></param>
+        /// <param name="toObjectType"></param>
+        /// <typeparam name="T">AssociationTypeHubSpotModel</typeparam>
+        /// <returns>AssociationTypeListHubSpotModel</returns>
+        public AssociationTypeListHubSpotModel<T> ListAssociationTypes<T>(string fromObjectType, string toObjectType) 
+            where T : AssociationTypeHubSpotModel, new()
+        {
+            var path = $"{new T().RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
+            // TODO - remove debugging
+            Console.WriteLine(path);
+            // TODO - remove serialisationType parameter
+            return _client.Execute<AssociationTypeListHubSpotModel<T>>(path, null, Method.Get,
+                SerialisationType.PropertyBag);
+        }
+
+        public AssociationListHubSpotModel<T> ListAssociationsByObjectType<T>(string fromObjectType, 
+            long fromObjectId, string toObjectType, int limit = 500) where T : AssociationHubSpotModel, new()
+        {
+            var path = $"{new T().RouteBasePath}/objects/{fromObjectType}/{fromObjectId}/associations/{toObjectType}" +
+                       $"?limit={limit}";
+            // TODO - remove debugging
+            Console.WriteLine(path);
+            // TODO - remove serialisationType parameter
+            return _client.Execute<AssociationListHubSpotModel<T>>(path, null, Method.Get,
+                SerialisationType.PropertyBag);
+        }
         
-        // TODO - List association types/labels between two object types
-        // Example URL: GET /crm/v4/associations/{fromObjectType}/{toObjectType}/labels
         
         // TODO - List all associations for a given object instance to another object type
         // Example URL: GET /crm/v4/objects/{fromObjectType}/{fromObject.Id}/associations/{toObjectType}?limit=500
