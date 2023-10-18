@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.Paging;
@@ -15,7 +16,7 @@ namespace HubSpot.NET.Api.Associations.Dto
         
         [DataMember(Name = "associationTypes")]
         public IList<AssociationTypeHubSpotModel> AssociationTypes { get; set; }
-
+        
         public bool ShouldSerializeAssociationTypes() => false; // TODO - not sure if we need to keep this
         
         [DataMember(Name = "inputs")]
@@ -31,8 +32,14 @@ namespace HubSpot.NET.Api.Associations.Dto
             get => Associations;
             set => Associations = value;
         }
-        
         public bool ShouldSerialize_results() => false;
+
+        [DataMember(Name = "associations")]
+        private IList<T> _associations
+        {
+            get => Associations;
+            set => Associations = value;
+        }
         
         [DataMember(Name = "toObjectId")]
         public AssociationObjectIdModel ToObject { get; set; }

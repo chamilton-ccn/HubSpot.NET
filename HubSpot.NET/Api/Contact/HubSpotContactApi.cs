@@ -182,6 +182,7 @@ namespace HubSpot.NET.Api.Contact
             where T : ContactHubSpotModel, new()
         {
             var path = $"{contacts.RouteBasePath}/batch/create";
+            // TODO - Do we really need ExecuteBatch anymore?
             return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
                 serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
         }
@@ -253,7 +254,7 @@ namespace HubSpot.NET.Api.Contact
         }
         
         /// <summary>
-        /// List all available contacts (basically "search" but with no filter criteria. Nearly identical to
+        /// List all available contacts (basically "search" but with no filter criteria).
         /// </summary>
         /// <param name="opts">Request options - used for pagination etc.</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
@@ -273,6 +274,7 @@ namespace HubSpot.NET.Api.Contact
                 path = path.SetQueryParam("after", opts.Offset);
             
             // TODO - remove convertToPropertiesSchema parameter
+            // TODO - Do we really need ExecuteList anymore?
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Get, convertToPropertiesSchema: true);
             /*
              * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
@@ -293,6 +295,7 @@ namespace HubSpot.NET.Api.Contact
             if (opts == null) return RecentlyCreated<T>();
             var path = $"{new T().RouteBasePath}/search";
             // TODO - remove convertToPropertiesSchema parameter
+            // TODO - Do we really need ExecuteList anymore?
             var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
             /*
              * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
@@ -308,7 +311,6 @@ namespace HubSpot.NET.Api.Contact
         public ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             if (opts != null) return Search<T>(opts);
-            // TODO - this 
             opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
             var searchRequestFilterGroup = new SearchRequestFilterGroup();
             /*

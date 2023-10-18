@@ -6,6 +6,7 @@ using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.Paging;
 using HubSpot.NET.Core.Search;
 
+// ReSharper disable InconsistentNaming
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 
 namespace HubSpot.NET.Api.Contact.Dto
@@ -30,36 +31,37 @@ namespace HubSpot.NET.Api.Contact.Dto
         public long? Total { get; set; }
 
         /// <summary>
-        /// This is a backing property for both Contacts and Results
+        /// The list of contacts
         /// </summary>
         [IgnoreDataMember]
-        private IList<T> ContactsList { get; set; } = new List<T>();
+        public IList<T> Contacts { get; set; } = new List<T>();
         
         /// <summary>
         /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// The list of contacts. Serialized as "inputs" in batch requests.
+        /// This is a backing field for Contacts. Serialized as "inputs" in batch requests.
         /// </value>
         [DataMember(Name = "inputs")]
-        public IList<T> Contacts
+        private IList<T> _inputs 
         {
-            get => ContactsList;
-            set => ContactsList = value;
+            get => Contacts;
+            set => Contacts = value;
         }
         
         /// <summary>
         /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// Also the list of contacts. Serialized as "results" in batch responses.
+        /// This is a backing field for Contacts. Deserialized as "results" in batch responses.
         /// </value>        
         [DataMember(Name = "results")]
-        public IList<T> Results
+        private IList<T> _results
         {
-            get => ContactsList;
-            set => ContactsList = value;
+            get => Contacts;
+            set => Contacts = value;
         }
+        public bool ShouldSerializeResults() => false;
         
         /// <summary>
         /// A count of errors returned in the response
@@ -123,8 +125,12 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// <summary>
         /// Set the default search behavior.
         /// </summary>
+        [IgnoreDataMember]
         private SearchRequestOptions _searchRequestOptions;
+        
+        [IgnoreDataMember]
         private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
+        
         [IgnoreDataMember]
         public SearchRequestOptions SearchRequestOptions {
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;

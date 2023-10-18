@@ -241,7 +241,7 @@ namespace HubSpot.NET.Examples
                               $"{randomContact.LastName}' ...");
             
             singleAssociation.AssociationTypes.Add(secondCustomAssociationLabel);
-
+            
             association = api.Associations.CreateAssociation(singleAssociation);
             
             Console.WriteLine($"-> Association created! The following custom labels were applied to the association " +
