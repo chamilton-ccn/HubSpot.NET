@@ -176,13 +176,13 @@ namespace HubSpot.NET.Examples
             Console.WriteLine("* Creating a single custom association label: 'TEST LABEL #1'...");
             var firstCustomAssociationLabel = api.Associations
                 .CreateCustomAssociationType(
-                    randomContact.HubSpotObjectType, 
-                    company.HubSpotObjectType, 
                     new AssociationTypeHubSpotModel
                     {
                         Name = "TEST LABEL #1", 
                         Label = "TEST LABEL #1",
-                        AssociationCategory = AssociationCategory.UserDefined
+                        AssociationCategory = AssociationCategory.UserDefined,
+                        FromObjectType = randomContact.HubSpotObjectType,
+                        ToObjectType = company.HubSpotObjectType
                     }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{firstCustomAssociationLabel.Name}' " +
@@ -224,13 +224,13 @@ namespace HubSpot.NET.Examples
             Console.WriteLine("* Creating another custom association label: 'TEST LABEL #2'...");
             var secondCustomAssociationLabel = api.Associations
                 .CreateCustomAssociationType(
-                    randomContact.HubSpotObjectType, 
-                    company.HubSpotObjectType, 
                     new AssociationTypeHubSpotModel
                     {
                         Name = "TEST LABEL #2",
                         Label = "TEST LABEL #2",
-                        AssociationCategory = AssociationCategory.UserDefined
+                        AssociationCategory = AssociationCategory.UserDefined,
+                        FromObjectType = randomContact.HubSpotObjectType,
+                        ToObjectType = company.HubSpotObjectType
                     }).GetSourceToDestLabel;
             
             Console.WriteLine($"-> Association label created! Name: '{secondCustomAssociationLabel.Name}' " +
@@ -250,6 +250,22 @@ namespace HubSpot.NET.Examples
             
             // Wait for HubSpot to catch up
             Utilities.Sleep(15);
+            
+            /*
+             * Update a custom association type/label
+             */
+            Console.WriteLine($"* Updating the name and label of the custom association type: " +
+                              $"'{firstCustomAssociationLabel.Label}' to 'TEST LABEL #1 (UPDATED)'");
+            firstCustomAssociationLabel.Name = "TEST LABEL #1 (UPDATED)";
+            firstCustomAssociationLabel.Label = "TEST LABEL #1 (UPDATED)";
+            firstCustomAssociationLabel = api.Associations.UpdateCustomAssociationType(firstCustomAssociationLabel);
+            Console.WriteLine($"-> Name and label have been updated to: '{firstCustomAssociationLabel.Name}'");
+            Console.WriteLine($"* Updating the name and label of the custom association type: " +
+                              $"'{secondCustomAssociationLabel.Label}' to 'TEST LABEL #2 (UPDATED)'");
+            secondCustomAssociationLabel.Name = "TEST LABEL #2 (UPDATED)";
+            secondCustomAssociationLabel.Label = "TEST LABEL #2 (UPDATED)";
+            secondCustomAssociationLabel = api.Associations.UpdateCustomAssociationType(secondCustomAssociationLabel);
+            Console.WriteLine($"-> Name and label have been updated to: '{secondCustomAssociationLabel.Name}'");
             
             /*
              * Batch creating associations for multiple objects with multiple association types
@@ -290,6 +306,9 @@ namespace HubSpot.NET.Examples
                 }
                 batchCreateAssociations.Associations.Add(batchAssociation);
             }
+            
+            // TODO - Batch create associations with association types of differing to/from object types.
+            
             var batchCreationResults = api.Associations.BatchCreateAssociations(batchCreateAssociations);
             foreach (var batchCreationResult in batchCreationResults)
             {
@@ -310,7 +329,6 @@ namespace HubSpot.NET.Examples
                         Console.WriteLine($"\t\t\t-> {label}");
                 }
             }
-
             
             // Wait for HubSpot to catch up
             Utilities.Sleep(30);
@@ -360,8 +378,9 @@ namespace HubSpot.NET.Examples
             /*
              * Batch delete specific associations (labeled or unlabeled)
              */
-            Console.WriteLine($"* Batch deleting previously created associations by explicitly specifying which to " +
-                              $"delete");
+            Console.WriteLine($"* Batch deleting previously created associations between '{randomContact.FirstName} " +
+                              $"{randomContact.LastName}' and '{company.Name}' by explicitly specifying which " +
+                              $"types/labels to delete");
             var associationList = new AssociationListHubSpotModel<AssociationHubSpotModel>
             {
                 Associations = new List<AssociationHubSpotModel>
@@ -390,13 +409,30 @@ namespace HubSpot.NET.Examples
                 .BatchDeleteAssociationLabels(associationList);
             
             /*
-             * Delete all associations between the previously created contact & company
+             * Delete all associations between all previously created contacts & company 
              */
-            Console.WriteLine($"* Deleting all associations between '{randomContact.FirstName} " +
-                              $"{randomContact.LastName}' and '{company.Name}'");
-            var deletedAssociation = api.Associations.DeleteAllAssociations(association);
-            Console.WriteLine($"-> All associations deleted between: '{deletedAssociation.FromObject.Id}' and " +
-                              $"'{deletedAssociation.ToObject.Id}'");
+            var deleteAssociation = new AssociationHubSpotModel();
+            foreach (var recentContact in recent.Contacts)
+            {
+                Console.WriteLine($"* Deleting all associations between '{recentContact.FirstName} " +
+                                  $"{recentContact.LastName}' and '{company.Name}'");
+                deleteAssociation.FromObject = new AssociationObjectIdModel
+                {
+                    Id = recentContact.Id,
+                    HubSpotObjectType = recentContact.HubSpotObjectType
+                };
+                deleteAssociation.ToObject = new AssociationObjectIdModel
+                {
+                    Id = company.Id,
+                    HubSpotObjectType = company.HubSpotObjectType
+                };
+                var deletedAssociation = api.Associations.DeleteAllAssociations(deleteAssociation);
+                Console.WriteLine($"-> All associations deleted between: '{deletedAssociation.FromObject.Id}' and " +
+                                  $"'{deletedAssociation.ToObject.Id}'");
+            }
+            
+            // Wait for HubSpot to catch up
+            Utilities.Sleep(30);
             
             /*
              * Delete the previously created association types
@@ -409,15 +445,11 @@ namespace HubSpot.NET.Examples
             api.Associations.DeleteAssociationType(randomContact.HubSpotObjectType, 
                 company.HubSpotObjectType, secondCustomAssociationLabel.AssociationTypeId);
             
-            
             /*
              * Delete the previously created company (cleanup)
              */
             Console.WriteLine($"* Deleting company with ID: {company.Id}");
             api.Company.Delete(company.Id);
-            
-            // TODO - add the ability to delete labels
-            
             
             /*
              * Delete recently created contacts
@@ -430,7 +462,6 @@ namespace HubSpot.NET.Examples
                 api.Contact.Delete(recentContact);
             }
                 
-            
             // TODO - Examples have been refactored up to this line.
             System.Environment.Exit(0);
 

@@ -87,6 +87,12 @@ namespace HubSpot.NET.Api.Associations.Dto
             get => AssociationCategory;
             set => AssociationCategory = value;
         }
+        
+        [IgnoreDataMember]
+        public string FromObjectType { get; set; }
+        
+        [IgnoreDataMember]
+        public string ToObjectType { get; set; }
        
         [IgnoreDataMember]
         public string HubSpotObjectType => "associations";

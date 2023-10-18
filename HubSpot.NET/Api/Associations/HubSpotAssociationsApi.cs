@@ -26,11 +26,23 @@ namespace HubSpot.NET.Api.Associations
         /// <summary>
         /// Batch create associations for objects
         /// </summary>
-        /// <param name="associationList">An AssociationListHubSpotModel instance</param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>AssociationBatchResultModel</returns>
-        public List<AssociationBatchResultModel> BatchCreateAssociations<T> (AssociationListHubSpotModel<T> associationList) 
-            where T : AssociationHubSpotModel, new()
+        /// <param name="associationList">
+        /// An AssociationListHubSpotModel instance
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// AssociationBatchResultModel
+        /// </returns>
+        /// <remarks>
+        /// This can be used to batch create associations from an AssociationListHubSpotModel where the from/to objects
+        /// contained within each AssociationHubSpotModel are not guaranteed to be the same HubSpotObjectTypes. I.e.,
+        /// 'contact' to 'company', 'deal' to 'company', etc.
+        /// </remarks>
+        /// TODO - INCOMPLETE
+        public List<AssociationBatchResultModel> BatchCreateAssociations<T> (AssociationListHubSpotModel<T> 
+            associationList) where T : AssociationHubSpotModel, new()
         {
             var objectTypePairs = new List<(string, string)> {};
             objectTypePairs.AddRange(associationList.Associations
@@ -40,9 +52,6 @@ namespace HubSpot.NET.Api.Associations
             var results = new List<AssociationBatchResultModel>();
             foreach (var objectTypePair in objectTypePairs)
             {
-                /*var associations = associationList.Associations
-                    .Where(a => (a.FromObject.HubSpotObjectType == objectTypePair.Item1) 
-                                && (a.ToObject.HubSpotObjectType == objectTypePair.Item2));*/
                 var filteredAssociationsList = new AssociationListHubSpotModel<T>
                 {
                     Associations =  associationList.Associations
@@ -64,9 +73,15 @@ namespace HubSpot.NET.Api.Associations
         /// <summary>
         /// Deletes specified association labels between two objects
         /// </summary>
-        /// <param name="associationList">An AssociationListHubSpotModel instance</param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>The provided AssociationListHubSpotModel instance</returns>
+        /// <param name="associationList">
+        /// An AssociationListHubSpotModel instance
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// The provided AssociationListHubSpotModel instance
+        /// </returns>
         /// <remarks>
         /// Deleting an unlabeled association will also delete all labeled associations between two objects
         /// </remarks>
@@ -85,7 +100,7 @@ namespace HubSpot.NET.Api.Associations
                 // TODO - remove debugging
                 Console.WriteLine($"### PATH: {path}");
                 // TODO - remove serialisationType parameter
-                // TODO - associationList needs to be filtered to ensure only the objects matching the to/from object types are in the request.
+                // TODO - associationList needs to be filtered to ensure only the objects matching the to/from object types are in the request. See BatchCreateAssociations.
                 _client.Execute<AssociationListHubSpotModel<T>>(path, associationList, Method.Post, 
                     SerialisationType.PropertyBag);
             }
@@ -96,17 +111,30 @@ namespace HubSpot.NET.Api.Associations
         // Example URL: POST /crm/v4/associations/{fromObjectType}/{toObjectType}/batch/read        
         
         // TODO - [Basic] [Create Default] Create the default (most generic) association type between two object types
+        // Example URL: PUT /crm/v4/objects/{fromObjectType}/{fromObjectId}/associations/default/{toObjectType}/{toObjectId}
         
         
         /// <summary>
         /// List all associations of an object by object type. Limit 500 per call.
         /// </summary>
-        /// <param name="fromObjectType">The source object type</param>
-        /// <param name="fromObjectId">The numeric ID of the source object instance</param>
-        /// <param name="toObjectType">The destination object type</param>
-        /// <param name="limit">The number of records to return (500 maximum)</param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>AssociationListHubSpotModel</returns>
+        /// <param name="fromObjectType">
+        /// The source object type
+        /// </param>
+        /// <param name="fromObjectId">
+        /// The numeric ID of the source object instance
+        /// </param>
+        /// <param name="toObjectType">
+        /// The destination object type
+        /// </param>
+        /// <param name="limit">
+        /// The number of records to return (500 maximum)
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// AssociationListHubSpotModel
+        /// </returns>
         public AssociationListHubSpotModel<T> ListAssociationsByObjectType<T>(string fromObjectType, 
             long fromObjectId, string toObjectType, int limit = 500) where T : AssociationHubSpotModel, new()
         {
@@ -122,9 +150,15 @@ namespace HubSpot.NET.Api.Associations
         /// <summary>
         /// Set association labels between two records.
         /// </summary>
-        /// <param name="association">An AssociationHubSpotModel instance</param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>The provided AssociationHubSpotModel instance, updated to include the result of the operation</returns>
+        /// <param name="association">
+        /// An AssociationHubSpotModel instance that represents the association to be created
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// The provided AssociationHubSpotModel instance, updated to include the result of the operation
+        /// </returns>
         public T CreateAssociation<T>(T association) where T : AssociationHubSpotModel, new()
         {
             var path = $"{association.RouteBasePath}/objects/{association.FromObject.HubSpotObjectType}/" +
@@ -142,9 +176,16 @@ namespace HubSpot.NET.Api.Associations
         /// <summary>
         /// Deletes all associations between two objects
         /// </summary>
-        /// <param name="association"></param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>The provided AssociationHubSpotModel instance</returns>
+        /// <param name="association">
+        /// An AssociationHubSpotModel instance representing the association to delete. Note: The AssociationTypes
+        /// property does not have to be populated.
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// The provided AssociationHubSpotModel instance.
+        /// </returns>
         public T DeleteAllAssociations<T>(T association) where T : AssociationHubSpotModel, new()
         {
             var path = $"{association.RouteBasePath}/objects/{association.FromObject.HubSpotObjectType}/" +
@@ -158,23 +199,102 @@ namespace HubSpot.NET.Api.Associations
         /// <summary>
         /// Creates a single custom association type/label
         /// </summary>
-        /// <param name="fromObjectType">The source object type</param>
-        /// <param name="toObjectType">The destination object type</param>
-        /// <param name="associationType">The name of the label</param>
-        /// <typeparam name="T">AssociationHubSpotModel</typeparam>
-        /// <returns>An AssociationTypeListHubSpotModel instance</returns>
-        /// <remarks>This is used to create a custom association type/label that can be used when creating the actual
-        /// association between two objects. It does not create an association on its own.</remarks>
-        public AssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
-            string toObjectType, T associationType = null) where T : AssociationTypeHubSpotModel, new()
+        /// <param name="fromObjectType">
+        /// The source object type. This is optional if the FromObjectType property of the AssociationTypeHubSpotModel
+        /// instance (associationType parameter) is populated.
+        /// </param>
+        /// <param name="toObjectType">
+        /// The destination object type. This is optional if the ToObjectType property of the
+        /// AssociationTypeHubSpotModel instance (associationType parameter) is populated.
+        /// </param>
+        /// <param name="associationType">
+        /// An AssociationTypeHubSpotModel instance.
+        /// </param>
+        /// <typeparam name="T">
+        /// AssociationHubSpotModel
+        /// </typeparam>
+        /// <returns>
+        /// The newly-created AssociationTypeListHubSpotModel instance.
+        /// </returns>
+        /// <remarks>
+        /// This is used to create a custom association type/label that can be used when creating the actual
+        /// association between two objects. It does not create an association on its own. Source and destination
+        /// object types can be provided as parameters or as properties of the AssociationTypeHubSpotModel instance; the
+        /// former takes precedence over the latter.
+        /// </remarks>
+        public AssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(T associationType = null, 
+            string fromObjectType = null, string toObjectType = null) where T : AssociationTypeHubSpotModel, new()
         {
             associationType = associationType ?? new T();
+            fromObjectType = fromObjectType ?? associationType.FromObjectType ??
+                throw new NullReferenceException("'fromObjectType' parameter and/or 'FromObjectType' property " +
+                                                 "of the provided association type instance is 'null'.");
+            toObjectType = toObjectType ?? associationType.ToObjectType ?? 
+                throw new NullReferenceException("'toObjectType' parameter and/or 'ToObjectType' property " +
+                                                 "of the provided association type instance is 'null'.");
             var path = $"{associationType.RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
             // TODO - remove debugging
             Console.WriteLine($"### PATH: {path}");
             // TODO - remove serialisationType parameter
-            return _client.Execute<AssociationTypeListHubSpotModel<T>>(path, associationType, Method.Post, 
+            var associationTypeList = _client.Execute<AssociationTypeListHubSpotModel<T>>(path, associationType, Method.Post, 
                 SerialisationType.PropertyBag);
+            associationTypeList.GetSourceToDestLabel.FromObjectType = fromObjectType;
+            associationTypeList.GetSourceToDestLabel.ToObjectType = toObjectType;
+            associationTypeList.GetDestToSourceLabel.FromObjectType = toObjectType;
+            associationTypeList.GetDestToSourceLabel.ToObjectType = fromObjectType;
+            return associationTypeList;
+        }
+
+        /// <summary>
+        /// Update a single association type/label
+        /// </summary>
+        /// <param name="associationType">An AssociationTypeHubSpotModel instance</param>
+        /// <param name="associationTypeId">
+        /// The associationTypeId/typeId of the type/label to be updated. This is optional if the AssociationTypeId
+        /// property of the AssociationTypeHubSpotModel instance (associationType parameter) is populated.
+        /// </param>
+        /// <param name="fromObjectType">
+        /// The source object type. This is optional if the FromObjectType property of the AssociationTypeHubSpotModel
+        /// instance (associationType parameter) is populated.
+        /// </param>
+        /// <param name="toObjectType">
+        /// The destination object type. This is optional if the FromObjectType property of the
+        /// AssociationTypeHubSpotModel instance (associationType parameter) is populated.
+        /// </param>
+        /// <typeparam name="T">AssociationTypeHubSpotModel</typeparam>
+        /// <returns>
+        /// The updated AssociationTypeHubSpotModel instance.
+        /// </returns>
+        /// <exception cref="NullReferenceException">
+        /// If this method cannot determine values for the fromObjectType, toObjectType, or the associationTypeId
+        /// parameters, a NullReferenceException will be raised.
+        /// </exception>
+        /// <remarks>
+        /// This is used to update the name and/or label properties of an existing custom association type.
+        /// </remarks>
+        public AssociationTypeHubSpotModel UpdateCustomAssociationType<T>(T associationType, 
+            int? associationTypeId = null, string fromObjectType = null, string toObjectType = null) 
+            where T : AssociationTypeHubSpotModel, new()
+        {
+            fromObjectType = fromObjectType ?? associationType.FromObjectType ??
+                throw new NullReferenceException("'fromObjectType' parameter and/or 'FromObjectType' property " +
+                                                 "of the provided association type instance is 'null'.");
+            toObjectType = toObjectType ?? associationType.ToObjectType ?? 
+                throw new NullReferenceException("'toObjectType' parameter and/or 'ToObjectType' property " +
+                                                 "of the provided association type instance is 'null'.");
+            associationType.AssociationTypeId = associationType.AssociationTypeId ??
+                                associationTypeId ?? throw new NullReferenceException("The " +
+                                    "'associationTypeId' parameter and/or the 'AssociationTypeId' property of the " +
+                                    "provided association type instance is 'null'.");
+            var path = $"{associationType.RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
+            // TODO - remove debugging
+            Console.WriteLine($"### PATH: {path}");
+            // TODO - remove serialisationType parameter
+            _client.Execute<AssociationTypeHubSpotModel>(path, associationType, Method.Put,
+                SerialisationType.PropertyBag);
+            associationType.FromObjectType = fromObjectType;
+            associationType.ToObjectType = toObjectType;
+            return associationType;
         }
 
         /// <summary>
@@ -193,7 +313,7 @@ namespace HubSpot.NET.Api.Associations
         }
 
         /// <summary>
-        /// List association types between two object types.
+        /// List all applicable association types between two object types.
         /// <a href="https://developers.hubspot.com/docs/api/crm/associations#:~:text=Retrieve%20association%20types">
         /// See the documentation
         /// </a> for more details.
@@ -207,10 +327,16 @@ namespace HubSpot.NET.Api.Associations
         {
             var path = $"{new T().RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
             // TODO - remove debugging
-            Console.WriteLine(path);
+            Console.WriteLine($"### PATH: {path}");
             // TODO - remove serialisationType parameter
-            return _client.Execute<AssociationTypeListHubSpotModel<T>>(path, null, Method.Get,
+            var associationTypeList = _client.Execute<AssociationTypeListHubSpotModel<T>>(path, null, Method.Get,
                 SerialisationType.PropertyBag);
+            foreach (var associationType in associationTypeList.AssociationTypes)
+            {
+                associationType.FromObjectType = fromObjectType;
+                associationType.ToObjectType = toObjectType;
+            }
+            return associationTypeList;
         }
     }
 }

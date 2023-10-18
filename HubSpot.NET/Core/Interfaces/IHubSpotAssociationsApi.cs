@@ -27,8 +27,12 @@ namespace HubSpot.NET.Core.Interfaces
         
         T DeleteAllAssociations<T>(T association) where T : AssociationHubSpotModel, new();
         
-        AssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(string fromObjectType, 
-            string toObjectType, T label = null) where T : AssociationTypeHubSpotModel, new();
+        AssociationTypeListHubSpotModel<T> CreateCustomAssociationType<T>(T associationType = null, 
+            string fromObjectType = null, string toObjectType = null) where T : AssociationTypeHubSpotModel, new();
+
+        AssociationTypeHubSpotModel UpdateCustomAssociationType<T>(T associationType,
+            int? associationTypeId = null, string fromObjectType = null, string toObjectType = null)
+            where T : AssociationTypeHubSpotModel, new();
 
         void DeleteAssociationType(string fromObjectType, string toObjectType, long associationTypeId);
 
