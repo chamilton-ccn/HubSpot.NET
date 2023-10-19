@@ -81,7 +81,7 @@
 		<LangVersion>7.1</LangVersion>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<LangVersion>7.1</LangVersion>
+		<LangVersion>8</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="Api\Company\Dto\SearchRequestFilter.cs" />

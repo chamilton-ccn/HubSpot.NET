@@ -93,16 +93,26 @@ namespace HubSpot.NET.Api.Contact
         }
 
         /// <summary>
-        /// Gets a single contact by ID from hubspot
+        /// Gets a single contact by ID
         /// </summary>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contactId">The ID of the contact</param>
-        /// <returns>The contact entity or null if the contact does not exist</returns>
-        /// TODO - Modify to allow SearchRequestOptions to tailor the output
-        public T GetById<T>(long contactId) where T : ContactHubSpotModel, new()
+        /// <param name="opts">A SearchRequestOptions instance</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>A ContactHubSpotModel instance or null if one cannot be found</returns>
+        public T GetById<T>(long contactId, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
+            opts ??= new SearchRequestOptions();
+            
             var path = $"{new T().RouteBasePath}/{contactId}";
-
+            
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+            
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
+            
             try
             {
                 // TODO - remove convertToPropertiesSchema parameter
@@ -132,8 +142,13 @@ namespace HubSpot.NET.Api.Contact
             var path = $"{new T().RouteBasePath}/{email}"
                 .SetQueryParam("idProperty", "email");
             
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+            
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
             
             try
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -103,7 +104,7 @@ namespace HubSpot.NET.Core.Search
         /// default values returned by each object type.
         /// </summary>
         [DataMember(Name = "properties")]
-        public virtual List<string> PropertiesToInclude { get; set; } = new List<string>();
+        public virtual IList<string> PropertiesToInclude { get; set; } = new List<string>(); // TODO - Why is this virtual?
 
         /// <summary>
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects:~:text=Archived%20CRM%20objects%20won%E2%80%99t%20appear%20in%20any%20search%20results">
@@ -114,5 +115,14 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         [IgnoreDataMember]
         public bool Archived { get; set; } = false;
+
+        // TODO - Test whether this is a viable alternative (for consistency) for methods like GetByProperty, GetByEmail, etc.
+        [DataMember(Name = "idProperty", EmitDefaultValue = false)]
+        public string IdProperty { get; set; }
+        
+        [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
+        public IList<string> PropertiesWithHistory { get; set; }
+        
+        
     }
 }
