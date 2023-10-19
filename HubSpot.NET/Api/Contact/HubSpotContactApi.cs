@@ -98,6 +98,7 @@ namespace HubSpot.NET.Api.Contact
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contactId">The ID of the contact</param>
         /// <returns>The contact entity or null if the contact does not exist</returns>
+        /// TODO - Modify to allow SearchRequestOptions to tailor the output
         public T GetById<T>(long contactId) where T : ContactHubSpotModel, new()
         {
             var path = $"{new T().RouteBasePath}/{contactId}";
@@ -264,8 +265,7 @@ namespace HubSpot.NET.Api.Contact
             if (opts == null)
                 opts = new SearchRequestOptions();
 
-            var path = $"{new T().RouteBasePath}"
-                .SetQueryParam("limit", opts.Limit);
+            var path = $"{new T().RouteBasePath}".SetQueryParam("limit", opts.Limit);
 
             if (opts.PropertiesToInclude.Any())
                 path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);

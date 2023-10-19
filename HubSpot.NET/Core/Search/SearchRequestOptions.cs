@@ -104,5 +104,15 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         [DataMember(Name = "properties")]
         public virtual List<string> PropertiesToInclude { get; set; } = new List<string>();
+
+        /// <summary>
+        /// <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects:~:text=Archived%20CRM%20objects%20won%E2%80%99t%20appear%20in%20any%20search%20results">
+        /// Archived CRM objects won't appear in any search results.
+        /// </a> However, SearchRequestOptions is a multi-purpose object used by some methods to tailor the output
+        /// returned from HubSpot's API. So while the Archived property below is never used/ignored by Search requests,
+        /// it is used by records retrieval requests.
+        /// </summary>
+        [IgnoreDataMember]
+        public bool Archived { get; set; } = false;
     }
 }

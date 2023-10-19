@@ -13,6 +13,7 @@ namespace HubSpot.NET.Core.Requests
     {
         // TODO - marked for removal
         private readonly RequestDataConverter _requestDataConverter;
+        
         private readonly JsonSerializerSettings _jsonSerializerSettings;
 
         /// <summary>

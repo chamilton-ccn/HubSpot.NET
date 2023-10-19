@@ -9,6 +9,7 @@ namespace HubSpot.NET.Core.Serializers
 	using Newtonsoft.Json.Serialization;
 	using RestSharp.Serializers;
 
+    // TODO - marked for removal
 	public class NewtonsoftRestSharpSerializer : ISerializer
     {
 
