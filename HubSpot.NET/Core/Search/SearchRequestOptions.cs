@@ -124,6 +124,5 @@ namespace HubSpot.NET.Core.Search
         [IgnoreDataMember]
         public IList<string> PropertiesWithHistory { get; set; }
         
-        
     }
 }
