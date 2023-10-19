@@ -117,10 +117,11 @@ namespace HubSpot.NET.Core.Search
         public bool Archived { get; set; } = false;
 
         // TODO - Test whether this is a viable alternative (for consistency) for methods like GetByProperty, GetByEmail, etc.
-        [DataMember(Name = "idProperty", EmitDefaultValue = false)]
+        [IgnoreDataMember]
         public string IdProperty { get; set; }
         
-        [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
+        // TODO - Test whether this is a viable alternative (for consistency) for methods like GetByProperty, GetByEmail, etc.
+        [IgnoreDataMember]
         public IList<string> PropertiesWithHistory { get; set; }
         
         

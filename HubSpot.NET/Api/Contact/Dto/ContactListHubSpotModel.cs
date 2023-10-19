@@ -137,6 +137,9 @@ namespace HubSpot.NET.Api.Contact.Dto
             set => _searchRequestOptions = value;
         }
         
+        [DataMember(Name = "idProperty", EmitDefaultValue = false)]
+        private string _idProperty  => SearchRequestOptions.IdProperty;
+        
         [IgnoreDataMember]
         public string HubSpotObjectType => "contacts";
         

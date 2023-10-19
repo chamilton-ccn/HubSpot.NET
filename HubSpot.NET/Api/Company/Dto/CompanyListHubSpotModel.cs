@@ -131,7 +131,10 @@ namespace HubSpot.NET.Api.Company.Dto
         public SearchRequestOptions SearchRequestOptions {
             get => _searchRequestOptions ?? _defaultSearchRequestOptions;
             set => _searchRequestOptions = value;
-        }        
+        }
+        
+        [DataMember(Name = "idProperty", EmitDefaultValue = false)]
+        private string _idProperty  => SearchRequestOptions.IdProperty;
         
         [IgnoreDataMember]
         public string HubSpotObjectType => "companies";
