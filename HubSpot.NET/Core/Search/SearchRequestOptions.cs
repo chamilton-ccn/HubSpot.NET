@@ -40,6 +40,12 @@ namespace HubSpot.NET.Core.Search
         public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
 
         /// <summary>
+        /// This is a backing field for Limit
+        /// </summary>
+        [IgnoreDataMember]
+        private int _limit { get; set; } = 100;
+        
+        /// <summary>
         /// Gets or sets the number of items to return.
         /// </summary>
         /// <remarks>
@@ -52,7 +58,16 @@ namespace HubSpot.NET.Core.Search
         /// The number of items to return.
         /// </value>
         [DataMember(Name = "limit")]
-        public virtual int Limit { get; set; } = 100;
+        public int Limit
+        {
+            get => _limit;
+            set
+            {
+                if (value > 100)
+                    throw new ArgumentException($"{value} exceeds the maximum limit of 100 records per request");
+                _limit = value;
+            }
+        }
         
         /// <summary>
         /// Get or set the continuation offset when calling list many times to enumerate all your items
