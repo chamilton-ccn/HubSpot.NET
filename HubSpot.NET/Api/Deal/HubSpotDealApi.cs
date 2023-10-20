@@ -84,7 +84,7 @@ namespace HubSpot.NET.Api.Deal
         public DealListHubSpotModel<T> List<T>(bool includeAssociations, SearchRequestOptions opts = null) where T : DealHubSpotModel, new()
         {
             if (opts == null)
-                opts = new SearchRequestOptions(250);
+                opts = new SearchRequestOptions { Limit = 250 };
 
             var path = $"{new DealListHubSpotModel<T>().RouteBasePath}/deal/paged"
                 .SetQueryParam("limit", opts.Limit);

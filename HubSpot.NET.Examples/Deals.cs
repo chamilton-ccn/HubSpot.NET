@@ -76,7 +76,7 @@ namespace HubSpot.NET.Examples
              * Get all deals
              */
             var deals = api.Deal.List<DealHubSpotModel>(false,
-                new SearchRequestOptions(250) { PropertiesToInclude = new List<string> { "dealname", "amount" } });
+                new SearchRequestOptions { Limit = 250, PropertiesToInclude = new List<string> { "dealname", "amount" } });
 
             /**
              *  Get all deals
