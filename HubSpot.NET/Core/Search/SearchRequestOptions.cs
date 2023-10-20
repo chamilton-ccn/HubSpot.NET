@@ -22,8 +22,8 @@ namespace HubSpot.NET.Core.Search
         /// If limit isn't specified, it to the <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
         /// maximum allowable number</see>
         /// </summary>        
-        private int _limit = 100;
-        private readonly int _upperLimit;
+        //private int _limit = 100;
+        //private readonly int _upperLimit;
         
         /// <summary>
         /// Gets the SearchRequestSort object, which determines how to return the results. By default, we'll sort by
@@ -59,8 +59,8 @@ namespace HubSpot.NET.Core.Search
         /// The number of items to return.
         /// </value>
         [DataMember(Name = "limit")]
-        public virtual int Limit
-        {
+        public virtual int Limit { get; set; }
+        /*{
             get => _limit;
             set
             {
@@ -71,22 +71,22 @@ namespace HubSpot.NET.Core.Search
                 }
                 _limit = value;
             }
-        }
+        }*/
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:HubSpot.NET.Core.Search.SearchRequestOptions"/> class.
         /// </summary>
         /// <param name="upperLimit">Upper limit for the amount of items to request for the list.</param>
-        public SearchRequestOptions(int upperLimit)
+        /*public SearchRequestOptions(int upperLimit)
         {
             _upperLimit = upperLimit;
-        }
+        }*/
 
         /// <summary>
         /// Sets the upper limit to 100, which is the
         /// <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">maximum per page</see>. 
         /// </summary>
-        public SearchRequestOptions() : this(100) { }
+        //public SearchRequestOptions() : this(100) { }
 
         /// <summary>
         /// Get or set the continuation offset when calling list many times to enumerate all your items
