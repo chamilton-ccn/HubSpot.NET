@@ -1,13 +1,15 @@
 # Before you proceed ...
 
-_This is a work in progress!_ It is not ready for production use. What you are looking at is an ambitious re-write
+_This is a work in progress!_ It is __NOT READY__ for production use. What you are looking at is an ambitious re-write
 of the most recent fork of this library. 
 
 ## Main goals for this fork:
 
 * [x] Upgrading from `RestSharp` 105.2.3 -> 110.2.0
-* [ ] Language update: `>=` C# 8.0 
+* [x] Language update: `>=` C# 8.0 
 * [ ] Updating to V3/V4 API endpoints
+* [ ] Standardizing model implementations
+* [ ] Standardizing API calls / method names
 * [ ] Simplify serialization/deserialization by modifying models to closely resemble HubSpot requests/responses.
   * This is a bigger issue than it sounds. With the V3/V4 API, HubSpot's API has become more standardized with respect 
     to the structure of requests and responses, so objects are being refactored to more closely match that structure,
@@ -19,20 +21,80 @@ of the most recent fork of this library.
 #### This list is subject to change as progress continues
 
 * [ ] Refactoring existing objects
-  * [x] Company
-  * [x] Contacts
+  * [ ] Company
+    * [x] Model (`IHubSpotModel`) Interface
+    * [x] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
+  * [ ] Contacts
+    * [x] Model (`IHubSpotModel`) Interface
+    * [x] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] ContactList
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Deal
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] EmailSubscription
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Engagement
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Files
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Owner
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Task
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Ticket
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Properties
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
 * [ ] Adding new(-ish) objects; _Note:_ Some of these may have existed in one way or another but were either incomplete 
       or in need of updating for the V3/V4 API. 
   * [ ] Associations (new-ish)
+    * [ ] Model (`IHubSpotModel`) Interface
+    * [ ] ModelList (`IHubSpotModelList`) Interface
+    * [ ] Refactor Unit Tests
+    * [ ] Refactor examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
     * A word on "types" vs "labels": All of HubSpot's default association types are "unlabeled" types, however you can 
       create your own custom association _types_ that can be either labeled or unlabeled. A _label_ merely describes the 
       association. A _type_ represents an association that _could_ exist between two object types. So when creating a 
@@ -40,12 +102,14 @@ of the most recent fork of this library.
       `null`. Creating an unlabeled custom association type is analogous to "enabling" an association type from within 
       the __Associations__ tab of an object's settings. Probably the only time you want to do this is when creating an
       association _type_ between two objects where either one or both of those objects are _custom objects_. 
-  * [x] Search (new-ish)
-* [ ] Refactor unit tests
-* [ ] Refactor HubSpot.NET.Examples
-* [ ] Custom object types
-* [ ] Object Properties/Schema
-* [ ] Comprehensive documentation (XML comments, examples, etc.)
+  * [ ] Refactor Search
+    * [ ] `SearchRequestOptions` interface?
+    * [ ] Unit Tests
+    * [ ] Examples
+    * [ ] Comprehensive documentation (XML comments, examples, etc.)
+* [ ] Custom object types (TODO list TBD)
+* [ ] Object Properties/Schema (TODO list TBD)
+
  
 # HubSpot.NET
 C# .NET Wrapper around the common HubSpot APIs:

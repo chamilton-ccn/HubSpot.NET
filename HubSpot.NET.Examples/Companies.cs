@@ -225,7 +225,7 @@ namespace HubSpot.NET.Examples
                     Name = $"Squared Up {i:N0} - NEW COMPANY!"
                 });
             }
-            
+
             companiesBatch = api.Company.BatchCreateOrUpdate(companiesBatch);
             Console.WriteLine($"-> {companiesBatch.Total} Companies were created or updated");
             Console.WriteLine($"-> Status: {companiesBatch.Status}");

@@ -15,21 +15,8 @@ namespace HubSpot.NET.Api.Contact.Dto
     /// Models a set of results returned when querying for sets of contacts
     /// </summary>
     [DataContract]
-    public class ContactListHubSpotModel<T> : IHubSpotModel where T: ContactHubSpotModel, new()
+    public class ContactListHubSpotModel<T> : IHubSpotModel, IHubSpotModelList<T> where T: ContactHubSpotModel, new()
     {
-        /// <summary>
-        /// List request status
-        /// </summary>
-        [DataMember(Name = "status", EmitDefaultValue = false)]
-        public string Status { get; set; }
-        
-        /// <summary>
-        /// Total number of contacts in the Contacts list. This is not always populated! For example: batch operations
-        /// do not return a total but search operations do. 
-        /// </summary>
-        [DataMember(Name = "total", EmitDefaultValue = false)]
-        public long? Total { get; set; }
-
         /// <summary>
         /// The list of contacts
         /// </summary>
@@ -40,10 +27,10 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// This is a backing field for Contacts. Serialized as "inputs" in batch requests.
+        /// The list of contacts. Serialized as "inputs" in batch requests.
         /// </value>
         [DataMember(Name = "inputs")]
-        private IList<T> _inputs 
+        public IList<T> Inputs 
         {
             get => Contacts;
             set => Contacts = value;
@@ -53,16 +40,38 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// Gets or sets the list of contacts.
         /// </summary>
         /// <value>
-        /// This is a backing field for Contacts. Deserialized as "results" in batch responses.
+        /// The list of contacts. Deserialized from "results" in batch responses.
         /// </value>        
         [DataMember(Name = "results")]
-        private IList<T> _results
+        public IList<T> Results
         {
             get => Contacts;
             set => Contacts = value;
         }
         public bool ShouldSerializeResults() => false;
         
+        /// <summary>
+        /// List request status
+        /// </summary>
+        [DataMember(Name = "status", EmitDefaultValue = false)]
+        public string Status { get; set; }
+        
+        /// <summary>
+        /// This is a backing field for Total
+        /// </summary>
+        [DataMember(Name = "total", EmitDefaultValue = false)]
+        public long? _total { get; set; }
+
+        /// <summary>
+        /// Total number of contacts in the Contacts list.
+        /// </summary>
+        [IgnoreDataMember]
+        public long? Total
+        {
+            get => _total ?? Contacts.Count;
+            set => _total = value;
+        }
+       
         /// <summary>
         /// A count of errors returned in the response
         /// </summary>
@@ -74,8 +83,11 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// </summary>
         [DataMember(Name = "errors")] 
         public IList<ErrorsListItem> Errors { get; set; } = new List<ErrorsListItem>();
+
+        public bool ShouldSerializeErrors() => false;
         
-        public bool ShouldSerializeErrors() => Errors.Count > 0;
+        [DataMember(Name = "requestedAt", EmitDefaultValue = false)]
+        public DateTime RequestedAt { get; set; }
         
         [DataMember(Name = "startedAt", EmitDefaultValue = false)]
         public DateTime StartedAt { get; set; }
@@ -123,10 +135,13 @@ namespace HubSpot.NET.Api.Contact.Dto
         public PagingModel Paging { get; set; }
 
         [IgnoreDataMember]
-        public SearchRequestOptions SearchRequestOptions { get; set; }
+        public SearchRequestOptions SearchRequestOptions { get; set; } = new SearchRequestOptions();
 
         [DataMember(Name = "idProperty", EmitDefaultValue = false)]
-        private string _idProperty => SearchRequestOptions?.IdProperty;
+        public string IdProperty  => SearchRequestOptions.IdProperty;
+        
+        [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
+        public IList<string> PropertiesWithHistory => SearchRequestOptions.PropertiesWithHistory;
         
         [IgnoreDataMember]
         public string HubSpotObjectType => "contacts";

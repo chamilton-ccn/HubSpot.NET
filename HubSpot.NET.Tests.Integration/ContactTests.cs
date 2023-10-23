@@ -201,9 +201,10 @@ namespace HubSpot.NET.Tests.Integration
 							{
 								new SearchRequestFilter
 								{
-									PropertyName = "hs_lastmodifieddate",
+									PropertyName = "lastmodifieddate",
 									Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
-									Value = ((DateTimeOffset)DateTime.Today.AddDays(-7)).ToUnixTimeMilliseconds().ToString()
+									Value = ((DateTimeOffset)sampleContacts.First().CreatedAt).AddSeconds(-10)
+										.ToUnixTimeMilliseconds().ToString()
 								}
 							}
 						}

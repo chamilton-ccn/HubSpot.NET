@@ -136,6 +136,7 @@ namespace HubSpot.NET.Api.Company
                     companiesWithOutId.Companies.Add(company);
                 }
             }
+
             var companiesResults = new CompanyListHubSpotModel<T>();
             
             // If the companies in our batch have Id values, we assume this is an update operation.
