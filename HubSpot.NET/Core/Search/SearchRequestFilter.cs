@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Core.Search
 {
@@ -9,24 +11,24 @@ namespace HubSpot.NET.Core.Search
     [DataContract]
     public class SearchRequestFilter
     {
-        [DataMember(Name = "propertyName")]
-        public string PropertyName { get; set; } = "createdate";
+        [DataMember(Name = "propertyName", EmitDefaultValue = false)]
+        public string PropertyName { get; set; }
 
-        [DataMember(Name = "operator")]
-        public SearchRequestFilterOperatorType Operator { get; set; } = 
-            SearchRequestFilterOperatorType.GreaterThanOrEqualTo;
+        [DataMember(Name = "operator", EmitDefaultValue = false)]
+        public SearchRequestFilterOperatorType Operator { get; set; }
 
         /// <summary>
-        /// By default, we set Value to 7 days ago.
-        /// Note: All timestamp values returned from the API are UTC.
+        /// A single value to search for
         /// </summary>
         /// <remarks>
-        /// This has to be a string because it has to accept strings, numbers, timestamps, etc. All will eventually be
-        /// serialized to strings anyway, so there is no benefit to be gained by using any other data type.
+        /// This has to accept strings, numbers, timestamps, etc.
+        /// Note: All timestamp values returned from the API are UTC. 
         /// </remarks>
-        [DataMember(Name = "value")]
-        public string Value { get; set; } = ((DateTimeOffset)DateTime.Today.AddDays(-7))
-            .ToUnixTimeMilliseconds().ToString();
+        [DataMember(Name = "value", EmitDefaultValue = false)]
+        public string Value { get; set; }
+        
+        [DataMember(Name = "values", EmitDefaultValue = false)]
+        public IList<string> Values { get; set; }
 
         /// <summary>
         /// HighValue is only used when the Operator is "between", otherwise it is ignored by HubSpot.

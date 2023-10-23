@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubSpot.NET.Examples", "Hub
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HubSpot.NET.Tests.Integration", "HubSpot.NET.Tests.Integration\HubSpot.NET.Tests.Integration.csproj", "{BE64EDA6-6413-4BBD-A194-5C3DB9894955}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCRATCH", "SCRATCH\SCRATCH.csproj", "{EEF25EB5-C1E1-45B5-87A0-30B543A0F2B5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{BE64EDA6-6413-4BBD-A194-5C3DB9894955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE64EDA6-6413-4BBD-A194-5C3DB9894955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE64EDA6-6413-4BBD-A194-5C3DB9894955}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEF25EB5-C1E1-45B5-87A0-30B543A0F2B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEF25EB5-C1E1-45B5-87A0-30B543A0F2B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEF25EB5-C1E1-45B5-87A0-30B543A0F2B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEF25EB5-C1E1-45B5-87A0-30B543A0F2B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

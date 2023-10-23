@@ -304,10 +304,7 @@ namespace HubSpot.NET.Api.Contact
         
         public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
-            /*
-             * If no search criteria is supplied, default to "RecentlyCreated".
-             */
-            if (opts == null) return RecentlyCreated<T>();
+            opts ??= new SearchRequestOptions();
             var path = $"{new T().RouteBasePath}/search";
             // TODO - remove convertToPropertiesSchema parameter
             // TODO - Do we really need ExecuteList anymore?
@@ -321,37 +318,6 @@ namespace HubSpot.NET.Api.Contact
             opts.Offset = data.Offset;
             data.SearchRequestOptions = opts;
             return data;
-        }
-
-        public ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts != null) return Search<T>(opts);
-            opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
-            var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            /*
-             * SearchRequestFilter defaults to "createdate GreaterThanOrEqualTo 7 days ago", which seems to be a
-             * reasonable default for "RecentlyCreated".
-             */
-            var searchRequestFilter = new SearchRequestFilter();
-            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
-            opts.FilterGroups.Add(searchRequestFilterGroup);
-            return Search<T>(opts);
-        }
-        
-        public ContactListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts != null) return Search<T>(opts);
-            opts = new ContactListHubSpotModel<T>().SearchRequestOptions;
-            opts.Limit = 100;
-            opts.SortBy = "lastmodifieddate";
-            var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            var searchRequestFilter = new SearchRequestFilter
-            {
-                PropertyName = "lastmodifieddate"
-            };
-            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
-            opts.FilterGroups.Add(searchRequestFilterGroup);
-            return Search<T>(opts);
         }
     }
 }

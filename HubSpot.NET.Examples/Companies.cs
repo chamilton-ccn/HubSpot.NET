@@ -30,9 +30,27 @@ namespace HubSpot.NET.Examples
             /*
              * Search for recently created companies
              */
+            var recentlyCreatedSearch = new SearchRequestOptions
+            {
+                FilterGroups = new List<SearchRequestFilterGroup>
+                {
+                    new SearchRequestFilterGroup
+                    {
+                        Filters = new List<SearchRequestFilter>
+                        {
+                            new SearchRequestFilter
+                            {
+                                PropertyName = "createdate",
+                                Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
+                                Value = ((DateTimeOffset)DateTime.Today.AddDays(-7)).ToUnixTimeMilliseconds().ToString()
+                            }
+                        }
+                    }
+                }
+            };
             Console.WriteLine("* Searching for recently created companies ...");
             var recentlyCreated = api.Company
-                .RecentlyCreated<CompanyHubSpotModel>();
+                .Search<CompanyHubSpotModel>(recentlyCreatedSearch);
             var moreResults = true;
             while (moreResults)
             {
@@ -43,7 +61,7 @@ namespace HubSpot.NET.Examples
                 }
                 if (moreResults)
                     recentlyCreated =
-                        api.Company.RecentlyUpdated<CompanyHubSpotModel>(recentlyCreated.SearchRequestOptions);
+                        api.Company.Search<CompanyHubSpotModel>(recentlyCreated.SearchRequestOptions);
             }
 
             /*
@@ -55,14 +73,18 @@ namespace HubSpot.NET.Examples
             Console.WriteLine($"-> Company description updated: {company.Name} {company.Description}...");
             
             // Wait for HubSpot to catch up
-            Utilities.Sleep(10);
+            Utilities.Sleep();
             
             /*
              * Search for recently updated companies
              */
+            var recentlyUpdatedSearch = recentlyCreatedSearch;
+            recentlyUpdatedSearch.FilterGroups[0].Filters[0].PropertyName = "hs_lastmodifieddate";
+            recentlyUpdatedSearch.SortBy = "hs_lastmodifieddate";
+            recentlyUpdatedSearch.SortDirection = SearchRequestSortType.Descending;
             Console.WriteLine("* Searching for recently updated companies ...");
             var recentlyUpdated = api.Company
-                .RecentlyUpdated<CompanyHubSpotModel>();
+                .Search<CompanyHubSpotModel>(recentlyUpdatedSearch);
             moreResults = true;
             while (moreResults)
             {
@@ -73,7 +95,7 @@ namespace HubSpot.NET.Examples
                 }
                 if (moreResults)
                     recentlyUpdated =
-                        api.Company.RecentlyUpdated<CompanyHubSpotModel>(recentlyUpdated.SearchRequestOptions);
+                        api.Company.Search<CompanyHubSpotModel>(recentlyUpdated.SearchRequestOptions);
             }
             
             /*

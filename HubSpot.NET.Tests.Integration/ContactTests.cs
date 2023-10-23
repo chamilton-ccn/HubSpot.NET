@@ -115,21 +115,27 @@ namespace HubSpot.NET.Tests.Integration
 			{
 				var searchOptions = new SearchRequestOptions
 				{
-					Limit = 3
+					Limit = 3,
+					FilterGroups = new List<SearchRequestFilterGroup>
+					{
+						new SearchRequestFilterGroup
+						{
+							Filters = new List<SearchRequestFilter>
+							{
+								new SearchRequestFilter
+								{
+									PropertyName = "createdate",
+									Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
+									Value = ((DateTimeOffset)sampleContacts.First().CreatedAt).AddSeconds(-10)
+										.ToUnixTimeMilliseconds().ToString()
+								}
+							}
+						}
+					}
 				};
-				var filterGroup = new SearchRequestFilterGroup();
-				var filter = new SearchRequestFilter
-				{
-					Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
-					Value = ((DateTimeOffset)sampleContacts.First().CreatedAt).AddSeconds(-10)
-						.ToUnixTimeMilliseconds().ToString(),
-					PropertyName = "createdate"
-				};
-				filterGroup.Filters.Add(filter);
-				searchOptions.FilterGroups.Add(filterGroup);
 				
 				// Act
-				var results = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
+				var results = contactApi.Search<ContactHubSpotModel>(searchOptions);
                 
 				// Assert
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
@@ -139,7 +145,7 @@ namespace HubSpot.NET.Tests.Integration
 				
 				// Second Act
 				searchOptions.Offset = results.Offset;
-				var results2 = contactApi.RecentlyCreated<ContactHubSpotModel>(searchOptions);
+				var results2 = contactApi.Search<ContactHubSpotModel>(searchOptions);
                 
 				Assert.IsFalse(results2.MoreResultsAvailable, "Did not identify at the end of results.");
 				Assert.AreEqual(2, results2.Contacts.Count, "Did not return 2 of the 5 results.");
@@ -186,19 +192,37 @@ namespace HubSpot.NET.Tests.Integration
 			{
 				var searchOptions = new SearchRequestOptions
 				{
-					Limit = 2
+					Limit = 2,
+					FilterGroups = new List<SearchRequestFilterGroup>
+					{
+						new SearchRequestFilterGroup
+						{
+							Filters = new List<SearchRequestFilter>
+							{
+								new SearchRequestFilter
+								{
+									PropertyName = "hs_lastmodifieddate",
+									Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
+									Value = ((DateTimeOffset)DateTime.Today.AddDays(-7)).ToUnixTimeMilliseconds().ToString()
+								}
+							}
+						}
+					}
 				};
 
 				// Act
-				ContactListHubSpotModel<ContactHubSpotModel> results = contactApi.RecentlyUpdated<ContactHubSpotModel>(searchOptions);
+				ContactListHubSpotModel<ContactHubSpotModel> results = contactApi
+					.Search<ContactHubSpotModel>(searchOptions);
 
 				// Assert
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
 				Assert.AreEqual(2, results.Contacts.Count, "Did not return 3 of the 5 results.");
-				Assert.AreEqual(false, results.Contacts.Any(c => string.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
+				Assert.AreEqual(false, results.Contacts.Any(c => string
+					.IsNullOrWhiteSpace(c.Email)), "Some contacts do not have email addresses.");
 				Assert.AreNotEqual(0, results.Offset);
 
-				// Cannot actually test recently updated as recently created polutes the results.
+				// Cannot actually test recently updated as recently created pollutes the results.
+				// TODO - test recently updated
 			}
 			finally
 			{

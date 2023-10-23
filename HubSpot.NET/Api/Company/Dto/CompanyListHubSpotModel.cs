@@ -117,24 +117,12 @@ namespace HubSpot.NET.Api.Company.Dto
         
         [DataMember(Name = "paging")]
         public PagingModel Paging { get; set; }
-        
-        /// <summary>
-        /// Set the default search behavior.
-        /// </summary>
+
         [IgnoreDataMember]
-        private SearchRequestOptions _searchRequestOptions = null;
-        
-        [IgnoreDataMember]
-        private readonly SearchRequestOptions _defaultSearchRequestOptions = new SearchRequestOptions();
-        
-        [IgnoreDataMember]
-        public SearchRequestOptions SearchRequestOptions {
-            get => _searchRequestOptions ?? _defaultSearchRequestOptions;
-            set => _searchRequestOptions = value;
-        }
-        
+        public SearchRequestOptions SearchRequestOptions { get; set; }
+
         [DataMember(Name = "idProperty", EmitDefaultValue = false)]
-        private string _idProperty  => SearchRequestOptions.IdProperty;
+        private string _idProperty  => SearchRequestOptions?.IdProperty;
         
         [IgnoreDataMember]
         public string HubSpotObjectType => "companies";

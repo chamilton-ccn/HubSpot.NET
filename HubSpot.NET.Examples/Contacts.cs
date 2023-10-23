@@ -137,7 +137,26 @@ namespace HubSpot.NET.Examples
              * Get recently created contacts
              */
             Console.WriteLine($"* Retrieving recently created contacts ...");
-            var recent = api.Contact.RecentlyCreated<ContactHubSpotModel>();
+            var recentlyCreatedSearch = new SearchRequestOptions
+            {
+                FilterGroups = new List<SearchRequestFilterGroup>
+                {
+                    new SearchRequestFilterGroup
+                    {
+                        Filters = new List<SearchRequestFilter>
+                        {
+                            new SearchRequestFilter
+                            {
+                                PropertyName = "createdate",
+                                Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
+                                Value = ((DateTimeOffset)DateTime.Today.AddDays(-7)).ToUnixTimeMilliseconds().ToString()
+                            }
+                        }
+                    }
+                }
+            };
+            var recent = api.Contact
+                .Search<ContactHubSpotModel>(recentlyCreatedSearch);
             var recentResults = true;
             while (recentResults)
             {
@@ -149,7 +168,7 @@ namespace HubSpot.NET.Examples
                         $"<{searchResult.Email}> Created: {searchResult.CreatedAt} Modified: {searchResult.UpdatedAt}");
                 }
                 if (recentResults)
-                    recent = api.Contact.RecentlyCreated<ContactHubSpotModel>(recent.SearchRequestOptions);
+                    recent = api.Contact.Search<ContactHubSpotModel>(recent.SearchRequestOptions);
             }
             
             /*
@@ -503,30 +522,7 @@ namespace HubSpot.NET.Examples
                     }
                 }
             });
-
-            /*
-             * Get all contacts with specific properties
-             * By default only a few properties are returned
-             */
-            var contacts = api.Contact.List<ContactHubSpotModel>(
-                new SearchRequestOptions { PropertiesToInclude = new List<string> { "firstname", "lastname", "email" } });
-
-            /*
-             * Get the most recently updated contacts, limited to 10
-             */
-            var recentlyUpdated = api.Contact.RecentlyUpdated<ContactHubSpotModel>(new SearchRequestOptions()
-            {
-                Limit = 10
-            });
-
-            /*
-             * Get the most recently created contacts, limited to 10
-             */
-            var recentlyCreated = api.Contact.RecentlyCreated<ContactHubSpotModel>(new SearchRequestOptions()
-            {
-                Limit = 10
-            });
-
+            
           
         }
     }

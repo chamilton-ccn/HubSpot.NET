@@ -18,8 +18,6 @@ namespace HubSpot.NET.Core.Interfaces
         CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         CompanyListHubSpotModel<T> GetByDomain<T>(string domain, SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
-        CompanyListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
-        CompanyListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
         // TODO - Decouple Associations
         //T GetAssociations<T>(T entity) where T : CompanyHubSpotModel, new();
     }

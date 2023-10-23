@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+
+// ReSharper disable InconsistentNaming
 
 namespace HubSpot.NET.Core.Search
 {
@@ -12,11 +13,13 @@ namespace HubSpot.NET.Core.Search
     public class SearchRequestOptions
     {
         /// <summary>
-        /// Gets or set the query term to use when searching. Limited to three groups.
+        /// Gets or set the query term to use when searching. Limited to three groups of three filters.
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#filter-search-results">Reference</a>
         /// </summary>
         [DataMember(Name = "filterGroups")]
-        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>();
+        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3);
+        
+        
         
         /// <summary>
         /// Gets the SearchRequestSort object, which determines how to return the results. By default, we'll sort by
@@ -38,7 +41,7 @@ namespace HubSpot.NET.Core.Search
         
         [IgnoreDataMember]
         public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
-
+        
         /// <summary>
         /// This is a backing field for Limit
         /// </summary>

@@ -219,12 +219,10 @@ namespace HubSpot.NET.Api.Company
 
         public CompanyListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
         {
-            /*
-             * If no search criteria is supplied, default to "RecentlyCreated".
-             */
-            if (opts == null) return RecentlyCreated<T>();
+            opts ??= new SearchRequestOptions();
             var path = $"{new T().RouteBasePath}/search";
             // TODO - remove convertToPropertiesSchema parameter
+            // TODO - Do we really need ExecuteList anymore?
             var data = _client.ExecuteList<CompanyListHubSpotModel<T>>(path, opts, Method.Post,
                 convertToPropertiesSchema: true);
             /*
@@ -285,39 +283,6 @@ namespace HubSpot.NET.Api.Company
             return Search<T>(opts);
         }
         
-        public CompanyListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) 
-            where T : CompanyHubSpotModel, new()
-        {
-            if (opts != null) return Search<T>(opts);
-            opts = new CompanyListHubSpotModel<T>().SearchRequestOptions;
-            var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            /*
-             * SearchRequestFilter defaults to "createdate GreaterThanOrEqualTo 7 days ago", which seems to be a
-             * reasonable default for "RecentlyCreated".
-             */
-            var searchRequestFilter = new SearchRequestFilter();
-            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
-            opts.FilterGroups.Add(searchRequestFilterGroup);
-            return Search<T>(opts);
-        }
-        
-        public CompanyListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) 
-            where T : CompanyHubSpotModel, new()
-        {
-            if (opts != null) return Search<T>(opts);
-            opts = new CompanyListHubSpotModel<T>().SearchRequestOptions;
-            opts.Limit = 100;
-            opts.SortBy = "hs_lastmodifieddate";
-            var searchRequestFilterGroup = new SearchRequestFilterGroup();
-            var searchRequestFilter = new SearchRequestFilter
-            {
-                PropertyName = "hs_lastmodifieddate"
-            };
-            searchRequestFilterGroup.Filters.Add(searchRequestFilter);
-            opts.FilterGroups.Add(searchRequestFilterGroup);
-            return Search<T>(opts);
-        }        
-
         /// <summary>
         /// Gets a list of associations for a given deal
         /// </summary>

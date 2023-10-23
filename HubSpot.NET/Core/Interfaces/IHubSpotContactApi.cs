@@ -17,7 +17,5 @@ namespace HubSpot.NET.Core.Interfaces
         T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new();
         ContactListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
         ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
-        ContactListHubSpotModel<T> RecentlyCreated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
-        ContactListHubSpotModel<T> RecentlyUpdated<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
         }
 }
