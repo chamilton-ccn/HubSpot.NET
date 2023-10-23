@@ -66,7 +66,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// Total number of contacts in the Contacts list.
         /// </summary>
         [IgnoreDataMember]
-        public long? Total
+        public long Total
         {
             get => _total ?? Contacts.Count;
             set => _total = value;

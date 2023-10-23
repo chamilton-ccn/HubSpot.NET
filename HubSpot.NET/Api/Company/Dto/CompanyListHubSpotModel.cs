@@ -62,7 +62,7 @@ namespace HubSpot.NET.Api.Company.Dto
         /// Total number of companies in the Companies list.
         /// </summary>
         [IgnoreDataMember]
-        public long? Total
+        public long Total
         {
             get => _total ?? Companies.Count;
             set => _total = value;

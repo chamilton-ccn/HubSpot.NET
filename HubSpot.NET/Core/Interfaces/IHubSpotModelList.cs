@@ -20,7 +20,7 @@ namespace HubSpot.NET.Core.Interfaces
         
         string Status { get; }
         
-        long? Total { get; }
+        long Total { get; }
         
         long? TotalErrors { get; }
         
