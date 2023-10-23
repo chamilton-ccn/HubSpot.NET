@@ -202,6 +202,10 @@ namespace HubSpot.NET.Api.Contact
             return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
                 serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
         }
+        
+        // TODO - BatchArchive
+        // TODO - BatchRead
+        // TODO - BatchUpdate
 
         /// <summary>
         /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
@@ -212,6 +216,7 @@ namespace HubSpot.NET.Api.Contact
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <param name="contacts">The set of contacts to update/create</param>
         /// <returns>A list of contacts that were either updated or created</returns>
+        /// TODO - This was a bad idea and I should feel bad for trying to implement it here.
         public ContactListHubSpotModel<T> BatchCreateOrUpdate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
         {
             var createPath = $"{contacts.RouteBasePath}/batch/create";

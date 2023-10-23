@@ -1,102 +1,129 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using HubSpot.NET.Api.Associations.Dto;
 using HubSpot.NET.Core.Interfaces;
 
 // ReSharper disable InconsistentNaming
 
 namespace HubSpot.NET.Api.Company.Dto
 {
-
-    /// <summary>
-    /// Models a Company entity within HubSpot. Default properties are included here
-    /// with the intention that you'd extend this class with properties specific to 
-    /// your HubSpot account.
-    /// </summary>
     [DataContract]
     public class CompanyHubSpotModel : IHubSpotModel
     {
         /// <summary>
-        /// Company unique ID in HubSpot
+        /// This property can be either a `long` or a `string`. By default, the Id (`id`) property refers to the numeric
+        /// HubSpot ID of a record, but it can also refer to any unique value of a given record by populating the
+        /// IdProperty (`idProperty`) property of a SearchRequestOptions object with the HubSpot "system" name of a
+        /// unique field that exists on the record. For example, we might want to retrieve a Company by some custom
+        /// unique attribute: "my_custom_unique_property". In a batch request, we can populate the Id property below
+        /// with a value from "my_custom_unique_property" (which could be a number or a string), then we can set the
+        /// `IdProperty` of the SearchRequestOptions object to "my_custom_unique_property". This way HubSpot
+        /// knows to use that as the unique identifier instead of the unique numeric Id. 
         /// </summary>
-        /// <remarks>
-        /// If this value is 0L (default value for long) then we don't want it serialized at all
-        /// </remarks>
         [DataMember(Name = "id", EmitDefaultValue = false)]
-        //[IgnoreDataMember] // TODO - What was the point of this again?
-        public long Id { get; set; }
+        public dynamic Id
+        {
+            get
+            {
+                if (_idLong != 0L && _idString == null)
+                    return _idLong;
+                return _idString;
+            }
+            set
+            {
+                try
+                {
+                    _idLong = long.Parse(value);
+                }
+                catch (FormatException)
+                {
+                    _idString = (string)value;
+                }
+            }
+        }
+
+        [IgnoreDataMember]
+        private long _idLong { get; set; }
+        
+        [IgnoreDataMember]
+        private string _idString { get; set; }
         
         [DataMember(Name = "properties")]
-        private CompanyPropertiesModel _properties { get; set; } = new CompanyPropertiesModel();
-
+        private CompanyPropertiesModel Properties { get; set; } = new CompanyPropertiesModel();
+        
+        [DataMember(Name = "associations")]
+        public IList<AssociationHubSpotModel> Associations { get; set; } = new List<AssociationHubSpotModel>();
+        public bool SerializeAssociations { get; set; } = true;
+        public bool ShouldSerializeAssociations() => SerializeAssociations;
+        
         [IgnoreDataMember]
         public string Name
         {
-            get => _properties.Name;
-            set => _properties.Name = value;
+            get => Properties.Name;
+            set => Properties.Name = value;
         }
         
         [IgnoreDataMember]
         public string Domain
         {
-            get => _properties.Domain;
-            set => _properties.Domain = value;
+            get => Properties.Domain;
+            set => Properties.Domain = value;
         }
 
         [IgnoreDataMember]
         public string Website
         {
-            get => _properties.Website;
-            set => _properties.Website = value;
+            get => Properties.Website;
+            set => Properties.Website = value;
         }
 
         [IgnoreDataMember]
         public string Description
         {
-            get => _properties.Description;
-            set => _properties.Description = value;
+            get => Properties.Description;
+            set => Properties.Description = value;
         }
 
         [IgnoreDataMember]
         public string About
         {
-            get => _properties.About;
-            set => _properties.About = value;
+            get => Properties.About;
+            set => Properties.About = value;
         }
 
         [IgnoreDataMember]
         public string City
         {
-            get => _properties.City;
-            set => _properties.City = value;
+            get => Properties.City;
+            set => Properties.City = value;
         }
 
         [IgnoreDataMember]
         public string State
         {
-            get => _properties.State;
-            set => _properties.State = value;
+            get => Properties.State;
+            set => Properties.State = value;
         }
 
         [IgnoreDataMember]
         public string ZipCode
         {
-            get => _properties.ZipCode;
-            set => _properties.ZipCode = value;
+            get => Properties.ZipCode;
+            set => Properties.ZipCode = value;
         }
 
         [IgnoreDataMember]
         public string Country
         {
-            get => _properties.Country;
-            set => _properties.Country = value;
+            get => Properties.Country;
+            set => Properties.Country = value;
         }
         
         [DataMember(Name = "createdAt")]
-        [IgnoreDataMember]
         public DateTime? CreatedAt { get; set; }
 
         [DataMember(Name = "updatedAt")]
-        [IgnoreDataMember]
         public DateTime? UpdatedAt { get; set; }
 
         [IgnoreDataMember]

@@ -106,7 +106,9 @@ namespace HubSpot.NET.Api.Company
                 serialisationType: SerialisationType.Raw); // TODO - remove serializationType parameter
         }
         
-        // TODO - Add a BatchDelete method
+        // TODO - BatchArchive
+        // TODO - BatchRead
+        // TODO - BatchUpdate
         
         /// <summary>
         /// Update or create a set of companies, this is the preferred method when creating/updating in bulk.

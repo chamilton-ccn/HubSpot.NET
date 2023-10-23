@@ -11,9 +11,6 @@ using HubSpot.NET.Core.Search;
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
-    /// <summary>
-    /// Models a set of results returned when querying for sets of contacts
-    /// </summary>
     [DataContract]
     public class ContactListHubSpotModel<T> : IHubSpotModel, IHubSpotModelList<T> where T: ContactHubSpotModel, new()
     {

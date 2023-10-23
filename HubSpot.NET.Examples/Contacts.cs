@@ -109,8 +109,8 @@ namespace HubSpot.NET.Examples
                 updateContact.LastName += " UPDATE ME!";
                 batchContacts.Contacts.Add(updateContact);
             }
-            batchContacts.Contacts[2].Id = 999999999999; // This ID does not (should not) exist
-            batchContacts.Contacts[4].Id = 888888888888; // This ID does not (should not) exist
+            batchContacts.Contacts[2].Id = 999999999999; // This ID does not (should not) exist in our tenant
+            batchContacts.Contacts[4].Id = 888888888888; // This ID does not (should not) exist in our tenant
             var batchResults = api.Contact.BatchCreateOrUpdate(batchContacts);
             Console.WriteLine($"-> Status: {batchResults.Status}");
             Console.WriteLine($"-> Errors:");
