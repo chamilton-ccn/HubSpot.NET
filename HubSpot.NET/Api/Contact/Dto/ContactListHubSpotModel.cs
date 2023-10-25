@@ -54,20 +54,10 @@ namespace HubSpot.NET.Api.Contact.Dto
         public string Status { get; set; }
         
         /// <summary>
-        /// This is a backing field for Total
+        /// Total results; typically only populated during search operations.
         /// </summary>
         [DataMember(Name = "total", EmitDefaultValue = false)]
-        public long? _total { get; set; }
-
-        /// <summary>
-        /// Total number of contacts in the Contacts list.
-        /// </summary>
-        [IgnoreDataMember]
-        public long Total
-        {
-            get => _total ?? Contacts.Count;
-            set => _total = value;
-        }
+        public long? Total { get; set; }
        
         /// <summary>
         /// A count of errors returned in the response

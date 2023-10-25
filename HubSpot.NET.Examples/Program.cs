@@ -28,7 +28,7 @@ namespace HubSpot.NET.Examples
                 .Build();
 #endif
 
-            /**
+            /*
              * Initialize the API with your API Key
              * You can find or generate this under Integrations -> HubSpot API key
              */
@@ -44,9 +44,9 @@ namespace HubSpot.NET.Examples
 
             //Deals.Example(api);
 
-            //Companies.Example(api);
+            Companies.Example(api);
 
-            Contacts.Example(api);
+            //Contacts.Example(api);
 
             //CompanyProperties.Example(api);
 

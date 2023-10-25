@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 // ReSharper disable InconsistentNaming
@@ -53,9 +54,9 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         /// <remarks>
         /// Defaults to 100. We're assuming 100 is the maximum value because  
-        /// <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
-        /// that is the maximum value for Contacts objects</see>. The documentation for Companies does not list a
-        /// maximum value and 100 seems reasonable anyway.
+        /// <a href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
+        /// that is the maximum value for Contacts objects</a>. The documentation for Companies does not list a
+        /// maximum value and 100 seems reasonable anyway. Note: The limit is 50 if PropertiesWithHistory is non-null.
         /// </remarks>
         /// <value>
         /// The number of items to return.
@@ -63,11 +64,14 @@ namespace HubSpot.NET.Core.Search
         [DataMember(Name = "limit")]
         public int Limit
         {
-            get => _limit;
+            get => PropertiesWithHistory.Any() ? 50 : _limit;
             set
             {
-                if (value > 100)
-                    throw new ArgumentException($"{value} exceeds the maximum limit of 100 records per request");
+                if ((value > 100) | (value > 50 & PropertiesWithHistory.Any()))
+                {
+                    throw new ArgumentException($"{value} exceeds the maximum limit of 100 records (or 50 if " +
+                                                $"including property history) per request");
+                }
                 _limit = value;
             }
         }
@@ -88,7 +92,7 @@ namespace HubSpot.NET.Core.Search
         /// default values returned by each object type.
         /// </summary>
         [DataMember(Name = "properties")]
-        public virtual IList<string> PropertiesToInclude { get; set; } = new List<string>(); // TODO - Why is this virtual?
+        public IList<string> PropertiesToInclude { get; set; } = new List<string>();
 
         /// <summary>
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects:~:text=Archived%20CRM%20objects%20won%E2%80%99t%20appear%20in%20any%20search%20results">
@@ -98,7 +102,7 @@ namespace HubSpot.NET.Core.Search
         /// it is used by records retrieval requests.
         /// </summary>
         [IgnoreDataMember]
-        public bool Archived { get; set; } = false;
+        public bool Archived { get; set; }
 
         [IgnoreDataMember]
         public string IdProperty { get; set; }

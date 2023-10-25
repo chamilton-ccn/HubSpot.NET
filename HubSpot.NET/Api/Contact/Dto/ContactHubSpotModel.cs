@@ -27,7 +27,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         {
             get
             {
-                if (_idLong != 0L && _idString == null)
+                if (_idLong != null && _idString == null)
                     return _idLong;
                 return _idString;
             }
@@ -52,13 +52,16 @@ namespace HubSpot.NET.Api.Contact.Dto
         }
 
         [IgnoreDataMember]
-        public long _idLong { get; set; }
+        private long? _idLong { get; set; }
         
         [IgnoreDataMember]
-        public string _idString { get; set; }
+        private string _idString { get; set; }
         
         [DataMember(Name = "properties")]
         private ContactPropertiesModel Properties { get; set; } = new ContactPropertiesModel();
+        
+        public bool SerializeProperties { get; set; } = true;
+        public bool ShouldSerializeProperties() => SerializeProperties;
         
         [DataMember(Name = "associations")]
         public IList<AssociationHubSpotModel> Associations { get; set; } = new List<AssociationHubSpotModel>();

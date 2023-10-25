@@ -21,7 +21,7 @@ namespace HubSpot.NET.Examples
              * Create a contact
              */
             Console.WriteLine("* Creating a contact ...");
-            var contact = api.Contact.CreateOrUpdate(new ContactHubSpotModel()
+            var contact = api.Contact.Create(new ContactHubSpotModel()
             {
                 Email = "john@squaredup.com",
                 FirstName = "John",
@@ -88,10 +88,10 @@ namespace HubSpot.NET.Examples
             }
             
             /*
-             * Batch create or update contacts
+             * Batch create contacts
              */
             Console.WriteLine($"* Creating a batch of contacts ...");
-            var batchContacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+            var batchCreateContacts = new ContactListHubSpotModel<ContactHubSpotModel>();
             foreach (var i in Enumerable.Range(1, 10))
             {
                 var batchContact = new ContactHubSpotModel
@@ -102,36 +102,44 @@ namespace HubSpot.NET.Examples
                     Phone = $"{i:N0}{i:N0}{i:N0}-{i:N0}{i:N0}{i:N0}-{i:N0}{i:N0}{i:N0}{i:N0}",
                     Company = $"Test Company {i:N0}"
                 };
-                batchContacts.Contacts.Add(batchContact);
+                batchCreateContacts.Contacts.Add(batchContact);
             }
-            foreach (var updateContact in search.Contacts)
+            var batchCreateContactsResult = api.Contact.BatchCreate(batchCreateContacts);
+            Console.WriteLine($"Status: {batchCreateContactsResult.Status}");
+            Console.WriteLine($"Total: {batchCreateContactsResult.Total}");
+            foreach (var createdContact in batchCreateContactsResult.Contacts)
+            {
+                Console.WriteLine($"Created contact: {createdContact.FirstName} {createdContact.LastName} " +
+                                  $"<{createdContact.Email}>");
+            }
+
+            /*
+             * Wait for HubSpot to catch up
+             */
+            Utilities.Sleep(15);
+            
+            /*
+             * Batch update contacts
+             */
+            Console.WriteLine($"* Updating a batch of contacts ...");
+            var batchUpdateContacts = batchCreateContactsResult;
+            foreach (var updateContact in batchUpdateContacts.Contacts)
             {
                 updateContact.LastName += " UPDATE ME!";
-                batchContacts.Contacts.Add(updateContact);
             }
-            batchContacts.Contacts[2].Id = 999999999999; // This ID does not (should not) exist in our tenant
-            batchContacts.Contacts[4].Id = 888888888888; // This ID does not (should not) exist in our tenant
-            var batchResults = api.Contact.BatchCreateOrUpdate(batchContacts);
-            Console.WriteLine($"-> Status: {batchResults.Status}");
-            Console.WriteLine($"-> Errors:");
-            foreach (var error in batchResults.Errors)
+            var batchUpdateContactsResult = api.Contact.BatchUpdate(batchUpdateContacts);
+            Console.WriteLine($"Status: {batchCreateContactsResult.Status}");
+            Console.WriteLine($"Total: {batchCreateContactsResult.Total}");
+            foreach (var updatedContact in batchUpdateContactsResult.Contacts)
             {
-                Console.WriteLine($"\tStatus: {error.Status}");
-                Console.WriteLine($"\tCategory: {error.Category}");
-                Console.WriteLine($"\tMessage: {error.Message}");
-                if (error.Context.Ids.Count <= 0) continue;
-                Console.WriteLine($"\tProblematic Objects:");
-                foreach (var id in error.Context.Ids)
-                {
-                    Console.WriteLine($"\t\t* id: {id}");
-                }
-
+                Console.WriteLine($"Updated contact: {updatedContact.FirstName} {updatedContact.LastName} " +
+                                  $"<{updatedContact.Email}>");
             }
             
             /*
              * Wait for HubSpot to catch up
              */
-            Utilities.Sleep(30);
+            Utilities.Sleep(15);
             
             /*
              * Get recently created contacts

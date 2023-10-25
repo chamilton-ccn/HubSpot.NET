@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using HubSpot.NET.Api.Contact;
 using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core.Search;
+using HubSpot.NET.Core.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HubSpot.NET.Tests.Integration
@@ -11,7 +13,321 @@ namespace HubSpot.NET.Tests.Integration
 	[TestClass]
 	public class ContactTests
 	{
+		/// <summary>
+		/// Test BatchArchive operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchRead, archived/un-archived operations.
+		/// </remarks>
 		[TestMethod]
+		public void BatchArchive_Contacts()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				contacts.Contacts.Add(new ContactHubSpotModel
+				{
+					FirstName = $"{i:N0} Testy",
+					LastName = $"Testerson {timestamp}",
+					Email = $"{i:N0}-test@communityclosing.com",
+					Phone = "3018675309",
+					Company = $"Community Closing Network, LLC"
+				});
+			}
+			var batchCreateResult = contactApi.BatchCreate(contacts);
+			Utilities.Sleep();
+			// Created contact records should have an Id property that is a long type.
+			Assert.IsFalse(batchCreateResult.Contacts
+				.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+			var batchArchiveResult = contactApi.BatchArchive(batchCreateResult);
+			Utilities.Sleep();
+			// Archived contact records should have a Status of "ARCHIVED"
+			Assert.IsTrue(batchArchiveResult.Status == "ARCHIVED"); // TODO - Should this be an enum?
+			var batchReadResult = contactApi.BatchRead(batchArchiveResult);
+			// Contacts should be empty after an archive operation.
+			Assert.AreEqual(0, batchReadResult.Contacts.Count);
+			// But if we set "Archived = true" in our SearchRequestOptions object ...
+			batchArchiveResult.SearchRequestOptions.Archived = true;
+			// ... then request the batch again ...
+			var batchReadArchivedResult = contactApi.BatchRead(batchArchiveResult);
+			// ... we should have 20 "archived" contact records.
+			Assert.AreEqual(20, batchReadArchivedResult.Contacts.Count);
+		}
+		
+		/// <summary>
+		/// Test BatchCreate operations.
+		/// </summary>
+		[TestMethod]
+		public void BatchCreate_Contacts()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				contacts.Contacts.Add(new ContactHubSpotModel
+				{
+					FirstName = $"{i:N0} Testy",
+					LastName = $"Testerson {timestamp}",
+					Email = $"{i:N0}-test@communityclosing.com",
+					Phone = "3018675309",
+					Company = $"Community Closing Network, LLC"
+				});
+			}
+			var batchCreateResult = contactApi.BatchCreate(contacts);
+			Utilities.Sleep();
+			try
+			{
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+			}
+			finally
+			{
+				contactApi.BatchArchive(batchCreateResult);
+			}
+		}
+		
+		/// <summary>
+		/// Test BatchRead operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchCreate and BatchRead operations.
+		/// </remarks>
+		[TestMethod]
+		public void BatchRead_Contacts()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				contacts.Contacts.Add(new ContactHubSpotModel
+				{
+					FirstName = $"{i:N0} Testy",
+					LastName = $"Testerson {timestamp}",
+					Email = $"{i:N0}-test@communityclosing.com",
+					Phone = "3018675309",
+					Company = $"Community Closing Network, LLC"
+				});
+			}
+			var batchCreateResult = contactApi.BatchCreate(contacts);
+			Utilities.Sleep();
+			try
+			{
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+				var batchReadResult = contactApi.BatchRead(batchCreateResult);
+				// Retrieved contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchReadResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+				
+				foreach (var contact in batchReadResult.Contacts)
+				{
+					contact.Id = contact.Email;
+				}
+				var searchOptions = new SearchRequestOptions
+				{
+					IdProperty = "email"
+				};
+				batchReadResult = contactApi.BatchRead(batchReadResult, searchOptions);
+				// Retrieved contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchReadResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L | !(c.Id is long))));
+			}
+			finally
+			{
+				contactApi.BatchArchive(batchCreateResult);
+			}
+		}
+
+		/// <summary>
+		/// Test BatchUpdate operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchCreate and BatchRead operations. 
+		/// </remarks>
+		[TestMethod]
+		public void BatchUpdate_Contacts()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				contacts.Contacts.Add(new ContactHubSpotModel
+				{
+					FirstName = $"{i:N0} Testy",
+					LastName = $"Testerson {timestamp}",
+					Email = $"{i:N0}-test@communityclosing.com",
+					Phone = "3018675309",
+					Company = $"Community Closing Network, LLC"
+				});
+			}
+			var batchCreateResult = contactApi.BatchCreate(contacts);
+			Utilities.Sleep();
+
+			try
+			{
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+				foreach (var contact in batchCreateResult.Contacts)
+					contact.FirstName = $"{contact.FirstName}-UPDATED";
+				var batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
+				Utilities.Sleep();
+				var batchReadResult = contactApi.BatchRead(batchUpdateResult);
+				// Updated contact records should have a FirstName property that ends with "-UPDATED".
+				Assert.IsTrue(batchReadResult.Contacts.All(c => c.FirstName.Contains("-UPDATED")));
+			}
+			finally
+			{
+				contactApi.BatchArchive(batchCreateResult);
+			}
+		}
+
+		
+		[TestMethod]
+		public void List_Contacts()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contacts = new ContactListHubSpotModel<ContactHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				contacts.Contacts.Add(new ContactHubSpotModel
+				{
+					FirstName = $"{i:N0} Testy",
+					LastName = $"Testerson {timestamp}",
+					Email = $"{i:N0}-test@communityclosing.com",
+					Phone = "3018675309",
+					Company = $"Community Closing Network, LLC"
+				});
+			}
+			var batchCreateResult = contactApi.BatchCreate(contacts);
+			Utilities.Sleep();
+
+			try
+			{
+				// TODO - INCOMPLETE
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+				
+				foreach (var contact in batchCreateResult.Contacts)
+					contact.FirstName = $"{contact.FirstName}-UPDATED";
+				var batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
+				
+				Utilities.Sleep();
+				
+				foreach (var contact in batchCreateResult.Contacts)
+					contact.FirstName = $"{contact.FirstName}-UPDATED2";
+				batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
+				
+				Utilities.Sleep();
+				
+				var searchOptions = new SearchRequestOptions
+				{
+					PropertiesToInclude = new List<string> {
+						"firstname", 
+						"lastname",
+						"email",
+						"company",
+						"phone"
+					},
+					PropertiesWithHistory = new List<string>
+					{
+						"firstname", 
+						"lastname",
+						"email",
+						"company",
+						"phone"
+					}
+				};
+				// TODO - "test" / temporary stuff follows
+				var listContacts = contactApi.List<ContactHubSpotModel>(searchOptions);
+				var moreResults = true;
+				while (moreResults)
+				{
+					moreResults = listContacts.MoreResultsAvailable;
+					foreach (var contact in listContacts.Contacts)
+					{
+						Console.WriteLine($"{contact.FirstName} {contact.LastName}");
+					}
+					if (moreResults)
+						listContacts = contactApi.List<ContactHubSpotModel>(listContacts.SearchRequestOptions);
+						
+				}
+
+			}
+			finally
+			{
+				contactApi.BatchArchive(batchCreateResult);
+			}
+			
+		}
+		
+		/// <summary>
+		/// Test Create operations
+		/// </summary>
+		[TestMethod]
+		public void Create_Contact()
+		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contact = contactApi.Create(new ContactHubSpotModel
+			{
+				Email = "test@communityclosing.com",
+				FirstName = "Testy",
+				LastName = "Testerson",
+				Phone = "3018675309",
+				Company = "Community Closing Network, LLC"
+			});
+			try
+			{
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse((contact.Id is null | contact.Id == 0L) | !(contact.Id is long));
+			}
+			finally
+			{
+				Utilities.Sleep();
+				contactApi.Delete(contact);
+				contactApi.GetByUniqueId<ContactHubSpotModel>(contact.Id); 
+			}
+		}
+		
+		[TestMethod]
+		public void GetByUniqueId_Contact()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Update_Contact()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Delete_Contact()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Search_Contacts()
+		{
+			
+		}
+		
+	
+		
+		
+		
+		// *** ORIGINAL TESTS FOLLOW *** //
+		/*[TestMethod]
 		public void Search_5SamplesLimitedTo3WitContinuations_ReturnsCollectionWith3ItemsWithContinuationDetails()
 		{
 			// Arrange
@@ -266,9 +582,9 @@ namespace HubSpot.NET.Tests.Integration
                 // Clean-up
 				contactApi.Delete(contact.Id);
 			}
-		}
+		}*/
 
-		[TestMethod]
+		/*[TestMethod]
 		public void Update_SampleDetails_PropertiesAreUpdated()
 		{
 			// Arrange
@@ -318,9 +634,9 @@ namespace HubSpot.NET.Tests.Integration
 				// Clean-up
 				contactApi.Delete(contact.Id);
 			}
-		}
+		}*/
 
-		[TestMethod]
+		/*[TestMethod]
 		public void Delete_SampleContact_ContactIsDeleted()
 		{
 			// Arrange
@@ -343,6 +659,6 @@ namespace HubSpot.NET.Tests.Integration
 			contact = contactApi.GetByEmail<ContactHubSpotModel>(sampleContact.Email);
 			Console.WriteLine();
 			Assert.IsNull(contact, "The contact was searchable and not deleted.");
-		}
+		}*/
 	}
 }

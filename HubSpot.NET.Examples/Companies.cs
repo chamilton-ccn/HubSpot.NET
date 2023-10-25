@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using HubSpot.NET.Api.Company.Dto;
-using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;
@@ -13,6 +12,27 @@ namespace HubSpot.NET.Examples
     {
         public static void Example(HubSpotApi api)
         {
+            /*
+             * Creating a reusable search filter
+             */
+            var reusableSearchFilter = new SearchRequestOptions()
+            {
+                FilterGroups = new List<SearchRequestFilterGroup>
+                {
+                    new SearchRequestFilterGroup
+                    {
+                        Filters = new List<SearchRequestFilter>
+                        {
+                            new SearchRequestFilter()
+                        }
+                    }
+                },
+                PropertiesToInclude = new List<string>
+                {
+                    "domain", "name", "website"
+                }
+            };
+            
             /*
              * Create a company
              */
@@ -25,32 +45,21 @@ namespace HubSpot.NET.Examples
             Console.WriteLine($"-> Company created: {company.Name} ...");
             
             // Wait for HubSpot to catch up
-            Utilities.Sleep(15);
+            Utilities.Sleep();
             
             /*
              * Search for recently created companies
              */
-            var recentlyCreatedSearch = new SearchRequestOptions
-            {
-                FilterGroups = new List<SearchRequestFilterGroup>
-                {
-                    new SearchRequestFilterGroup
-                    {
-                        Filters = new List<SearchRequestFilter>
-                        {
-                            new SearchRequestFilter
-                            {
-                                PropertyName = "createdate",
-                                Operator = SearchRequestFilterOperatorType.GreaterThanOrEqualTo,
-                                Value = ((DateTimeOffset)DateTime.Today.AddDays(-7)).ToUnixTimeMilliseconds().ToString()
-                            }
-                        }
-                    }
-                }
-            };
             Console.WriteLine("* Searching for recently created companies ...");
+            
+            reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "createdate";
+            reusableSearchFilter.FilterGroups[0].Filters[0].Operator = SearchRequestFilterOperatorType
+                .GreaterThanOrEqualTo;
+            reusableSearchFilter.FilterGroups[0].Filters[0].Value = ((DateTimeOffset)DateTime.Today.AddDays(-7))
+                .ToUnixTimeMilliseconds().ToString();
+            
             var recentlyCreated = api.Company
-                .Search<CompanyHubSpotModel>(recentlyCreatedSearch);
+                .Search<CompanyHubSpotModel>(reusableSearchFilter);
             var moreResults = true;
             while (moreResults)
             {
@@ -63,9 +72,9 @@ namespace HubSpot.NET.Examples
                     recentlyCreated =
                         api.Company.Search<CompanyHubSpotModel>(recentlyCreated.SearchRequestOptions);
             }
-
+            
             /*
-             * Update a company's property
+             * Update a company
              */
             Console.WriteLine("* Updating a company ...");
             company.Description = "Data Visualization for Enterprise IT";
@@ -78,13 +87,13 @@ namespace HubSpot.NET.Examples
             /*
              * Search for recently updated companies
              */
-            var recentlyUpdatedSearch = recentlyCreatedSearch;
-            recentlyUpdatedSearch.FilterGroups[0].Filters[0].PropertyName = "hs_lastmodifieddate";
-            recentlyUpdatedSearch.SortBy = "hs_lastmodifieddate";
-            recentlyUpdatedSearch.SortDirection = SearchRequestSortType.Descending;
             Console.WriteLine("* Searching for recently updated companies ...");
+            
+            reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "hs_lastmodifieddate";
+            reusableSearchFilter.SortBy = "hs_lastmodifieddate";
+            
             var recentlyUpdated = api.Company
-                .Search<CompanyHubSpotModel>(recentlyUpdatedSearch);
+                .Search<CompanyHubSpotModel>(reusableSearchFilter);
             moreResults = true;
             while (moreResults)
             {
@@ -101,8 +110,14 @@ namespace HubSpot.NET.Examples
             /*
              * Get all companies with domain name "squaredup.com"
              */
+            Console.WriteLine("* Searching for companies with the domain: 'squaredup.com' ...");
+            reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "domain";
+            reusableSearchFilter.FilterGroups[0].Filters[0].Operator = SearchRequestFilterOperatorType.EqualTo;
+            reusableSearchFilter.FilterGroups[0].Filters[0].Value = "squaredup.com";
+            
             var companiesByDomain = api.Company
-                .GetByDomain<CompanyHubSpotModel>("squaredup.com");
+                .Search<CompanyHubSpotModel>(reusableSearchFilter);
+            
             moreResults = true;
             while (moreResults)
             {
@@ -111,39 +126,20 @@ namespace HubSpot.NET.Examples
                 {
                     Console.WriteLine($"-> Found company with domain: {domainSearchResult.Domain}");
                 }
-
                 if (moreResults)
                     companiesByDomain =
-                        api.Company.GetByDomain<CompanyHubSpotModel>("squaredup.com",
-                            companiesByDomain.SearchRequestOptions);
+                        api.Company.Search<CompanyHubSpotModel>(companiesByDomain.SearchRequestOptions);
             }
             
             /*
              * Search for a company by name
              */
             Console.WriteLine($"* Searching for a company by name: {company.Name} ...");
-            var searchedCompany = api.Company.Search<CompanyHubSpotModel>(new SearchRequestOptions()
-            {
-                FilterGroups = new List<SearchRequestFilterGroup>
-                {
-                    new SearchRequestFilterGroup
-                    {
-                        Filters = new List<SearchRequestFilter>
-                        {
-                            new SearchRequestFilter
-                            {
-                                PropertyName = "name",
-                                Operator = SearchRequestFilterOperatorType.EqualTo,
-                                Value = company.Name
-                            }
-                        }
-                    }
-                },
-                PropertiesToInclude = new List<string>
-                {
-                    "domain", "name", "website"
-                }
-            });
+            
+            reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "name";
+            reusableSearchFilter.FilterGroups[0].Filters[0].Value = company.Name;
+            
+            var searchedCompany = api.Company.Search<CompanyHubSpotModel>(reusableSearchFilter);
             foreach (var c in searchedCompany.Companies)
             {
                 Console.WriteLine($"-> Found: {c.Name}");
@@ -158,45 +154,25 @@ namespace HubSpot.NET.Examples
             /*
              * Batch create multiple companies and test searching/paging
              */
-            var companiesBatch = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+            var batchCreateCompanies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
             Console.WriteLine("* Batch creating multiple companies to demonstrate search & paging ...");
             for (var i = 1; i <= 33; i++)
             {
-                companiesBatch.Companies.Add(new CompanyHubSpotModel()
+                batchCreateCompanies.Companies.Add(new CompanyHubSpotModel()
                 {
                     Domain = "squaredup.com",
                     Name = $"Squared Up {i:N0}"
                 });
             }
-            companiesBatch = api.Company.BatchCreate(companiesBatch);
+            batchCreateCompanies = api.Company.BatchCreate(batchCreateCompanies);
             
             // Wait for HubSpot to catch up
-            Utilities.Sleep(20);
+            Utilities.Sleep();
             
             Console.WriteLine($"* Searching for companies containing 'Squared Up' in the name ...");
-            
-            var reusableSearchFilter = new SearchRequestOptions()
-            {
-                FilterGroups = new List<SearchRequestFilterGroup>
-                {
-                    new SearchRequestFilterGroup
-                    {
-                        Filters = new List<SearchRequestFilter>
-                        {
-                            new SearchRequestFilter
-                            {
-                                PropertyName = "name",
-                                Operator = SearchRequestFilterOperatorType.ContainsAToken,
-                                Value = "Squared Up"
-                            }
-                        }
-                    }
-                },
-                PropertiesToInclude = new List<string>
-                {
-                    "domain", "name", "website"
-                }
-            };
+
+            reusableSearchFilter.FilterGroups[0].Filters[0].Operator = SearchRequestFilterOperatorType.ContainsAToken;
+            reusableSearchFilter.FilterGroups[0].Filters[0].Value = "Squared Up";
             
             var searchedCompanies = api.Company
                 .Search<CompanyHubSpotModel>(reusableSearchFilter);
@@ -213,25 +189,18 @@ namespace HubSpot.NET.Examples
             }
             
             /*
-             * Batch create -or- update multiple companies
+             * Batch update companies
              */
-            foreach (var c in companiesBatch.Companies)
+            Console.WriteLine($"* Updating a batch of companies ...");
+            foreach (var c in batchCreateCompanies.Companies)
                 c.Name += " UPDATE ME!";
-            foreach (var i in Enumerable.Range(34, 66))
-            {
-                companiesBatch.Companies.Add(new CompanyHubSpotModel()
-                {
-                    Domain = "squaredup.com",
-                    Name = $"Squared Up {i:N0} - NEW COMPANY!"
-                });
-            }
 
-            companiesBatch = api.Company.BatchCreateOrUpdate(companiesBatch);
-            Console.WriteLine($"-> {companiesBatch.Total} Companies were created or updated");
-            Console.WriteLine($"-> Status: {companiesBatch.Status}");
+            var batchUpdateCompanies = api.Company.BatchUpdate(batchCreateCompanies);
+            Console.WriteLine($"-> Total: {batchUpdateCompanies.Total}");
+            Console.WriteLine($"-> Status: {batchUpdateCompanies.Status}");
             
             // Wait for HubSpot to catch up
-            Utilities.Sleep(20);
+            Utilities.Sleep();
             
             /*
              * List companies (using default search options)
@@ -251,17 +220,26 @@ namespace HubSpot.NET.Examples
             
             Console.WriteLine($"* Deleting all previously created companies ...");
             reusableSearchFilter.FilterGroups[0].Filters[0].PropertyName = "domain";
+            reusableSearchFilter.FilterGroups[0].Filters[0].Operator = SearchRequestFilterOperatorType.EqualTo;
             reusableSearchFilter.FilterGroups[0].Filters[0].Value = "squaredup.com";
             searchedCompanies = api.Company
-                .Search<CompanyHubSpotModel>(reusableSearchFilter);            
+                .Search<CompanyHubSpotModel>(reusableSearchFilter);
+
+            var deleteTest = api.Company.BatchArchive(searchedCompanies);
+            Console.WriteLine($">>>>>>> {deleteTest.Status}");
+            foreach (var shit in deleteTest.Companies)
+                Console.WriteLine($"shitty shit shit {shit.Name}");
+            
             moreResults = true;
             while (moreResults)
             {
                 moreResults = searchedCompanies.MoreResultsAvailable;
                 foreach (var searchResult in searchedCompanies.Companies)
                 {
-                    Console.WriteLine($"-> Deleting: {searchResult.Name}");
-                    api.Company.Delete(searchResult);
+                    //Console.WriteLine($"-> Deleting: {searchResult.Name}");
+                    //api.Company.Delete(searchResult);
+                    if (api.Company.GetByUniqueId<CompanyHubSpotModel>(searchResult.Id) == null)
+                        Console.WriteLine($"{searchResult.Name} has been deleted!");
                 }
                 if (moreResults)
                     searchedCompanies = api.Company.Search<CompanyHubSpotModel>(searchedCompany.SearchRequestOptions);

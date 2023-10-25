@@ -26,31 +26,40 @@ namespace HubSpot.NET.Api.Company.Dto
         {
             get
             {
-                if (_idLong != 0L && _idString == null)
+                if (_idLong != null && _idString == null)
                     return _idLong;
                 return _idString;
             }
             set
             {
-                try
+                if (value is long | value is int)
                 {
-                    _idLong = long.Parse(value);
+                    _idLong = (long)value;
                 }
-                catch (FormatException)
+                else
                 {
-                    _idString = (string)value;
+                    try
+                    {
+                        _idLong = long.Parse(value);
+                    }
+                    catch (FormatException)
+                    {
+                        _idString = (string)value;
+                    }
                 }
             }
         }
 
         [IgnoreDataMember]
-        private long _idLong { get; set; }
+        private long? _idLong { get; set; }
         
         [IgnoreDataMember]
         private string _idString { get; set; }
         
         [DataMember(Name = "properties")]
         private CompanyPropertiesModel Properties { get; set; } = new CompanyPropertiesModel();
+        public bool SerializeProperties { get; set; } = true;
+        public bool ShouldSerializeProperties() => SerializeProperties;
         
         [DataMember(Name = "associations")]
         public IList<AssociationHubSpotModel> Associations { get; set; } = new List<AssociationHubSpotModel>();

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Api.Contact.Dto
 {

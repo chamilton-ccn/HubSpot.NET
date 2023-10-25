@@ -20,32 +20,225 @@ namespace HubSpot.NET.Api.Company
         {
             _client = client;
         }
-
+        
         /// <summary>
-        /// Creates a Company entity
+        /// Archive a batch of companies by ID
         /// </summary>
+        /// <param name="companies">CompanyListHubSpotModel</param>
         /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="entity">The entity</param>
-        /// <returns>The created entity (with ID set)</returns>
-        public T Create<T>(T entity) where T : CompanyHubSpotModel, new()
+        /// <returns>CompanyListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public CompanyListHubSpotModel<T> BatchArchive<T>(CompanyListHubSpotModel<T> companies) 
+            where T : CompanyHubSpotModel, new()
         {
-            var path = $"{entity.RouteBasePath}";
-            // TODO - remove serialisationType parameter
-            return _client.Execute<T>(path, entity, Method.Post, SerialisationType.PropertyBag);
+            var path = $"{companies.RouteBasePath}/batch/archive";
+            
+            foreach (var contact in companies.Companies)
+            {
+                contact.SerializeAssociations = false;
+                contact.SerializeProperties = false;
+            }
+            
+            // TODO - remove SerializationType parameter
+            _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
+                SerialisationType.PropertyBag);
+            companies.Status = "ARCHIVED"; // TODO - Should this be an enum?
+            return companies;
         }
         
         /// <summary>
-        /// Updates a given company entity, any changed properties are updated
+        /// Create a batch of companies
+        /// </summary>
+        /// <param name="companies">CompanyListHubSpotModel</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>CompanyListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public CompanyListHubSpotModel<T> BatchCreate<T>(CompanyListHubSpotModel<T> companies)
+            where T : CompanyHubSpotModel, new()
+        {
+            var path = $"{companies.RouteBasePath}/batch/create";
+            // TODO remove serialisationType parameter
+            return _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
+                serialisationType: SerialisationType.Raw); 
+        }
+        
+        /// <summary>
+        /// Read a batch of companies by internal ID, or unique property values
+        /// </summary>
+        /// <param name="companies">CompanyListHubSpotModel</param>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>CompanyListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public CompanyListHubSpotModel<T> BatchRead<T>(CompanyListHubSpotModel<T> companies,
+            SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
+        {   
+            opts = opts != null 
+                ? companies.SearchRequestOptions = opts 
+                : companies.SearchRequestOptions;
+            
+            var path = $"{companies.RouteBasePath}/batch/read";
+
+            path = opts.Archived
+                ? path.SetQueryParam("archived", true)
+                : path;
+
+            foreach (var contact in companies.Companies)
+            {   
+                contact.SerializeAssociations = false;
+                contact.SerializeProperties = false;
+            }   
+
+            // TODO - remove SerializationType parameter
+            return _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
+                SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Update a batch of companies
+        /// </summary>
+        /// <param name="companies">CompanyListHubSpotModel</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>CompanyListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public CompanyListHubSpotModel<T> BatchUpdate<T>(CompanyListHubSpotModel<T> companies)
+            where T : CompanyHubSpotModel, new()
+        {
+            var path = $"{companies.RouteBasePath}/batch/update";
+            // TODO - remove SerializationType parameter
+            return _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
+                SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Read a page of companies. Control what is returned via the properties query param.
+        /// </summary>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>CompanyListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null)
+            where T : CompanyHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+
+            var path = $"{new T().RouteBasePath}";
+
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+
+            path = opts.PropertiesWithHistory.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesWithHistory, "propertiesWithHistory")
+                : path;
+            
+            path = path.SetQueryParam("limit", opts.Limit);
+            
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
+
+            if (opts.Offset.HasValue)
+                path = path.SetQueryParam("after", opts.Offset);
+            
+            // TODO - remove SerializationType parameter
+            var data = _client.Execute<CompanyListHubSpotModel<T>>(path, opts, Method.Get,
+                SerialisationType.PropertyBag);
+            opts.Offset = data.Offset;
+            data.SearchRequestOptions = opts;
+            return data;
+        }
+        
+        /// <summary>
+        /// Create a company with the given properties and return a copy of the object, including the ID
         /// </summary>
         /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="company">The company entity</param>
-        /// <returns>The updated company entity</returns>
-        public T Update<T>(T company) where T : CompanyHubSpotModel, new()
+        /// <param name="company">A CompanyHubSpotModel instance</param>
+        /// <returns>A CompanyHubSpotModel instance with the Id field populated</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public T Create<T>(T company) where T : CompanyHubSpotModel, new()
         {
-            var path = company.Id != 0L
-                ? $"{company.RouteBasePath}/{company.Id}"
-                : throw new ArgumentException("Company entity must have an id set!");
+            var path = $"{company.RouteBasePath}";
+            // TODO - remove serialisationType parameter
+            return _client.Execute<T>(path, company, Method.Post, SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Get a single company by unique Id
+        /// </summary>
+        /// <param name="uniqueId">The unique ID of the company</param>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>A CompanyHubSpotModel instance or null if one cannot be found</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public T GetByUniqueId<T>(string uniqueId, SearchRequestOptions opts = null) 
+            where T : CompanyHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            
+            var path = $"{new T().RouteBasePath}/{uniqueId}";
 
+            path = opts.IdProperty != null
+                ? path.SetQueryParam("idProperty", opts.IdProperty)
+                : path;
+            
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+            
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
+            
+            try
+            {
+                // TODO - Remove SerializationType parameter
+                var data = _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
+                return data;
+            }
+            catch (HubSpotException e)
+            {
+                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
+                    return null;
+                throw;
+            }
+        }
+        public T GetByUniqueId<T>(long uniqueId, SearchRequestOptions opts = null)
+            where T : CompanyHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            return GetByUniqueId<T>(uniqueId.ToString(), opts);
+        }
+        public T GetByUniqueId<T>(int uniqueId, SearchRequestOptions opts = null)
+            where T : CompanyHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            return GetByUniqueId<T>(uniqueId.ToString(), opts);
+        }
+        
+        /// <summary>
+        /// Perform a partial update of a company identified by Id
+        /// </summary>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <param name="company">CompanyHubSpotModel</param>
+        /// <param name="idProperty">The name of the unique property value to use as the unique id</param>
+        /// <exception cref="ArgumentException">Id property of the company object cannot be null</exception>
+        /// <remarks>
+        /// The Id field can contain the value of any valid unique identifier as long as
+        /// that identifier is specified by the idProperty parameter.
+        /// </remarks>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/companies"/>
+        public T Update<T>(T company, string idProperty = null) where T : CompanyHubSpotModel, new()
+        {
+            if (company.Id == null)
+                throw new ArgumentException("Id property cannot be null!");
+            
+            var path = $"{company.RouteBasePath}/{company.Id}";
+            
+            path = idProperty != null
+                ? path.SetQueryParam("idProperty", idProperty)
+                : path;
+            
             // TODO - remove serialisationType parameter 
             return _client.Execute<T>(path, company, Method.Patch, SerialisationType.PropertyBag);
         }
@@ -69,221 +262,23 @@ namespace HubSpot.NET.Api.Company
         /// </param>
         public void Delete(CompanyHubSpotModel company)
         {
-            if (company.Id == 0L)
-                throw new ArgumentException("Company entity must have an id.");
+            if (company.Id == null)
+                throw new ArgumentException("Unable to delete without specifying an id.");
             Delete(company.Id);
         }
-
-        /// <summary>
-        /// Creates or Updates a company entity
-        /// </summary>
-        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="company">The company object to create or update</param>
-        /// <returns>The created company (with ID set)</returns>
-        public T CreateOrUpdate<T>(T company) where T : CompanyHubSpotModel, new()
-        {
-            try
-            {
-                return Create(company);
-            }
-            catch (HubSpotException e)
-            {
-                return Update(company);
-            }
-        }
         
-        /// <summary>
-        /// Creates a batch of Company objects
-        /// </summary>
-        /// <param name="companies"></param>
-        /// <typeparam name="T">A CompanyHubSpotModel instance</typeparam>
-        /// <returns>CompanyListHubSpotModel</returns>
-        public CompanyListHubSpotModel<T> BatchCreate<T>(CompanyListHubSpotModel<T> companies)
-            where T : CompanyHubSpotModel, new()
-        {
-            var path = $"{new T().RouteBasePath}/batch/create";
-            return _client.ExecuteBatch<CompanyListHubSpotModel<T>>(path, companies, Method.Post,
-                serialisationType: SerialisationType.Raw); // TODO - remove serializationType parameter
-        }
+        // TODO [PUBLIC_OBJECT] [MERGE]
+        // TODO [GDPR] [GDPR DELETE]
         
-        // TODO - BatchArchive
-        // TODO - BatchRead
-        // TODO - BatchUpdate
-        
-        /// <summary>
-        /// Update or create a set of companies, this is the preferred method when creating/updating in bulk.
-        /// This method will determine whether a company in the batch needs to be updated or created.
-        /// </summary>
-        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="companies">The set of companies to update/create</param>
-        /// <returns>A list of companies that were either updated or created</returns>
-        public CompanyListHubSpotModel<T> BatchCreateOrUpdate<T>(CompanyListHubSpotModel<T> companies)
-            where T : CompanyHubSpotModel, new()
-        {
-            var updatePath = $"{new T().RouteBasePath}/batch/update";
-            
-            var companiesWithId = new CompanyListHubSpotModel<T>();
-            var companiesWithOutId = new CompanyListHubSpotModel<T>();
-            var statuses = new List<string>();
-            
-            foreach (var company in companies.Companies)
-            {
-                // If company.Id isn't the default value for long, add it to the list of companies with id values
-                if (company.Id != 0L)
-                {
-                    companiesWithId.Companies.Add(company);
-                }
-                else
-                {
-                    companiesWithOutId.Companies.Add(company);
-                }
-            }
-
-            var companiesResults = new CompanyListHubSpotModel<T>();
-            
-            // If the companies in our batch have Id values, we assume this is an update operation.
-            if (companiesWithId.Companies.Count != 0)
-            {
-                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
-                //return _client.Execute<CompanyListHubSpotModel<T>>(path, companies, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-                var data = _client.ExecuteBatch<CompanyListHubSpotModel<T>>(updatePath, companiesWithId, Method.Post,
-                    serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
-                foreach (var error in data.Errors)
-                    companiesResults.Errors.Add(error);
-                foreach (var company in data.Companies)
-                    companiesResults.Companies.Add(company);
-                statuses.Add(data.Status += $" ({data.Companies.Count} companies updated)");
-                companiesResults.Total = data.Companies.Count;
-            }
-            // If the companies in our batch do not have Id values, we assume this is a create operation.
-            if (companiesWithOutId.Companies.Count != 0)
-            {
-                var data = BatchCreate(companiesWithOutId);
-                foreach (var error in data.Errors)
-                    companiesResults.Errors.Add(error);
-                foreach (var company in data.Companies)
-                    companiesResults.Companies.Add(company);
-                statuses.Add(data.Status += $" ({data.Companies.Count} companies created)");
-                companiesResults.Total += data.Companies.Count;
-            }
-            companiesResults.Status = string.Join(",", statuses);
-            return companiesResults;
-        }
-
-        /// <summary>
-        /// Gets a single company by ID from hubspot
-        /// </summary>
-        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="companyId">The ID of the company</param>
-        /// <returns>The company entity or null if the company does not exist</returns>
-        public T GetById<T>(long companyId) where T : CompanyHubSpotModel, new()
-        {
-            var path =  $"{new T().RouteBasePath}/{companyId}";
-
-            try
-            {
-                // TODO - remove convertToPropertiesSchema parameter
-                return _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
-            }
-            catch (HubSpotException e)
-            {
-                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
-                    return null;
-                throw;
-            }
-        }
-
-        public CompanyListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T: CompanyHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new SearchRequestOptions();
-
-            var path = $"{new T().RouteBasePath}"
-                .SetQueryParam("limit", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
-
-            if (opts.Offset.HasValue)
-                path = path.SetQueryParam("after", opts.Offset);
-
-            // TODO - remove convertToPropertiesSchema parameter
-			var data = _client.ExecuteList<CompanyListHubSpotModel<T>>(path, convertToPropertiesSchema: true);
-            /*
-             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
-             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
-             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
-             * is one).
-             */
-            opts.Offset = data.Offset;
-            data.SearchRequestOptions = opts;
-            return data;
-        }
-
         public CompanyListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
         {
             opts ??= new SearchRequestOptions();
             var path = $"{new T().RouteBasePath}/search";
-            // TODO - remove convertToPropertiesSchema parameter
-            // TODO - Do we really need ExecuteList anymore?
-            var data = _client.ExecuteList<CompanyListHubSpotModel<T>>(path, opts, Method.Post,
-                convertToPropertiesSchema: true);
-            /*
-             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
-             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
-             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
-             * is one).
-             */
+            // TODO - remove SerializationType parameter
+            var data = _client.Execute<CompanyListHubSpotModel<T>>(path, opts, Method.Post, SerialisationType.PropertiesSchema);
             opts.Offset = data.Offset;
             data.SearchRequestOptions = opts;
             return data;
-        }
-
-        
-        /// <summary>
-        /// Gets a list of companies by domain name
-        /// </summary>
-        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
-        /// <param name="domain">Domain name to search for</param>
-        /// <param name="opts">
-        /// Set of search options - domain name will be AND'ed to this if it is specified
-        /// </param>
-        /// <returns>
-        /// A list of companies whose domain name matches
-        /// </returns>
-        /// <remarks>
-        /// This exists for backward compatibility.
-        /// </remarks>
-        [Obsolete("This functionality will be removed in favor of the general purpose Search method")]
-        public CompanyListHubSpotModel<T> GetByDomain<T>(string domain, SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new()
-        {
-            var domainFilter = new SearchRequestFilterGroup
-            {
-                Filters = new List<SearchRequestFilter>
-                {
-                    new SearchRequestFilter
-                    {
-                        PropertyName = "domain",
-                        Operator = SearchRequestFilterOperatorType.EqualTo,
-                        Value = domain
-                    }
-                }
-            };
-            
-            if (opts == null)
-            {
-                opts = new SearchRequestOptions()
-                {
-                    FilterGroups = new List<SearchRequestFilterGroup> { domainFilter },
-                };
-            }
-            else
-            {
-                opts.FilterGroups.Add(domainFilter);
-            }
-            if (!opts.PropertiesToInclude.Contains("domain"))
-                opts.PropertiesToInclude.Add("domain");
-            return Search<T>(opts);
         }
         
         /// <summary>

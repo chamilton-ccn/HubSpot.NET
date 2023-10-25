@@ -8,7 +8,7 @@
         /// <param name="duration">
         /// The number of seconds to sleep
         /// </param>
-        public static void Sleep(int duration = 10)
+        public static void Sleep(int duration = 20)
         {
             System.Threading.Thread.Sleep(duration * 1000);
         }

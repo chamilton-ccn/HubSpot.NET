@@ -68,7 +68,7 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual("Updated Company #1", company.Name);
 
 				// Second Act
-				company = companyApi.GetById<CompanyHubSpotModel>(company.Id);
+				company = companyApi.GetByUniqueId<CompanyHubSpotModel>(company.Id);
 
 				// Second Assert
 				Assert.AreNotEqual(sampleCompany.Domain, company.Domain);
@@ -100,7 +100,7 @@ namespace HubSpot.NET.Tests.Integration
 			companyApi.Delete(company.Id);
 
 			// Assert
-			company = companyApi.GetById<CompanyHubSpotModel>(company.Id);
+			company = companyApi.GetByUniqueId<CompanyHubSpotModel>(company.Id);
 			Assert.IsNull(company, "The company was searchable and not deleted.");
 		}
 
@@ -134,7 +134,14 @@ namespace HubSpot.NET.Tests.Integration
 				};
 
 				// Act
-				CompanyListHubSpotModel<CompanyHubSpotModel> results = companyApi.GetByDomain<CompanyHubSpotModel>("sampledomain.com", searchOptions);
+				var domainSearch = new SearchRequestOptions();
+				domainSearch.FilterGroups[0].Filters[0] = new SearchRequestFilter
+				{
+					Value = "sampledomain.com",
+					PropertyName = "domain",
+					Operator = SearchRequestFilterOperatorType.EqualTo
+				};
+				var results = companyApi.Search<CompanyHubSpotModel>(domainSearch);
 
 				// Assert
 				Assert.IsTrue(results.MoreResultsAvailable, "Did not identify more results are available.");
@@ -146,7 +153,7 @@ namespace HubSpot.NET.Tests.Integration
 
 				// Second Act
 				searchOptions.Offset = results.Offset;
-				var results2 = companyApi.GetByDomain<CompanyHubSpotModel>("sampledomain.com", searchOptions);
+				var results2 = companyApi.Search<CompanyHubSpotModel>(domainSearch);
 
 				Assert.IsFalse(results2.MoreResultsAvailable, "Did not identify at the end of results.");
 				Assert.AreEqual(1, results2.Results.Count, "Did not return 1 of the 5 results.");

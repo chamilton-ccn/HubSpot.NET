@@ -21,6 +21,7 @@ namespace HubSpot.NET.Core.Extensions
         /// </summary>
         /// <param name="url">The URL string</param>
         /// <param name="properties">An enumerable containing values that will be appended to the URL</param>
+        /// <param name="parameterName">The name of the URL parameter; defaults to "properties".</param>
         /// <returns>A URL with a "properties" query parameter appended.</returns>
         /// <example>
         /// <code>
@@ -29,14 +30,15 @@ namespace HubSpot.NET.Core.Extensions
         /// </code>
         /// The above returns: http://example.tld?properties=firstname%2clastname%2cemail
         /// </example>
-        public static string SetPropertiesListQueryParams(this string url, IEnumerable<string> properties)
+        public static string SetPropertiesListQueryParams(this string url, IEnumerable<string> properties,
+            string parameterName = "properties")
         {
             var newUrl = new StringBuilder(url);
             if (!url.Contains('?'))
                 newUrl.Append('?');
             else if (!url.EndsWith("&"))
                 newUrl.Append('&');
-            newUrl.Append($"properties={WebUtility.UrlEncode(string.Join(",", properties))}");
+            newUrl.Append($"{parameterName}={WebUtility.UrlEncode(string.Join(",", properties))}");
             return newUrl.ToString();
         }
 

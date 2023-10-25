@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using RestSharp;
-using System.Collections.Generic;
 using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core;
 using HubSpot.NET.Core.Errors;
@@ -20,13 +19,144 @@ namespace HubSpot.NET.Api.Contact
         {
             _client = client;
         }
+        
+        /// <summary>
+        /// Archive a batch of contacts by ID
+        /// </summary>
+        /// <param name="contacts">ContactListHubSpotModel</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public ContactListHubSpotModel<T> BatchArchive<T>(ContactListHubSpotModel<T> contacts) 
+            where T : ContactHubSpotModel, new()
+        {
+            var path = $"{contacts.RouteBasePath}/batch/archive";
+            
+            foreach (var contact in contacts.Contacts)
+            {
+                contact.SerializeAssociations = false;
+                contact.SerializeProperties = false;
+            }
+            
+            // TODO - remove SerializationType parameter
+            _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
+                SerialisationType.PropertyBag);
+            contacts.Status = "ARCHIVED"; // TODO - Should this be an enum?
+            return contacts;
+        }
+        
+        /// <summary>
+        /// Create a batch of contacts
+        /// </summary>
+        /// <param name="contacts">ContactListHubSpotModel</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
+            where T : ContactHubSpotModel, new()
+        {
+            var path = $"{contacts.RouteBasePath}/batch/create";
+            // TODO remove serialisationType parameter
+            return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
+                serialisationType: SerialisationType.Raw); 
+        }
 
         /// <summary>
-        /// Create a contact
+        /// Read a batch of contacts by internal ID, or unique property values
+        /// </summary>
+        /// <param name="contacts">ContactListHubSpotModel</param>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public ContactListHubSpotModel<T> BatchRead<T>(ContactListHubSpotModel<T> contacts,
+            SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
+        {
+            opts = opts != null 
+                ? contacts.SearchRequestOptions = opts 
+                : contacts.SearchRequestOptions;
+            
+            var path = $"{contacts.RouteBasePath}/batch/read";
+
+            path = opts.Archived
+                ? path.SetQueryParam("archived", true)
+                : path;
+            
+            foreach (var contact in contacts.Contacts)
+            {
+                contact.SerializeAssociations = false;
+                contact.SerializeProperties = false;
+            }
+
+            // TODO - remove SerializationType parameter
+            return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
+                SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Update a batch of contacts
+        /// </summary>
+        /// <param name="contacts">ContactListHubSpotModel</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public ContactListHubSpotModel<T> BatchUpdate<T>(ContactListHubSpotModel<T> contacts)
+            where T : ContactHubSpotModel, new()
+        {
+            var path = $"{contacts.RouteBasePath}/batch/update";
+            // TODO - remove SerializationType parameter
+            return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
+                SerialisationType.PropertyBag);
+        }
+        
+        /// <summary>
+        /// Read a page of contacts. Control what is returned via the properties query param.
+        /// </summary>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactListHubSpotModel</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public ContactListHubSpotModel<T> List<T>(SearchRequestOptions opts = null)
+            where T : ContactHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+
+            var path = $"{new T().RouteBasePath}";
+
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+
+            path = opts.PropertiesWithHistory.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesWithHistory, "propertiesWithHistory")
+                : path;
+            
+            path = path.SetQueryParam("limit", opts.Limit);
+                
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
+
+            if (opts.Offset.HasValue)
+                path = path.SetQueryParam("after", opts.Offset);
+            
+            //TODO - remove debugging
+            Console.WriteLine($">>>>> PATH: {path}");
+            // TODO - remove SerializationType parameter
+            var data = _client.Execute<ContactListHubSpotModel<T>>(path, opts, Method.Get,
+                SerialisationType.PropertyBag);
+            opts.Offset = data.Offset;
+            data.SearchRequestOptions = opts;
+            return data;
+        }
+        
+        /// <summary>
+        /// Create a contact with the given properties and return a copy of the object, including the ID
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contact">The contact object</param>
-        /// <returns>The created entity (with ID set)</returns>
+        /// <param name="contact">A ContactHubSpotModel instance</param>
+        /// <returns>A ContactHubSpotModel instance with the Id field populated</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
         public T Create<T>(T contact) where T : ContactHubSpotModel, new()
         {
             var path = $"{contact.RouteBasePath}";
@@ -35,17 +165,81 @@ namespace HubSpot.NET.Api.Contact
         }
         
         /// <summary>
-        /// Updates a given contact
+        /// Get a single contact by unique Id
+        /// </summary>
+        /// <param name="uniqueId">The unique ID of the contact</param>
+        /// <param name="opts">SearchRequestOptions</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>A ContactHubSpotModel instance or null if one cannot be found</returns>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public T GetByUniqueId<T>(string uniqueId, SearchRequestOptions opts = null) 
+            where T : ContactHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            
+            var path = $"{new T().RouteBasePath}/{uniqueId}";
+
+            path = opts.IdProperty != null
+                ? path.SetQueryParam("idProperty", opts.IdProperty)
+                : path;
+            
+            path = opts.PropertiesToInclude.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
+                : path;
+            
+            path = opts.Archived 
+                ? path.SetQueryParam("archived", true)
+                : path;
+            
+            try
+            {
+                // TODO - Remove SerializationType parameter
+                var data = _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
+                return data;
+            }
+            catch (HubSpotException e)
+            {
+                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
+                    return null;
+                throw;
+            }
+        }
+        public T GetByUniqueId<T>(long uniqueId, SearchRequestOptions opts = null)
+            where T : ContactHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            return GetByUniqueId<T>(uniqueId.ToString(), opts);
+        }
+        public T GetByUniqueId<T>(int uniqueId, SearchRequestOptions opts = null)
+            where T : ContactHubSpotModel, new()
+        {
+            opts ??= new SearchRequestOptions();
+            return GetByUniqueId<T>(uniqueId.ToString(), opts);
+        }
+        
+        /// <summary>
+        /// Perform a partial update of a contact identified by Id
         /// </summary>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contact">The contact object</param>
-        public T Update<T>(T contact) where T : ContactHubSpotModel, new()
+        /// <param name="contact">ContactHubSpotModel</param>
+        /// <param name="idProperty">The name of the unique property value to use as the unique id</param>
+        /// <exception cref="ArgumentException">Id property of the contact object cannot be null</exception>
+        /// <remarks>
+        /// The Id field can contain the value of any valid unique identifier as long as
+        /// that identifier is specified by the idProperty parameter.
+        /// </remarks>
+        /// <seealso href="https://developers.hubspot.com/docs/api/crm/contacts"/>
+        public T Update<T>(T contact, string idProperty = null) where T : ContactHubSpotModel, new()
         {
-            var path = contact.Id != 0L
-                ? $"{contact.RouteBasePath}/{contact.Id}"
-                : (contact.Email != null 
-                    ? $"{contact.RouteBasePath}/{contact.Email}".SetQueryParam("idProperty", "email")
-                    : throw new ArgumentException("Contact entity must have an id or email set!"));
+            if (contact.Id == null)
+                throw new ArgumentException("Id property cannot be null!");
+            
+            var path = $"{contact.RouteBasePath}/{contact.Id}";
+            
+            path = idProperty != null
+                ? path.SetQueryParam("idProperty", idProperty)
+                : path;
+            
             // TODO - remove serialisationType parameter 
             return _client.Execute<T>(path, contact, Method.Patch, SerialisationType.PropertyBag);
         }
@@ -69,107 +263,22 @@ namespace HubSpot.NET.Api.Contact
         /// </param>
         public void Delete(ContactHubSpotModel contact)
         {
-            if (contact.Id == 0L)
-                throw new ArgumentException("You must specify a contact ID to delete");
+            if (contact.Id == null)
+                throw new ArgumentException("Unable to delete without specifying an id.");
             Delete(contact.Id);
         }
-
-        /// <summary>
-        /// Creates or Updates a contact entity based on the Entity Email
-        /// </summary>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contact">The contact object to create or update</param>
-        /// <returns>The created contact (with ID set)</returns>
-        public T CreateOrUpdate<T>(T contact) where T : ContactHubSpotModel, new()
-        {
-            try
-            {
-                return Create(contact);
-            }
-            catch (HubSpotException e)
-            {
-                return Update(contact);
-            }
-        }
-
-        /// <summary>
-        /// Gets a single contact by ID
-        /// </summary>
-        /// <param name="contactId">The ID of the contact</param>
-        /// <param name="opts">A SearchRequestOptions instance</param>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <returns>A ContactHubSpotModel instance or null if one cannot be found</returns>
-        public T GetById<T>(long contactId, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            opts ??= new SearchRequestOptions();
-            
-            var path = $"{new T().RouteBasePath}/{contactId}";
-            
-            path = opts.PropertiesToInclude.Any()
-                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
-                : path;
-            
-            path = opts.Archived 
-                ? path.SetQueryParam("archived", true)
-                : path;
-            
-            try
-            {
-                // TODO - remove convertToPropertiesSchema parameter
-                var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
-                return data;
-            }
-            catch (HubSpotException e)
-            {
-                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
-                    return null;
-                throw;
-            }
-        }
-
-        /// <summary>Gets a contact by their email address</summary>
-        /// <param name="email">Email address to search for</param>
-        /// <param name="opts">
-        /// Request options - used to specify properties to return, limiting results, pagination, etc.
-        /// </param>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <returns>The contact entity or null if the contact does not exist</returns>
-        public T GetByEmail<T>(string email, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new SearchRequestOptions();
-            
-            var path = $"{new T().RouteBasePath}/{email}"
-                .SetQueryParam("idProperty", "email");
-            
-            path = opts.PropertiesToInclude.Any()
-                ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
-                : path;
-            
-            path = opts.Archived 
-                ? path.SetQueryParam("archived", true)
-                : path;
-            
-            try
-            {
-                // TODO - remove convertToPropertiesSchema parameter
-                var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
-                return data;
-            }
-            catch (HubSpotException e)
-            {
-                if (e.ReturnedError.StatusCode == HttpStatusCode.NotFound)
-                    return null;
-                throw;
-            }
-        }
-
+        
+        //  TODO [PUBLIC_OBJECT] [MERGE]
+        //  TODO [GDPR] [GDPR DELETE]
+        
         /// <summary>
         /// Gets a contact by their user token
         /// </summary>
         /// <param name="userToken">User token to search for from hubspotutk cookie</param>
         /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
         /// <returns>The contact entity or null if the contact does not exist</returns>
+        /// TODO - Needs updating or removal
+        [Obsolete("Conditionally obsolete: Needs documentation for > v1 API")]
         public T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new()
         {
             var path = $"/contacts/v1/contact/utk/{userToken}/profile";
@@ -177,7 +286,7 @@ namespace HubSpot.NET.Api.Contact
             try
             {
                 // TODO - remove convertToPropertiesSchema parameter
-                T data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
+                var data = _client.Execute<T>(path, Method.Get, convertToPropertiesSchema: true);
                 return data;
             }
             catch (HubSpotException exception)
@@ -188,138 +297,14 @@ namespace HubSpot.NET.Api.Contact
             }
         }
 
-        /// <summary>
-        /// Creates a batch of Contact objects
-        /// </summary>
-        /// <param name="contacts"></param>
-        /// <typeparam name="T">A ContactHubSpotModel instance</typeparam>
-        /// <returns>ContactListHubSpotModel</returns>
-        public ContactListHubSpotModel<T> BatchCreate<T>(ContactListHubSpotModel<T> contacts)
+        public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) 
             where T : ContactHubSpotModel, new()
-        {
-            var path = $"{contacts.RouteBasePath}/batch/create";
-            // TODO - Do we really need ExecuteBatch anymore?
-            return _client.ExecuteBatch<ContactListHubSpotModel<T>>(path, contacts, Method.Post,
-                serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
-        }
-        
-        // TODO - BatchArchive
-        // TODO - BatchRead
-        // TODO - BatchUpdate
-
-        /// <summary>
-        /// Update or create a set of contacts, this is the preferred method when creating/updating in bulk.
-        /// Batch operations are <see href="https://developers.hubspot.com/docs/api/crm/contacts#limits">limited to 100
-        /// records per batch</see>. This method will determine whether a contact in the batch needs to be updated or
-        /// created.
-        /// </summary>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <param name="contacts">The set of contacts to update/create</param>
-        /// <returns>A list of contacts that were either updated or created</returns>
-        /// TODO - This was a bad idea and I should feel bad for trying to implement it here.
-        public ContactListHubSpotModel<T> BatchCreateOrUpdate<T>(ContactListHubSpotModel<T> contacts) where T : ContactHubSpotModel, new()
-        {
-            var createPath = $"{contacts.RouteBasePath}/batch/create";
-            var updatePath = $"{contacts.RouteBasePath}/batch/update";
-
-            var contactsWithId = new ContactListHubSpotModel<T>();
-            var contactsWithEmail = new ContactListHubSpotModel<T>();
-            var statuses = new List<string>();
-            
-            foreach (var contact in contacts.Contacts)
-            {
-                // If contact.Id isn't the default value for long, add it to the list of contacts with id values
-                if (contact.Id != 0L)
-                {
-                    contactsWithId.Contacts.Add(contact);
-                }
-                else if (contact.Email != null)
-                {
-                    contactsWithEmail.Contacts.Add(contact);
-                }
-            }
-
-            var contactsResults = new ContactListHubSpotModel<T>();
-            
-            // If the contacts in our batch have Id values, we assume this is an update operation.
-            if (contactsWithId.Contacts.Count != 0)
-            {
-                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
-                //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-                var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(updatePath, contactsWithId, Method.Post,
-                    serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
-                foreach (var error in data.Errors)
-                    contactsResults.Errors.Add(error);
-                foreach (var contact in data.Contacts)
-                    contactsResults.Contacts.Add(contact);
-                statuses.Add(data.Status += $" ({data.Contacts.Count} contacts updated)");
-                contactsResults.Total = data.Contacts.Count;
-            }
-            // If the contacts in our batch do not have Id values, we assume this is a create operation.
-            if (contactsWithEmail.Contacts.Count != 0)
-            {
-                // TODO at this point there is no difference between this invocation of ExecuteBatch and Execute (below)
-                //return _client.Execute<ContactListHubSpotModel<T>>(path, contacts, Method.Post, serialisationType: SerialisationType.BatchCreationSchema);
-                // TODO - We should use BatchCreate here instead of _client.ExecuteBatch
-                var data = _client.ExecuteBatch<ContactListHubSpotModel<T>>(createPath, contactsWithEmail,
-                    Method.Post, serialisationType: SerialisationType.Raw); // TODO remove serialisationType parameter
-                foreach (var error in data.Errors)
-                    contactsResults.Errors.Add(error);
-                foreach (var contact in data.Contacts) 
-                    contactsResults.Contacts.Add(contact);
-                statuses.Add(data.Status += $" ({data.Contacts.Count} contacts created)");
-                contactsResults.Total += data.Contacts.Count;
-            }
-            contactsResults.Status = string.Join(",", statuses);
-            return contactsResults;
-        }
-        
-        /// <summary>
-        /// List all available contacts (basically "search" but with no filter criteria).
-        /// </summary>
-        /// <param name="opts">Request options - used for pagination etc.</param>
-        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
-        /// <returns>A list of contacts</returns>
-        public ContactListHubSpotModel<T> List<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
-        {
-            if (opts == null)
-                opts = new SearchRequestOptions();
-
-            var path = $"{new T().RouteBasePath}".SetQueryParam("limit", opts.Limit);
-
-            if (opts.PropertiesToInclude.Any())
-                path = path.SetPropertiesListQueryParams(opts.PropertiesToInclude);
-
-            if (opts.Offset.HasValue)
-                path = path.SetQueryParam("after", opts.Offset);
-            
-            // TODO - remove convertToPropertiesSchema parameter
-            // TODO - Do we really need ExecuteList anymore?
-            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Get, convertToPropertiesSchema: true);
-            /*
-             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
-             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
-             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
-             * is one).
-             */
-            opts.Offset = data.Offset;
-            data.SearchRequestOptions = opts;
-            return data;
-        }
-        
-        public ContactListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : ContactHubSpotModel, new()
         {
             opts ??= new SearchRequestOptions();
             var path = $"{new T().RouteBasePath}/search";
-            // TODO - remove convertToPropertiesSchema parameter
-            // TODO - Do we really need ExecuteList anymore?
-            var data = _client.ExecuteList<ContactListHubSpotModel<T>>(path, opts, Method.Post, convertToPropertiesSchema: true);
-            /*
-             * Update the Offset in opts to match the Offset returned from our request (data.Offset), then set the
-             * SearchRequestOptions in our data object to the value of opts (we don't want to lose anything that may
-             * have been passed in) so that it can be passed back into this method on the next iteration (assuming there
-             * is one).
-             */
+            // TODO - remove SerializationType parameter
+            var data = _client.Execute<ContactListHubSpotModel<T>>(path, opts, Method.Post, 
+                SerialisationType.PropertyBag);
             opts.Offset = data.Offset;
             data.SearchRequestOptions = opts;
             return data;
