@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Api.Associations.Dto;
 using HubSpot.NET.Core.Interfaces;
@@ -63,8 +64,18 @@ namespace HubSpot.NET.Api.Company.Dto
         
         [DataMember(Name = "associations")]
         public IList<AssociationHubSpotModel> Associations { get; set; } = new List<AssociationHubSpotModel>();
-        public bool SerializeAssociations { get; set; } = true;
-        public bool ShouldSerializeAssociations() => SerializeAssociations;
+        //public bool SerializeAssociations { get; set; } = true;
+        //public bool ShouldSerializeAssociations() => SerializeAssociations;
+        
+        public bool? SerializeAssociations { get; set; }
+        public bool ShouldSerializeAssociations() => SerializeAssociations ?? Associations.Any();
+        
+        // TODO - EXPERIMENTAL / NEEDS TESTING: We want the value of SerializeAssociations to always override
+        // TODO - Associations.Any() unless it is null, then we fall back on Associations.Any(). Example:
+        // TODO -    public bool? SerializeAssociations { get; set; }
+        // TODO -    public bool ShouldSerializeAssociations() => SerializeAssociations ?? Associations.Any();
+        // TODO - Maybe do the same with SerializeProperties/ShouldSerializeProperties ?
+        
         
         [IgnoreDataMember]
         public string Name
