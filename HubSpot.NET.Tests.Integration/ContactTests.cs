@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using HubSpot.NET.Api.Contact;
 using HubSpot.NET.Api.Contact.Dto;
+using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Search;
 using HubSpot.NET.Core.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -189,7 +190,12 @@ namespace HubSpot.NET.Tests.Integration
 			}
 		}
 
-		
+		/// <summary>
+		/// Test List operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests contact property history and SearchRequestOptions (Limit, PropertiesWithHistory)
+		/// </remarks>
 		[TestMethod]
 		public void List_Contacts()
 		{
@@ -212,20 +218,22 @@ namespace HubSpot.NET.Tests.Integration
 
 			try
 			{
-				// TODO - INCOMPLETE
 				// Created contact records should have an Id property that is a long type.
 				Assert.IsFalse(batchCreateResult.Contacts
 					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
 				
+				// Update our newly-created models so we can generate some property history.
 				foreach (var contact in batchCreateResult.Contacts)
 					contact.FirstName = $"{contact.FirstName}-UPDATED";
-				var batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
+				contactApi.BatchUpdate(batchCreateResult);
 				
 				Utilities.Sleep();
 				
+				// Update (again) our recently updated models so we can generate some more property history.
 				foreach (var contact in batchCreateResult.Contacts)
 					contact.FirstName = $"{contact.FirstName}-UPDATED2";
-				batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
+				
+				contactApi.BatchUpdate(batchCreateResult);
 				
 				Utilities.Sleep();
 				
@@ -240,28 +248,51 @@ namespace HubSpot.NET.Tests.Integration
 					},
 					PropertiesWithHistory = new List<string>
 					{
-						"firstname", 
-						"lastname",
-						"email",
-						"company",
-						"phone"
+						"firstname"
 					}
 				};
-				// TODO - "test" / temporary stuff follows
-				var listContacts = contactApi.List<ContactHubSpotModel>(searchOptions);
-				var moreResults = true;
-				while (moreResults)
-				{
-					moreResults = listContacts.MoreResultsAvailable;
-					foreach (var contact in listContacts.Contacts)
-					{
-						Console.WriteLine($"{contact.FirstName} {contact.LastName}");
-					}
-					if (moreResults)
-						listContacts = contactApi.List<ContactHubSpotModel>(listContacts.SearchRequestOptions);
-						
-				}
 
+				batchCreateResult.SearchRequestOptions = searchOptions;
+				
+				/*
+				 * By this point, every contact object in batchCreateResult should have had its FirstName property
+				 * updated twice, so there should be three property history items (created, updated, updated again) for
+				 * the FirstName property of each contact object in the list.
+				 */
+				foreach (var contact in contactApi.BatchRead(batchCreateResult, searchOptions).Contacts)
+				{
+					Assert.IsTrue(contact.PropertiesWithHistory.FirstName.Count == 3);
+				}
+				
+				/*
+				 * 20 contacts were created previously, so we should have no trouble listing 10 of them and there should
+				 * be a paging object in the results.
+				 */
+				searchOptions.Limit = 10;
+				var list10Contacts = contactApi.List<ContactHubSpotModel>(searchOptions);
+				Assert.AreEqual(10, list10Contacts.Contacts.Count);
+				Assert.IsNotNull(list10Contacts.Paging);
+				Assert.IsTrue(list10Contacts.MoreResultsAvailable);
+				
+				/*
+				 * Under any circumstances, if we attempt to set a per-request limit higher than 100, an
+				 * ArgumentException will be thrown.
+				 */
+				Assert.ThrowsException<ArgumentException>(() => searchOptions.Limit = 101);
+				
+				/*
+				 * Testing the default value for Limit: If the per-request limit is 0 (default/undefined), and
+				 * PropertiesWithHistory is populated, the limit will be 50.
+				 */
+				searchOptions.Limit = 0;
+				Assert.AreEqual(50, searchOptions.Limit);
+				
+				/*
+				 * Testing the default value for Limit: If the per-request limit is 0 (default/undefined), and
+				 * PropertiesWithHistory is not populated, the limit will be 100.
+				 */
+				searchOptions.PropertiesWithHistory.Clear();
+				Assert.AreEqual(100, searchOptions.Limit);
 			}
 			finally
 			{
@@ -298,10 +329,101 @@ namespace HubSpot.NET.Tests.Integration
 			}
 		}
 		
+		/// <summary>
+		/// Test GetByUniqueId operations
+		/// </summary>
+		/// <remarks>
+		/// Also tests retrieval of archived contact records.
+		/// </remarks>
 		[TestMethod]
 		public void GetByUniqueId_Contact()
 		{
+			var contactApi = new HubSpotContactApi(TestSetUp.Client);
+			var contact = contactApi.Create(new ContactHubSpotModel
+			{
+				Email = "test@communityclosing.com",
+				FirstName = "Testy",
+				LastName = "Testerson",
+				Phone = "3018675309",
+				Company = "Community Closing Network, LLC"
+			});
+
+			// We're going to keep a record of all created contacts to we can ensure they're removed later.
+			var createdContacts = new ContactListHubSpotModel<ContactHubSpotModel>
+			{
+				Contacts = new List<ContactHubSpotModel> { contact }
+			};
+
+			Utilities.Sleep();
 			
+			try
+			{
+				// Created contact records should have an Id property that is a long type.
+				Assert.IsFalse((contact.Id is null | contact.Id == 0L) | !(contact.Id is long));
+
+				// Test retrieving a contact record via the "email" attribute.
+				var searchOptions = new SearchRequestOptions
+				{
+					IdProperty = "email"
+				};
+				var getContactByEmail = contactApi
+					.GetByUniqueId<ContactHubSpotModel>("test@communityclosing.com", searchOptions);
+				Assert.AreEqual("test@communityclosing.com", getContactByEmail.Email);
+				
+				/*
+				 * A word on archived contact records and email addresses: Even though an email address is a "unique"
+				 * property, if you create and delete a contact that has the same email address multiple times, you
+				 * will no longer be able to use GetByUniqueId to retrieve the archived record because there will be
+				 * multiple archived records with that same email address. Further complicating matters (to the extent
+				 * we need to retrieve archived items) is the fact that search will never return archived records, so
+				 * you can't search for them, nor can you use the BatchRead method to retrieve them. To summarize: once
+				 * a record has been archived (deleted), you cannot reliably retrieve them via any unique property other
+				 * than the record id. This is demonstrated in the test that follows.
+				 */
+				var oldContactId = contact.Id;
+				contactApi.Delete(contact);
+				Utilities.Sleep();
+				contact = contactApi.Create(contact);
+				createdContacts.Contacts.Add(contact);
+				Assert.AreNotEqual(oldContactId, contact.Id);
+
+				oldContactId = contact.Id;
+				contactApi.Delete(contact);
+				Utilities.Sleep();
+				contact = contactApi.Create(contact);
+				createdContacts.Contacts.Add(contact);
+				Assert.AreNotEqual(oldContactId, contact.Id);
+				
+				searchOptions.Archived = true;
+				
+				// GetByUniqueId fails if using the email address as the unique id ...
+				Assert.ThrowsException<HubSpotException>(() => contactApi
+					.GetByUniqueId<ContactHubSpotModel>(contact.Email, searchOptions));
+				
+				// ... And BatchRead fails as well.
+				var batchReadArchivedContactsViaEmail = new ContactListHubSpotModel<ContactHubSpotModel>();
+				batchReadArchivedContactsViaEmail.Contacts.Add(new ContactHubSpotModel {Id = contact.Email});
+				batchReadArchivedContactsViaEmail.SearchRequestOptions = searchOptions;
+				Assert.ThrowsException<HubSpotException>(() => contactApi.BatchRead(batchReadArchivedContactsViaEmail));
+				
+				/*
+				 * However, both GetByUniqueId and BatchRead will work if you know the id of the record(s) you want to
+				 * retrieve. This is demonstrated in the test that follows.
+				 */
+				searchOptions.IdProperty = null;
+				var getArchivedContactById = contactApi
+					.GetByUniqueId<ContactHubSpotModel>(contact.Id, searchOptions);
+				Assert.AreEqual(contact.Id, getArchivedContactById.Id);
+
+				var getArchivedContactsById = contactApi
+					.BatchRead(createdContacts, searchOptions);
+				Assert.IsFalse(getArchivedContactsById.Contacts
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)));
+			}
+			finally
+			{
+				contactApi.BatchArchive(createdContacts);
+			}
 		}
 		
 		[TestMethod]

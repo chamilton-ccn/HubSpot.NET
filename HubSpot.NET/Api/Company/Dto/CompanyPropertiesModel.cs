@@ -2,6 +2,13 @@
 
 namespace HubSpot.NET.Api.Company.Dto
 {
+    /// <summary>
+    /// A word or two regarding model properties: All possible properties are not present on most models. The reason
+    /// being, there are simply too many, and that's before you start counting potential custom properties. For example,
+    /// at the time of this writing, there are over 300 available properties for a single Contact object. So, if you
+    /// need a property that isn't available using the the predefined models, you will need to inherit from an existing
+    /// model and add your own properties.
+    /// </summary>
     [DataContract]
     public class CompanyPropertiesModel
     {

@@ -19,9 +19,7 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         [DataMember(Name = "filterGroups")]
         public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3);
-        
-        
-        
+
         /// <summary>
         /// Gets the SearchRequestSort object, which determines how to return the results. By default, we'll sort by
         /// "createdate", "descending". This member is never interacted with directly.
@@ -36,35 +34,36 @@ namespace HubSpot.NET.Core.Search
                     SortDirection = SortDirection
                 }
             };
-        
+
         [IgnoreDataMember]
         public string SortBy { get; set; } = "createdate";
-        
+
         [IgnoreDataMember]
         public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
-        
+
         /// <summary>
         /// This is a backing field for Limit
         /// </summary>
         [IgnoreDataMember]
-        private int _limit { get; set; } = 100;
-        
+        private int _limit { get; set; }
+
         /// <summary>
         /// Gets or sets the number of items to return.
         /// </summary>
         /// <remarks>
-        /// Defaults to 100. We're assuming 100 is the maximum value because  
-        /// <a href="https://developers.hubspot.com/docs/api/crm/contacts#limits">
-        /// that is the maximum value for Contacts objects</a>. The documentation for Companies does not list a
-        /// maximum value and 100 seems reasonable anyway. Note: The limit is 50 if PropertiesWithHistory is non-null.
+        /// Defaults to 100; 50 if requesting property history.
         /// </remarks>
         /// <value>
-        /// The number of items to return.
+        /// The number of items to return for any single request.
         /// </value>
         [DataMember(Name = "limit")]
         public int Limit
         {
-            get => PropertiesWithHistory.Any() ? 50 : _limit;
+            get => (_limit == 0 & PropertiesWithHistory.Any())
+                ? 50
+                : _limit == 0
+                    ? 100
+                    : _limit;
             set
             {
                 if ((value > 100) | (value > 50 & PropertiesWithHistory.Any()))
@@ -72,10 +71,11 @@ namespace HubSpot.NET.Core.Search
                     throw new ArgumentException($"{value} exceeds the maximum limit of 100 records (or 50 if " +
                                                 $"including property history) per request");
                 }
+
                 _limit = value;
             }
         }
-        
+
         /// <summary>
         /// Get or set the continuation offset when calling list many times to enumerate all your items
         /// </summary>
@@ -93,6 +93,7 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         [DataMember(Name = "properties")]
         public IList<string> PropertiesToInclude { get; set; } = new List<string>();
+        public bool ShouldSerializePropertiesToInclude() => PropertiesToInclude.Any();
 
         /// <summary>
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects:~:text=Archived%20CRM%20objects%20won%E2%80%99t%20appear%20in%20any%20search%20results">
@@ -106,9 +107,9 @@ namespace HubSpot.NET.Core.Search
 
         [IgnoreDataMember]
         public string IdProperty { get; set; }
-        
+
         [IgnoreDataMember]
-        public IList<string> PropertiesWithHistory { get; set; }
-        
+        public IList<string> PropertiesWithHistory { get; set; } = new List<string>();
+        public bool ShouldSerializePropertiesWithHistory() => PropertiesWithHistory.Any();
     }
 }

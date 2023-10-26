@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Interfaces;
@@ -129,6 +130,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         
         [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
         public IList<string> PropertiesWithHistory => SearchRequestOptions.PropertiesWithHistory;
+        public bool ShouldSerializePropertiesWithHistory() => PropertiesWithHistory.Any();
         
         [IgnoreDataMember]
         public string HubSpotObjectType => "contacts";

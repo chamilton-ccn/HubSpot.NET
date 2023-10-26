@@ -140,8 +140,6 @@ namespace HubSpot.NET.Api.Contact
             if (opts.Offset.HasValue)
                 path = path.SetQueryParam("after", opts.Offset);
             
-            //TODO - remove debugging
-            Console.WriteLine($">>>>> PATH: {path}");
             // TODO - remove SerializationType parameter
             var data = _client.Execute<ContactListHubSpotModel<T>>(path, opts, Method.Get,
                 SerialisationType.PropertyBag);
@@ -187,9 +185,16 @@ namespace HubSpot.NET.Api.Contact
                 ? path.SetPropertiesListQueryParams(opts.PropertiesToInclude)
                 : path;
             
+            path = opts.PropertiesWithHistory.Any()
+                ? path.SetPropertiesListQueryParams(opts.PropertiesWithHistory, "propertiesWithHistory")
+                : path;
+            
             path = opts.Archived 
                 ? path.SetQueryParam("archived", true)
                 : path;
+            
+            //TODO remove debugging
+            Console.WriteLine($"#### PATH: {path}");
             
             try
             {
