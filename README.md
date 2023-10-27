@@ -6,7 +6,7 @@ of the most recent fork of this library.
 ## Main goals for this fork:
 
 * [x] Upgrading from `RestSharp` 105.2.3 -> 110.2.0
-* [x] Language update: `>=` C# 8.0 
+* [x] Language update: `>=` C# 8.0 (Haven't decided if we're staying at 8.0)
 * [ ] Updating to V3/V4 API endpoints
 * [ ] Standardizing model implementations
 * [ ] Standardizing API calls / method names
@@ -30,7 +30,7 @@ of the most recent fork of this library.
   * [ ] Contacts
     * [x] Model (`IHubSpotModel`) Interface
     * [x] ModelList (`IHubSpotModelList`) Interface
-    * [ ] Refactor Unit Tests
+    * [x] Refactor Unit Tests
     * [ ] Refactor examples
     * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] ContactList

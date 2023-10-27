@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HubSpot.NET.Api.Company;
 using HubSpot.NET.Api.Company.Dto;
 using HubSpot.NET.Core.Search;
+using HubSpot.NET.Core.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HubSpot.NET.Tests.Integration
@@ -10,7 +12,107 @@ namespace HubSpot.NET.Tests.Integration
 	[TestClass]
 	public class CompanyTests
 	{
-		private object apiCompany;
+
+		[TestMethod]
+		public void BatchArchive_Companies()
+		{
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var companies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				companies.Companies.Add(new CompanyHubSpotModel
+				{
+					Name = $"{i:N0} Community Closing Network, LLC",
+					Phone = "3018675309",
+					Domain = $"{i:N0}-communityclosing.com"
+				});
+			}
+			var batchCreateResult = companyApi.BatchCreate(companies);
+			Utilities.Sleep();
+			// Created company records should have an Id property that is a long type.
+			Assert.IsFalse(batchCreateResult.Companies
+					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+				"Found company records with invalid id properties");
+			var batchArchiveResult = companyApi.BatchArchive(batchCreateResult);
+			Utilities.Sleep();
+			// Archived company records should have a Status of "ARCHIVED"
+			Assert.IsTrue(batchArchiveResult.Status == "ARCHIVED",
+				"Status is not 'ARCHIVED'"); // TODO - Should this be an enum?
+			var batchReadResult = companyApi.BatchRead(batchArchiveResult);
+			// Companies should be empty after an archive operation.
+			Assert.AreEqual(0, batchReadResult.Companies.Count,
+				"'Companies' should be empty");
+			// But if we set "Archived = true" in our SearchRequestOptions object ...
+			batchArchiveResult.SearchRequestOptions.Archived = true;
+			// ... then request the batch again ...
+			var batchReadArchivedResult = companyApi.BatchRead(batchArchiveResult);
+			// ... we should have 20 "archived" company records.
+			Assert.AreEqual(20, batchReadArchivedResult.Companies.Count,
+				$"20 company records were expected, but instead we received " +
+				$"{batchReadArchivedResult.Companies.Count}");
+		}
+		
+		
+		[TestMethod]
+		public void BatchCreate_Companies()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void BatchRead_Companies()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void BatchUpdate_Companies()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void List_Companies()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Create_Company()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void GetByUniqueId_Company()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Update_Company()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Delete_Company()
+		{
+			
+		}
+		
+		[TestMethod]
+		public void Search_Companies()
+		{
+			
+		}
+		
+		
+		
+		
+		// ### ORIGINAL TESTS FOLLOW ### //
+		/*private object apiCompany;
 
 		[TestMethod]
 		public void Create_SampleDetails_IdProeprtyIsSet()
@@ -251,6 +353,6 @@ namespace HubSpot.NET.Tests.Integration
 					companyApi.Delete(sampleCompanys[i].Id);
 				}
 			}
-		}
+		}*/
 	}
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using HubSpot.NET.Api.Associations.Dto;
 using HubSpot.NET.Core.Interfaces;
-using Microsoft.CSharp.RuntimeBinder;
 
 // ReSharper disable InconsistentNaming
 

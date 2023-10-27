@@ -90,6 +90,13 @@ namespace HubSpot.NET.Api.Company.Dto
         }
 
         [IgnoreDataMember]
+        public string Phone
+        {
+            get => Properties.Phone;
+            set => Properties.Phone = value;
+        }
+
+        [IgnoreDataMember]
         public string Description
         {
             get => Properties.Description;
@@ -130,6 +137,9 @@ namespace HubSpot.NET.Api.Company.Dto
             get => Properties.Country;
             set => Properties.Country = value;
         }
+        
+        [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
+        public CompanyPropertiesHistoryModel PropertiesWithHistory { get; set; }
         
         [DataMember(Name = "createdAt")]
         public DateTime? CreatedAt { get; set; }

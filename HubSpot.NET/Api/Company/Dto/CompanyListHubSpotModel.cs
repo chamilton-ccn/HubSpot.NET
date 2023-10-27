@@ -1,10 +1,11 @@
 ﻿using System;
-using HubSpot.NET.Core.Interfaces;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
 using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Paging;
 using HubSpot.NET.Core.Search;
+using System.Collections.Generic;
+using HubSpot.NET.Core.Interfaces;
+using System.Runtime.Serialization;
 
 // ReSharper disable InconsistentNaming
 
@@ -128,6 +129,7 @@ namespace HubSpot.NET.Api.Company.Dto
 
         [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
         public IList<string> PropertiesWithHistory => SearchRequestOptions.PropertiesWithHistory;
+        public bool ShouldSerializePropertiesWithHistory() => PropertiesWithHistory.Any();
         
         [IgnoreDataMember]
         public string HubSpotObjectType => "companies";

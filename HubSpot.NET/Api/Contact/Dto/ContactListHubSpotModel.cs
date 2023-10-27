@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using HubSpot.NET.Core.Errors;
-using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.Paging;
 using HubSpot.NET.Core.Search;
+using System.Collections.Generic;
+using HubSpot.NET.Core.Interfaces;
+using System.Runtime.Serialization;
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
