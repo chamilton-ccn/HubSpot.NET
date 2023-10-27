@@ -13,6 +13,7 @@ namespace HubSpot.NET.Tests.Integration
 	public class CompanyTests
 	{
 
+		// TODO - [XML Documentation] BatchArchive_Companies
 		[TestMethod]
 		public void BatchArchive_Companies()
 		{
@@ -25,7 +26,7 @@ namespace HubSpot.NET.Tests.Integration
 				{
 					Name = $"{i:N0} Community Closing Network, LLC",
 					Phone = "3018675309",
-					Domain = $"{i:N0}-communityclosing.com"
+					Domain = $"{i:N0}-{timestamp}-communityclosing.com"
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
@@ -53,59 +54,91 @@ namespace HubSpot.NET.Tests.Integration
 				$"{batchReadArchivedResult.Companies.Count}");
 		}
 		
-		
+		// TODO - [XML Documentation] BatchCreate_Companies 
 		[TestMethod]
 		public void BatchCreate_Companies()
 		{
-			
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var companies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				companies.Companies.Add(new CompanyHubSpotModel
+				{
+					Name = $"{i:N0} Community Closing Network, LLC",
+					Phone = "3018675309",
+					Domain = $"{i:N0}-{timestamp}-communityclosing.com"
+				});
+			}
+			var batchCreateResult = companyApi.BatchCreate(companies);
+			Utilities.Sleep();
+			try
+			{
+				// Created company records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+			}
+			finally
+			{
+				companyApi.BatchArchive(batchCreateResult);
+			}
 		}
 		
+		// TODO - [XML Documentation] BatchRead_Companies
 		[TestMethod]
 		public void BatchRead_Companies()
 		{
-			
+			// TODO - [TEST] BatchRead_Companies 
 		}
 		
+		// TODO - [XML Documentation] BatchUpdate_Companies
 		[TestMethod]
 		public void BatchUpdate_Companies()
 		{
-			
+			// TODO - [TEST] BatchUpdate_Companies	
 		}
 		
+		// TODO - [XML Documentation] List_Companies
 		[TestMethod]
 		public void List_Companies()
 		{
-			
+			// TODO - [TEST] List_Companies
 		}
 		
+		// TODO - [XML Documentation] Create_Company
 		[TestMethod]
 		public void Create_Company()
 		{
-			
+			// TODO - [TEST] Create_Company
 		}
 		
+		// TODO - [XML Documentation] GetByUniqueId_Company
 		[TestMethod]
 		public void GetByUniqueId_Company()
 		{
-			
+			// TODO - [TEST] GetByUniqueId_Company
 		}
 		
+		// TODO - [XML Documentation] Update_Company
 		[TestMethod]
 		public void Update_Company()
 		{
-			
+			// TODO - [TEST] Update_Company
 		}
 		
+		// TODO - [XML Documentation] Delete_Company 
 		[TestMethod]
 		public void Delete_Company()
 		{
-			
+			// TODO - [TEST] Delete_Company 
 		}
 		
+		// TODO - [XML Documentation] Search_Companies
 		[TestMethod]
 		public void Search_Companies()
 		{
-			
+			// TODO - [TEST] Search_Companies
 		}
 		
 		
