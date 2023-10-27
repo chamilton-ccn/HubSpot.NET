@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using HubSpot.NET.Core.Utilities;
 
 // ReSharper disable InconsistentNaming
 
@@ -18,7 +19,7 @@ namespace HubSpot.NET.Core.Search
         /// <a href="https://developers.hubspot.com/docs/api/crm/search#filter-search-results">Reference</a>
         /// </summary>
         [DataMember(Name = "filterGroups")]
-        public IList<SearchRequestFilterGroup> FilterGroups { get; set; } = new List<SearchRequestFilterGroup>(3);
+        public IList<SearchRequestFilterGroup> FilterGroups = new LimitedList<SearchRequestFilterGroup>(3);
 
         /// <summary>
         /// Gets the SearchRequestSort object, which determines how to return the results. By default, we'll sort by

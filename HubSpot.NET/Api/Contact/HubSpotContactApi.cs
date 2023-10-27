@@ -193,14 +193,10 @@ namespace HubSpot.NET.Api.Contact
                 ? path.SetQueryParam("archived", true)
                 : path;
             
-            //TODO remove debugging
-            Console.WriteLine($"#### PATH: {path}");
-            
             try
             {
                 // TODO - Remove SerializationType parameter
-                var data = _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
-                return data;
+                return _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
             }
             catch (HubSpotException e)
             {

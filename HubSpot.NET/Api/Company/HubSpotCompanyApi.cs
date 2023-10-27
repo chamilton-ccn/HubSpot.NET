@@ -193,8 +193,7 @@ namespace HubSpot.NET.Api.Company
             try
             {
                 // TODO - Remove SerializationType parameter
-                var data = _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
-                return data;
+                return _client.Execute<T>(path, Method.Get, SerialisationType.PropertyBag);
             }
             catch (HubSpotException e)
             {
