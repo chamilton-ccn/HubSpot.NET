@@ -36,9 +36,11 @@ namespace HubSpot.NET.Core.Search
                 }
             };
 
+        // TODO - [SortBy] XML Documentation
         [IgnoreDataMember]
         public string SortBy { get; set; } = "createdate";
 
+        // TODO [SortDirection] XML Documentation
         [IgnoreDataMember]
         public SearchRequestSortType SortDirection { get; set; } = SearchRequestSortType.Descending;
 
@@ -89,9 +91,10 @@ namespace HubSpot.NET.Core.Search
 
         /// <summary>
         /// Specifies the properties that should be returned by the search.
-        /// See <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects">this page</a> for a list of
-        /// default values returned by each object type.
+        /// See <a href="https://developers.hubspot.com/docs/api/crm/search#crm-objects">this</a> for a list of default
+        /// values returned by each object type.
         /// </summary>
+        // TODO - XML Documentation: Explain why ShouldSerializePropertiesToInclude is necessary. 
         [DataMember(Name = "properties")]
         public IList<string> PropertiesToInclude { get; set; } = new List<string>();
         public bool ShouldSerializePropertiesToInclude() => PropertiesToInclude.Any();
@@ -106,9 +109,11 @@ namespace HubSpot.NET.Core.Search
         [IgnoreDataMember]
         public bool Archived { get; set; }
 
+        // TODO - [IdProperty] XML Documentation
         [IgnoreDataMember]
         public string IdProperty { get; set; }
 
+        // TODO - [PropertiesWithHistory] XML Documentation
         [IgnoreDataMember]
         public IList<string> PropertiesWithHistory { get; set; } = new List<string>();
         public bool ShouldSerializePropertiesWithHistory() => PropertiesWithHistory.Any();

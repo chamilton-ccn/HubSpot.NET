@@ -13,14 +13,15 @@ namespace HubSpot.NET.Api.Contact.Dto
     public class ContactHubSpotModel : IHubSpotModel
     {
         /// <summary>
-        /// This property can be either a `long` or a `string`. By default, the Id (`id`) property refers to the numeric
-        /// HubSpot ID of a record, but it can also refer to any unique value of a given record by populating the
-        /// IdProperty (`idProperty`) property of a SearchRequestOptions object with the HubSpot "system" name of a
-        /// unique field that exists on the record. For example, we might want to retrieve a Contact by some custom
-        /// unique attribute: "my_custom_unique_property". In a batch request, we can populate the Id property below
-        /// with a value from "my_custom_unique_property" (which could be a number or a string), then we can set the
-        /// `IdProperty` of the SearchRequestOptions object to "my_custom_unique_property". This way HubSpot
-        /// knows to use that as the unique identifier instead of the unique numeric Id. 
+        /// This property can be either a <c>long</c> or a <c>string</c>. By default, the Id (<c>id</c>) property refers
+        /// to the numeric HubSpot ID of a record, but it can also refer to any unique value of a given record by
+        /// populating the <c>IdProperty</c> (<c>idProperty</c>) property of a <c>SearchRequestOptions</c> object with
+        /// the HubSpot "system" name of a unique field that exists on the record. For example, we might want to
+        /// retrieve a Contact by some custom unique attribute: <i>my_custom_unique_property</i>. In a batch request, we
+        /// can populate the Id property below with a value from <i>my_custom_unique_property</i> (which could be a
+        /// number or a string), then we can set the <c>IdProperty</c> of the <c>SearchRequestOptions</c> object to
+        /// <i>my_custom_unique_property</i>. This way HubSpot knows to use that as the unique identifier instead of the
+        /// unique numeric Id. 
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         public dynamic Id

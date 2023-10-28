@@ -190,6 +190,8 @@ namespace HubSpot.NET.Api.Company
                 ? path.SetQueryParam("archived", true)
                 : path;
             
+            // TODO - remove debugging
+            Console.WriteLine($"### PATH: {path}");
             try
             {
                 // TODO - Remove SerializationType parameter

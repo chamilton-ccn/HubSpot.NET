@@ -17,7 +17,7 @@ namespace HubSpot.NET.Tests.Integration
 		/// Test BatchArchive operations.
 		/// </summary>
 		/// <remarks>
-		/// Also tests BatchRead, archived/un-archived operations.
+		/// Also tests BatchRead archived/un-archived operations.
 		/// </remarks>
 		[TestMethod]
 		public void BatchArchive_Contacts()
@@ -83,6 +83,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
 			Utilities.Sleep();
+			
 			try
 			{
 				// Created contact records should have an Id property that is a long type.
@@ -100,7 +101,7 @@ namespace HubSpot.NET.Tests.Integration
 		/// Test BatchRead operations.
 		/// </summary>
 		/// <remarks>
-		/// Also tests BatchCreate and BatchRead operations.
+		/// Also tests BatchCreate operations.
 		/// </remarks>
 		[TestMethod]
 		public void BatchRead_Contacts()
@@ -121,6 +122,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
 			Utilities.Sleep();
+			
 			try
 			{
 				// Created contact records should have an Id property that is a long type.
@@ -204,7 +206,7 @@ namespace HubSpot.NET.Tests.Integration
 		/// Test List operations.
 		/// </summary>
 		/// <remarks>
-		/// Also tests contact property history and SearchRequestOptions (Limit, PropertiesWithHistory)
+		/// Also tests contact property history and SearchRequestOptions (Limit, PropertiesWithHistory).
 		/// </remarks>
 		[TestMethod]
 		public void List_Contacts()
@@ -321,7 +323,7 @@ namespace HubSpot.NET.Tests.Integration
 		}
 		
 		/// <summary>
-		/// Test Create operations
+		/// Test Create operations.
 		/// </summary>
 		[TestMethod]
 		public void Create_Contact()
@@ -335,6 +337,7 @@ namespace HubSpot.NET.Tests.Integration
 				Phone = "3018675309",
 				Company = "Community Closing Network, LLC"
 			});
+			
 			try
 			{
 				// Created contact records should have an Id property that is a long type.
@@ -345,12 +348,11 @@ namespace HubSpot.NET.Tests.Integration
 			{
 				Utilities.Sleep();
 				contactApi.Delete(contact);
-				contactApi.GetByUniqueId<ContactHubSpotModel>(contact.Id); 
 			}
 		}
 		
 		/// <summary>
-		/// Test GetByUniqueId operations
+		/// Test GetByUniqueId operations.
 		/// </summary>
 		/// <remarks>
 		/// Also tests retrieval of archived contact records.
@@ -556,7 +558,7 @@ namespace HubSpot.NET.Tests.Integration
 		}
 		
 		/// <summary>
-		/// Test Search operations
+		/// Test Search operations.
 		/// </summary>
 		[TestMethod]
 		public void Search_Contacts()
@@ -577,6 +579,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
 			Utilities.Sleep();
+			
 			try
 			{
 				// Created contact records should have an Id property that is a long type.

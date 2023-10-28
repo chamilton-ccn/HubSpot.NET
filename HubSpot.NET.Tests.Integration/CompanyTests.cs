@@ -13,7 +13,12 @@ namespace HubSpot.NET.Tests.Integration
 	public class CompanyTests
 	{
 
-		// TODO - [XML Documentation] BatchArchive_Companies
+		/// <summary>
+		/// Test BatchArchive operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchRead archived/unarchived operations.
+		/// </remarks>
 		[TestMethod]
 		public void BatchArchive_Companies()
 		{
@@ -54,7 +59,9 @@ namespace HubSpot.NET.Tests.Integration
 				$"{batchReadArchivedResult.Companies.Count}");
 		}
 		
-		// TODO - [XML Documentation] BatchCreate_Companies 
+		/// <summary>
+		/// Test BatchCreate operations.
+		/// </summary>
 		[TestMethod]
 		public void BatchCreate_Companies()
 		{
@@ -72,6 +79,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
 			Utilities.Sleep();
+			
 			try
 			{
 				// Created company records should have an Id property that is a long type.
@@ -85,39 +93,347 @@ namespace HubSpot.NET.Tests.Integration
 			}
 		}
 		
-		// TODO - [XML Documentation] BatchRead_Companies
+		/// <summary>
+		/// Test BatchRead operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchCreate operations.
+		/// </remarks>
 		[TestMethod]
 		public void BatchRead_Companies()
 		{
-			// TODO - [TEST] BatchRead_Companies 
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var companies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				companies.Companies.Add(new CompanyHubSpotModel
+				{
+					Name = $"{i:N0} Community Closing Network, LLC",
+					Phone = "3018675309",
+					Domain = $"{i:N0}-{timestamp}-communityclosing.com"
+				});
+			}
+			var batchCreateResult = companyApi.BatchCreate(companies);
+			Utilities.Sleep();
+			
+			try
+			{
+				// Created company records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+				var batchReadResult = companyApi.BatchRead(batchCreateResult);
+				
+				// Retrieved company records should have an Id property that is a long type.
+				Assert.IsFalse(batchReadResult.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+
+				/*
+				 * Even though HubSpot says domain names are the "primary unique identifier" for companies:
+				 * https://tinyurl.com/3xnkkxr6 You still *cannot* retrieve a company by its domain name:
+				 * https://tinyurl.com/ytr95847 Until this changes (assuming that it will ever change) the test below
+				 * should pass (i.e., reading a batch of companies using the domain name as the unique id will return
+				 * no records. Why test for this? Well, it feels like this is something that should eventually be
+				 * rectified; this test will keep an eye on that :-)
+				 */
+				foreach (var company in batchReadResult.Companies)
+				{
+					company.Id = company.Domain;
+				}
+				var searchOptions = new SearchRequestOptions
+				{
+					IdProperty = "domain",
+					PropertiesToInclude = new List<string>
+					{
+						"name",
+						"phone",
+						"domain"
+					}
+				};
+				batchReadResult = companyApi.BatchRead(batchReadResult, searchOptions);
+				Assert.AreEqual(0, batchReadResult.Companies.Count);
+			}
+			finally
+			{
+				companyApi.BatchArchive(batchCreateResult);
+			}
 		}
 		
-		// TODO - [XML Documentation] BatchUpdate_Companies
+		/// <summary>
+		/// Test BatchUpdate operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests BatchCreate and BatchRead operations. 
+		/// </remarks>
 		[TestMethod]
 		public void BatchUpdate_Companies()
 		{
-			// TODO - [TEST] BatchUpdate_Companies	
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var companies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				companies.Companies.Add(new CompanyHubSpotModel
+				{
+					Name = $"{i:N0} Community Closing Network, LLC",
+					Phone = "3018675309",
+					Domain = $"{i:N0}-{timestamp}-communityclosing.com"
+				});
+			}
+			var batchCreateResult = companyApi.BatchCreate(companies);
+			Utilities.Sleep();
+
+			try
+			{
+				// Created company records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+				foreach (var company in batchCreateResult.Companies)
+				{
+					company.Name = $"{company.Name} UPDATED";
+				}
+				var batchUpdateResult = companyApi.BatchUpdate(batchCreateResult);
+				Utilities.Sleep();
+				var batchReadResult = companyApi.BatchRead(batchUpdateResult);
+				// Updated company records should have a FirstName property that ends with "-UPDATED".
+				Assert.IsTrue(batchReadResult.Companies.All(c => c.Name.Contains("UPDATED")),
+					"'Name' property is not what was expected");
+			}
+			finally
+			{
+				companyApi.BatchArchive(batchCreateResult);
+			}
 		}
 		
-		// TODO - [XML Documentation] List_Companies
+		/// <summary>
+		/// Test List operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests company property history and SearchRequestOptions (Limit, PropertiesWithHistory).
+		/// </remarks>
 		[TestMethod]
 		public void List_Companies()
 		{
-			// TODO - [TEST] List_Companies
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var companies = new CompanyListHubSpotModel<CompanyHubSpotModel>();
+			var timestamp = ((DateTimeOffset)DateTime.Today).ToUnixTimeMilliseconds().ToString();
+			foreach (var i in Enumerable.Range(1, 20))
+			{
+				companies.Companies.Add(new CompanyHubSpotModel
+				{
+					Name = $"{i:N0} Community Closing Network, LLC",
+					Phone = "3018675309",
+					Domain = $"{i:N0}-{timestamp}-communityclosing.com"
+				});
+			}
+			var batchCreateResult = companyApi.BatchCreate(companies);
+			Utilities.Sleep();
+
+			try
+			{
+				// Created company records should have an Id property that is a long type.
+				Assert.IsFalse(batchCreateResult.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+				
+				// Update our newly-created models so we can generate some property history.
+				foreach (var company in batchCreateResult.Companies)
+					company.Name = $"{company.Name} UPDATED";
+				companyApi.BatchUpdate(batchCreateResult);
+				
+				Utilities.Sleep();
+				
+				// Update (again) our recently updated models so we can generate some more property history.
+				foreach (var company in batchCreateResult.Companies)
+					company.Name = $"{company.Name} UPDATED2";
+
+				companyApi.BatchUpdate(batchCreateResult);
+				
+				Utilities.Sleep();
+
+				var searchOptions = new SearchRequestOptions
+				{
+					PropertiesToInclude = new List<string>
+					{
+						"name",
+						"phone",
+						"domain"
+					},
+					PropertiesWithHistory = new List<string>
+					{
+						"name"
+					}
+				};
+				
+				batchCreateResult.SearchRequestOptions = searchOptions;
+
+				/*
+				 * By this point, every company object in batchCreateResult should have had its Name property
+				 * updated twice, so there should be three property history items (created, updated, updated again) for
+				 * the Name property of each company object in the list.
+				 */
+				foreach (var company in companyApi.BatchRead(batchCreateResult, searchOptions).Companies)
+				{
+					Assert.IsTrue(company.PropertiesWithHistory.Name.Count == 3,
+						$"Unexpected number of 'Name' property history items: " +
+						$"{company.PropertiesWithHistory.Name.Count}");
+				}
+				
+				/*
+				 * 20 company objects were created previously, so we should have no trouble listing 10 of them and there
+				 * should be a paging object in the results.
+				 */
+				searchOptions.Limit = 10;
+				var list10Companies = companyApi.List<CompanyHubSpotModel>(searchOptions);
+				Assert.AreEqual(10, list10Companies.Companies.Count,
+					$"10 companies were expected, instead we received: {list10Companies.Companies.Count}");
+				Assert.IsNotNull(list10Companies.Paging, "Paging object was null");
+				Assert.IsTrue(list10Companies.MoreResultsAvailable, "More results were expected");
+				
+				/*
+				 * Under any circumstances, if we attempt to set a per-request limit higher than 100, an
+				 * ArgumentException will be thrown.
+				 */
+				Assert.ThrowsException<ArgumentException>(() => searchOptions.Limit = 101, 
+					"Setting the limit > 100 should throw an ArgumentException");
+				
+				/*
+				 * Testing the default value for Limit: If the per-request limit is 0 (default/undefined), and
+				 * PropertiesWithHistory is populated, the limit will be 50.
+				 */
+				searchOptions.Limit = 0;
+				Assert.AreEqual(50, searchOptions.Limit,
+					"If there is no limit specified (or if it is 0), and 'PropertiesWithHistory' is not " +
+					"empty, limit should default to 50");
+				
+				/*
+				 * Testing the default value for Limit: If the per-request limit is 0 (default/undefined), and
+				 * PropertiesWithHistory is not populated, the limit will be 100.
+				 */
+				searchOptions.PropertiesWithHistory.Clear();
+				Assert.AreEqual(100, searchOptions.Limit,
+					"If there is no limit specified (or if it is 0), and 'PropertiesWithHistory' is " +
+					"empty, limit should default to 100");
+			}
+			finally
+			{
+				companyApi.BatchArchive(batchCreateResult);
+			}
 		}
 		
-		// TODO - [XML Documentation] Create_Company
+		/// <summary>
+		/// Test Create operations.
+		/// </summary>
 		[TestMethod]
 		public void Create_Company()
 		{
-			// TODO - [TEST] Create_Company
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var company = companyApi.Create(new CompanyHubSpotModel
+			{
+				Name = $"Community Closing Network, LLC",
+				Phone = "3018675309",
+				Domain = $"communityclosing.com"
+			});
+
+			try
+			{
+				// Created  company records should have an Id property that is a long type.
+				Assert.IsFalse((company.Id is null | company.Id == 0L) | !(company.Id is long),
+					"Found company records with invalid id properties");
+			}
+			finally
+			{
+				Utilities.Sleep();
+				companyApi.Delete(company);
+			}
 		}
 		
-		// TODO - [XML Documentation] GetByUniqueId_Company
+		/// <summary>
+		/// Test GetByUniqueId operations.
+		/// </summary>
+		/// <remarks>
+		/// Also tests retrieval of archived company records.
+		/// </remarks>
 		[TestMethod]
 		public void GetByUniqueId_Company()
 		{
-			// TODO - [TEST] GetByUniqueId_Company
+			var companyApi = new HubSpotCompanyApi(TestSetUp.Client);
+			var company = companyApi.Create(new CompanyHubSpotModel
+			{
+				Name = "Community Closing Network, LLC",
+				Phone = "3018675309",
+				Domain = "communityclosing.com"
+			});
+			
+			// We're going to keep a record of all created companies to we can ensure they're removed later.
+			var createdCompanies = new CompanyListHubSpotModel<CompanyHubSpotModel>
+			{
+				Companies = new List<CompanyHubSpotModel> { company }
+			};
+
+			Utilities.Sleep();
+
+			try
+			{
+				// Created company records should have an Id property that is a long type.
+				Assert.IsFalse((company.Id is null | company.Id == 0L) | !(company.Id is long),
+					"Found company records with invalid id properties");
+				
+				/*
+				 * At the time of this writing, the only truly unique, non-custom property that can be used to retrieve
+				 * company objects is the "id" attribute, but we'll set up this test to be easily modifiable should
+				 * HubSpot ever add another unique, non-custom property to the company object. If and when HubSpot ever
+				 * makes the "domain" property truly unique, see the GetByUniqueId_Company test for an example of how
+				 * this test should be modified.
+				 */
+				var getCompanyById = companyApi
+					.GetByUniqueId<CompanyHubSpotModel>(company.Id);
+				Assert.AreEqual(company.Id, getCompanyById.Id, 
+					$"Unexpected value for 'Id': {getCompanyById.Id}; expected: '{company.Id}'");
+				
+				/*
+				 * Next we'll create and delete a couple of company objects to demonstrate retrieving archived records
+				 * by id.
+				 */
+				var oldCompanyId = company.Id;
+				companyApi.Delete(company);
+				Utilities.Sleep();
+				company = companyApi.Create(company);
+				createdCompanies.Companies.Add(company);
+				Assert.AreNotEqual(oldCompanyId, company.Id,
+					"Old company id and new company id are the same but they shouldn't be");
+
+				oldCompanyId = company.Id;
+				companyApi.Delete(company);
+				Utilities.Sleep();
+				company = companyApi.Create(company);
+				createdCompanies.Companies.Add(company);
+				Assert.AreNotEqual(oldCompanyId, company.Id,
+					"Old company id and new company id are the same but they shouldn't be");
+				
+				var searchOptions = new SearchRequestOptions
+				{
+					Archived = true
+				};
+
+				var getArchivedCompanyById = companyApi
+					.GetByUniqueId<CompanyHubSpotModel>(company.Id, searchOptions);
+				Assert.AreEqual(company.Id, getArchivedCompanyById.Id,
+					"Company ids do not match");
+
+				var getArchivedCompaniesById = companyApi
+					.BatchRead(createdCompanies, searchOptions);
+				Assert.IsFalse(getArchivedCompaniesById.Companies
+						.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
+					"Found company records with invalid id properties");
+			}
+			finally
+			{
+				companyApi.BatchArchive(createdCompanies);
+			}
 		}
 		
 		// TODO - [XML Documentation] Update_Company
