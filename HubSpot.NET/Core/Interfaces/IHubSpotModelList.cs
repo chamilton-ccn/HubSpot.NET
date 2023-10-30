@@ -28,11 +28,11 @@ namespace HubSpot.NET.Core.Interfaces
 
         bool ShouldSerializeErrors();
         
-        DateTime RequestedAt { get; }
+        DateTime? RequestedAt { get; }
         
-        DateTime StartedAt { get; }
+        DateTime? StartedAt { get; }
         
-        DateTime CompletedAt { get; }
+        DateTime? CompletedAt { get; }
         
         bool MoreResultsAvailable { get; }
         

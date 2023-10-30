@@ -27,7 +27,7 @@ namespace HubSpot.NET.Core.Search
         /// </summary>
         [DataMember(Name = "sorts")]
         private IList<SearchRequestSort> Sort =>
-            new List<SearchRequestSort>(1)
+            new LimitedList<SearchRequestSort>(1)
             {
                 new SearchRequestSort
                 {

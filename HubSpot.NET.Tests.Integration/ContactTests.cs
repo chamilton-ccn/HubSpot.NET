@@ -57,8 +57,7 @@ namespace HubSpot.NET.Tests.Integration
 			var batchReadArchivedResult = contactApi.BatchRead(batchArchiveResult);
 			// ... we should have 20 "archived" contact records.
 			Assert.AreEqual(20, batchReadArchivedResult.Contacts.Count,
-			$"20 contact records were expected, but instead we received " +
-			$"{batchReadArchivedResult.Contacts.Count}");
+				$"Unexpected number of contacts: {batchReadArchivedResult.Contacts.Count}; expected: 20 ");
 		}
 		
 		/// <summary>
@@ -188,13 +187,13 @@ namespace HubSpot.NET.Tests.Integration
 					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
 					"Found contact records with invalid id properties");
 				foreach (var contact in batchCreateResult.Contacts)
-					contact.FirstName = $"{contact.FirstName}-UPDATED";
+					contact.FirstName = $"{contact.FirstName} (UPDATED)";
 				var batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
 				Utilities.Sleep();
 				var batchReadResult = contactApi.BatchRead(batchUpdateResult);
-				// Updated contact records should have a FirstName property that ends with "-UPDATED".
-				Assert.IsTrue(batchReadResult.Contacts.All(c => c.FirstName.Contains("-UPDATED")),
-					"'FirstName' property is not what was expected");
+				// Updated contact records should have a FirstName property that contains "(UPDATED)".
+				Assert.IsTrue(batchReadResult.Contacts.All(c => c.FirstName.Contains("(UPDATED)")),
+					"'FirstName' property does not contain '(UPDATED)'");
 			}
 			finally
 			{
@@ -237,14 +236,14 @@ namespace HubSpot.NET.Tests.Integration
 				
 				// Update our newly-created models so we can generate some property history.
 				foreach (var contact in batchCreateResult.Contacts)
-					contact.FirstName = $"{contact.FirstName}-UPDATED";
+					contact.FirstName = $"{contact.FirstName} (UPDATED)";
 				contactApi.BatchUpdate(batchCreateResult);
 				
 				Utilities.Sleep();
 				
 				// Update (again) our recently updated models so we can generate some more property history.
 				foreach (var contact in batchCreateResult.Contacts)
-					contact.FirstName = $"{contact.FirstName}-UPDATED2";
+					contact.FirstName = $"{contact.FirstName} (UPDATED AGAIN)";
 				
 				contactApi.BatchUpdate(batchCreateResult);
 				
@@ -276,7 +275,7 @@ namespace HubSpot.NET.Tests.Integration
 				{
 					Assert.IsTrue(contact.PropertiesWithHistory.FirstName.Count == 3,
 						$"Unexpected number of 'FirstName' property history items: " +
-						$"{contact.PropertiesWithHistory.FirstName.Count}");
+						$"{contact.PropertiesWithHistory.FirstName.Count}; expected: 3");
 				}
 				
 				/*
@@ -286,7 +285,7 @@ namespace HubSpot.NET.Tests.Integration
 				searchOptions.Limit = 10;
 				var list10Contacts = contactApi.List<ContactHubSpotModel>(searchOptions);
 				Assert.AreEqual(10, list10Contacts.Contacts.Count,
-					$"10 contacts were expected, instead we received: {list10Contacts.Contacts.Count}");
+					$"Unexpected number of contacts: {list10Contacts.Contacts.Count}; expected: 10");
 				Assert.IsNotNull(list10Contacts.Paging, "Paging object was null");
 				Assert.IsTrue(list10Contacts.MoreResultsAvailable, "More results were expected");
 				
@@ -442,8 +441,7 @@ namespace HubSpot.NET.Tests.Integration
 				searchOptions.IdProperty = null;
 				var getArchivedContactById = contactApi
 					.GetByUniqueId<ContactHubSpotModel>(contact.Id, searchOptions);
-				Assert.AreEqual(contact.Id, getArchivedContactById.Id,
-					"Contact ids do not match");
+				Assert.AreEqual(contact.Id, getArchivedContactById.Id, "Contact ids do not match");
 
 				var getArchivedContactsById = contactApi
 					.BatchRead(createdContacts, searchOptions);
@@ -480,10 +478,10 @@ namespace HubSpot.NET.Tests.Integration
 					"Found contact records with invalid id properties");
 
 				contact.Email = $"UPDATED-{contact.Email}";
-				contact.FirstName = $"{contact.FirstName}-UPDATED";
-				contact.LastName = $"{contact.LastName}-UPDATED";
+				contact.FirstName = $"{contact.FirstName} (UPDATED)";
+				contact.LastName = $"{contact.LastName} (UPDATED)";
 				contact.Phone = "2408675309";
-				contact.Company = $"{contact.Company}-UPDATED";
+				contact.Company = $"{contact.Company} (UPDATED)";
 
 				contact = contactApi.Update(contact);
 				
@@ -497,18 +495,18 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.AreEqual("updated-test@communityclosing.com", contact.Email,
 					$"Unexpected value for 'Email': '{contact.Email}'; expected: " +
 					$"'updated-test@communityclosing.com'");
-				Assert.AreEqual("Testy-UPDATED", contact.FirstName,
+				Assert.AreEqual("Testy (UPDATED)", contact.FirstName,
 					$"Unexpected value for 'FirstName': '{contact.FirstName}'; expected: " +
-					$"'Testy-UPDATED'");
-				Assert.AreEqual("Testerson-UPDATED", contact.LastName,
+					$"'Testy (UPDATED)'");
+				Assert.AreEqual("Testerson (UPDATED)", contact.LastName,
 					$"Unexpected value for 'LastName': '{contact.LastName}'; expected: " +
-					$"'Testerson-UPDATED'");
+					$"'Testerson (UPDATED)'");
 				Assert.AreEqual("2408675309", contact.Phone,
 					$"Unexpected value for 'Phone': '{contact.Phone}'; expected: " +
 					$"'2408675309'");
-				Assert.AreEqual("Community Closing Network, LLC-UPDATED", contact.Company,
+				Assert.AreEqual("Community Closing Network, LLC (UPDATED)", contact.Company,
 					$"Unexpected value for 'Company': '{contact.Company}'; expected: " +
-					$"'Community Closing Network, LLC-UPDATED'");
+					$"'Community Closing Network, LLC (UPDATED)'");
 			}
 			finally
 			{
@@ -617,11 +615,11 @@ namespace HubSpot.NET.Tests.Integration
 				
 				// We should only have 5 records ...
 				Assert.AreEqual(5, searchResult.Contacts.Count, 
-					$"5 contact records were expected, but instead we received {searchResult.Contacts.Count}");
+					$"Unexpected number of contacts: {searchResult.Contacts.Count}; expected: 5");
 				
 				// ... But there should be a total of 20 records
 				Assert.AreEqual(20, searchResult.Total,
-					$"20 total contact records were expected, but instead there are {searchResult.Total}");
+					$"Unexpected number of contacts: {searchResult.Total}; expected: 20");
 				
 				// ... And more results should be available
 				Assert.IsTrue(searchResult.MoreResultsAvailable, 
@@ -667,12 +665,126 @@ namespace HubSpot.NET.Tests.Integration
 				
 				Assert.ThrowsException<ArgumentOutOfRangeException>(() => batchCreateResult
 					.SearchRequestOptions.FilterGroups[0].Filters.Add(new SearchRequestFilter()),
-					"The maximum number of filters per filter group is 3");
+					"The maximum number of filters should be 3");
 			}
 			finally
 			{
 				contactApi.BatchArchive(batchCreateResult);
-			}			
+			}
+		}
+
+		/// <summary>
+		/// Tests the default values of properties for ContactHubSpotModel and ContactListHubSpotModel.
+		/// </summary>
+		[TestMethod]
+		public void Default_Property_Values()
+		{
+			var contactHubSpotModel = new ContactHubSpotModel();
+			
+			Assert.IsNull(contactHubSpotModel.Id,
+				$"Unexpected value for 'Id': '{contactHubSpotModel.Id}'; expected: 'null'");
+			Assert.IsTrue(contactHubSpotModel.SerializeProperties,
+				$"Unexpected value for 'SerializeProperties': '{contactHubSpotModel.SerializeProperties}'; " +
+				$"expected: 'true'");
+			var shouldSerializeProperties = contactHubSpotModel.ShouldSerializeProperties(); 
+			Assert.IsTrue(shouldSerializeProperties,
+				$"Unexpected value returned by 'ShouldSerializeProperties': " +
+				$"'{shouldSerializeProperties}'; expected: 'true'");
+			Assert.AreEqual(0, contactHubSpotModel.Associations.Count,
+				$"Unexpected number of items in 'Associations': {contactHubSpotModel.Associations.Count}; " +
+				$"expected: 0");
+			Assert.IsNull(contactHubSpotModel.SerializeAssociations,
+				$"Unexpected value for 'SerializeAssociations': '{contactHubSpotModel.Associations}'; " +
+				$"expected: 'null'");
+			var shouldSerializeAssociations = contactHubSpotModel.ShouldSerializeAssociations(); 
+			Assert.IsFalse(shouldSerializeAssociations,
+				$"Unexpected value for 'ShouldSerializeAssociations': '{shouldSerializeAssociations}'; " +
+				$"expected: 'false'");
+			Assert.IsNull(contactHubSpotModel.Email,
+				$"Unexpected value for 'Email': '{contactHubSpotModel.Email}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.FirstName,
+				$"Unexpected value for 'FirstName': '{contactHubSpotModel.FirstName}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.LastName,
+				$"Unexpected value for 'LastName': '{contactHubSpotModel.LastName}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.Website,
+				$"Unexpected value for 'Website': '{contactHubSpotModel.Website}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.EmailDomain,
+				$"Unexpected value for 'EmailDomain': '{contactHubSpotModel.EmailDomain}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.Company,
+				$"Unexpected value for 'Company': '{contactHubSpotModel.Company}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.Phone,
+				$"Unexpected value for 'Phone': '{contactHubSpotModel.Phone}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.Address,
+				$"Unexpected value for 'Address': '{contactHubSpotModel.Address}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.City,
+				$"Unexpected value for 'City': '{contactHubSpotModel.City}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.State,
+				$"Unexpected value for 'State': '{contactHubSpotModel.State}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.ZipCode,
+				$"Unexpected value for 'ZipCode': '{contactHubSpotModel.ZipCode}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.PropertiesWithHistory,
+				$"Unexpected value for 'PropertiesWithHistory': '{contactHubSpotModel.PropertiesWithHistory}'; " +
+				$"expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.CreatedAt,
+				$"Unexpected value for 'CreatedAt': '{contactHubSpotModel.CreatedAt}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.UpdatedAt,
+				$"Unexpected value for 'UpdatedAt': '{contactHubSpotModel.UpdatedAt}'; expected: 'null'");
+			Assert.AreEqual("contacts", contactHubSpotModel.HubSpotObjectType,
+				$"Unexpected value for 'HubSpotObjectType': '{contactHubSpotModel.HubSpotObjectType}'; " +
+				$"expected: 'contacts'");
+			Assert.AreEqual("/crm/v3/objects/contacts",contactHubSpotModel.RouteBasePath,
+				$"Unexpected value for 'RouteBasePath': '{contactHubSpotModel.RouteBasePath}'; " +
+				$"expected: '/crm/v3/objects/contacts'");
+			
+			var contactListHubSpotModel = new ContactListHubSpotModel<ContactHubSpotModel>();
+			
+			Assert.AreEqual(0, contactListHubSpotModel.Contacts.Count,
+				$"Unexpected number of items in 'Contacts': {contactListHubSpotModel.Contacts.Count}; " +
+				$"expected: 0");
+			Assert.AreEqual(0, contactListHubSpotModel.Inputs.Count,
+				$"Unexpected number of items in 'Inputs': {contactListHubSpotModel.Inputs.Count}; expected: 0");
+			Assert.AreEqual(0, contactListHubSpotModel.Results.Count,
+				$"Unexpected number of items in 'Results': '{contactListHubSpotModel.Results.Count}'; expected: 0");
+			var shouldSerializeResults = contactListHubSpotModel.ShouldSerializeResults();
+			Assert.IsFalse(shouldSerializeResults,
+				$"Unexpected value for 'ShouldSerializeResults': '{shouldSerializeResults}'; expected: 'false'");
+			Assert.IsNull(contactListHubSpotModel.Status,
+				$"Unexpected value for 'Status': '{contactListHubSpotModel.Status}'; expected: 'null'");
+			Assert.IsNull(contactListHubSpotModel.Total,
+				$"Unexpected value for 'Total': '{contactListHubSpotModel.Total}'; expected: 'null'");
+			Assert.IsNull(contactListHubSpotModel.TotalErrors,
+				$"Unexpected value for 'TotalErrors': '{contactListHubSpotModel.TotalErrors}'; " +
+				$"expected: 'null'");
+			Assert.AreEqual(0, contactListHubSpotModel.Errors.Count,
+				$"Unexpected number of items in 'Errors': {contactListHubSpotModel.Errors.Count}; expected: 0");
+			var shouldSerializeErrors = contactListHubSpotModel.ShouldSerializeErrors();
+			Assert.IsFalse(shouldSerializeErrors,
+				$"Unexpected value for 'ShouldSerializeErrors': '{shouldSerializeErrors}'; expected: 'false'");
+			Assert.IsNull(contactListHubSpotModel.RequestedAt,
+				$"Unexpected value for 'RequestedAt': '{contactListHubSpotModel.RequestedAt}'; expected: 'null'");
+			Assert.IsNull(contactListHubSpotModel.StartedAt,
+				$"Unexpected value for 'StartedAt': '{contactListHubSpotModel.StartedAt}'; expected: 'null'");
+			Assert.IsNull(contactListHubSpotModel.CompletedAt,
+				$"Unexpected value for 'CompletedAt': '{contactListHubSpotModel.CompletedAt}'; expected: 'null'");
+			Assert.IsFalse(contactListHubSpotModel.MoreResultsAvailable,
+				$"Unexpected value for 'MoreResultsAvailable': '{contactListHubSpotModel.MoreResultsAvailable}'; " +
+				$"expected: 'false'");
+			Assert.IsNull(contactListHubSpotModel.Offset,
+				$"Unexpected value for 'Offset': '{contactListHubSpotModel.Offset}'; expected: 'null'");
+			Assert.IsNull(contactListHubSpotModel.Paging,
+				$"Unexpected value for 'Paging': '{contactListHubSpotModel.Paging}'; expected: 'null'");
+			// TODO: SearchRequestOptions is not tested here; instead it will be tested in Search unit tests
+			Assert.IsNull(contactListHubSpotModel.IdProperty,
+				$"Unexpected value for 'IdProperty': '{contactListHubSpotModel.IdProperty}'; expected: 'null'");
+			Assert.AreEqual(0, contactListHubSpotModel.PropertiesWithHistory.Count,
+				$"Unexpected number of items 'PropertiesWithHistory': " +
+				$"{contactListHubSpotModel.PropertiesWithHistory.Count}; expected: 0");
+			Assert.AreEqual("contacts", contactListHubSpotModel.HubSpotObjectType,
+				$"Unexpected value for 'HubSpotObjectType': '{contactListHubSpotModel.HubSpotObjectType}'; " +
+				$"expected: 'contacts'");
+			Assert.AreEqual("/crm/v3/objects/contacts",contactListHubSpotModel.RouteBasePath,
+				$"Unexpected value for 'RouteBasePath': '{contactListHubSpotModel.RouteBasePath}'; " +
+				$"expected: '/crm/v3/objects/contacts'");
 		}
 	}
 }

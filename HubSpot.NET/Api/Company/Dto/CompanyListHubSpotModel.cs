@@ -74,13 +74,13 @@ namespace HubSpot.NET.Api.Company.Dto
         public bool ShouldSerializeErrors() => false;
         
         [DataMember(Name = "requestedAt", EmitDefaultValue = false)]
-        public DateTime RequestedAt { get; set; }
+        public DateTime? RequestedAt { get; set; }
         
         [DataMember(Name = "startedAt", EmitDefaultValue = false)]
-        public DateTime StartedAt { get; set; }
+        public DateTime? StartedAt { get; set; }
         
         [DataMember(Name = "completedAt", EmitDefaultValue = false)]
-        public DateTime CompletedAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
         
         /// <summary>
         /// Gets or sets a value indicating whether more results are available.
