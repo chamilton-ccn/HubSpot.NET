@@ -118,6 +118,13 @@ namespace HubSpot.NET.Api.Contact.Dto
         }
         
         [IgnoreDataMember]
+        public string MobilePhone
+        {
+            get => Properties.MobilePhone;
+            set => Properties.MobilePhone = value;
+        }
+        
+        [IgnoreDataMember]
         public string Address
         {
             get => Properties.Address;

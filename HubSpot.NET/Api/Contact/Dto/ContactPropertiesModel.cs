@@ -53,6 +53,9 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "phone")]
         public string Phone { get; set; }
         
+        [DataMember(Name = "mobilephone")]
+        public string  MobilePhone { get; set; }
+        
         [DataMember(Name = "address")]
         public string Address { get; set; }
         

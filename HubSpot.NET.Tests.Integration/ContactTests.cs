@@ -717,6 +717,8 @@ namespace HubSpot.NET.Tests.Integration
 				$"Unexpected value for 'Company': '{contactHubSpotModel.Company}'; expected: 'null'");
 			Assert.IsNull(contactHubSpotModel.Phone,
 				$"Unexpected value for 'Phone': '{contactHubSpotModel.Phone}'; expected: 'null'");
+			Assert.IsNull(contactHubSpotModel.MobilePhone,
+				$"Unexpected value for 'MobilePhone': '{contactHubSpotModel.MobilePhone}'; expected: 'null'");
 			Assert.IsNull(contactHubSpotModel.Address,
 				$"Unexpected value for 'Address': '{contactHubSpotModel.Address}'; expected: 'null'");
 			Assert.IsNull(contactHubSpotModel.City,
