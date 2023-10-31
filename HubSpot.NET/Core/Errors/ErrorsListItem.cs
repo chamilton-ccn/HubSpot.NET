@@ -5,6 +5,7 @@ namespace HubSpot.NET.Core.Errors
 {
     public class ErrorsListItem
     {
+        // TODO - Need a test for this. It might need to be dynamic or string.
         [DataMember(Name = "id")]
         public long Id { get; set; }
         

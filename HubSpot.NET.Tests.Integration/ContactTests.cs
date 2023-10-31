@@ -147,6 +147,9 @@ namespace HubSpot.NET.Tests.Integration
 				Assert.IsFalse(batchReadResult.Contacts
 					.All(c => (c.Id is null | c.Id == 0L | !(c.Id is long))),
 					"Found contact records with invalid id properties");
+				
+				// TODO - Test "Archived = true" in search options. Currently this doesn't work even though the documentation says it should. I've emailed HubSpot about it; stay tuned!
+
 			}
 			finally
 			{

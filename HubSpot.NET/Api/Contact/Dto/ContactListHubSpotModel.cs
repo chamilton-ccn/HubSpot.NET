@@ -127,6 +127,11 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "idProperty", EmitDefaultValue = false)]
         public string IdProperty  => SearchRequestOptions.IdProperty;
         
+        // TODO - Needs a unit test
+        [DataMember(Name = "properties")]
+        public IList<string> PropertiesToInclude => SearchRequestOptions.PropertiesToInclude;
+        public bool ShouldSerializePropertiesToInclude() => PropertiesToInclude.Any(); 
+        
         [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]
         public IList<string> PropertiesWithHistory => SearchRequestOptions.PropertiesWithHistory;
         public bool ShouldSerializePropertiesWithHistory() => PropertiesWithHistory.Any();

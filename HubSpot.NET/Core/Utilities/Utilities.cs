@@ -16,7 +16,6 @@ namespace HubSpot.NET.Core.Utilities
         {
             System.Threading.Thread.Sleep(duration * 1000);
         }
-        
     }
     
     /// <summary>

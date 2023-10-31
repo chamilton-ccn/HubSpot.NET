@@ -4,6 +4,7 @@ using HubSpot.NET.Core.Interfaces;
 
 namespace HubSpot.NET.Core.Errors
 {
+    // TODO - Needs unit test
     public class ErrorsListItemContext
     {
         [DataMember(Name = "ids")]

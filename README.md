@@ -24,7 +24,7 @@ of the most recent fork of this library.
   * [ ] Company
     * [x] Model (`IHubSpotModel`) Interface
     * [x] ModelList (`IHubSpotModelList`) Interface
-    * [ ] Refactor Unit Tests
+    * [x] Refactor Unit Tests
     * [ ] Refactor examples
     * [ ] Comprehensive documentation (XML comments, examples, etc.)
   * [ ] Contacts
@@ -109,6 +109,7 @@ of the most recent fork of this library.
     * [ ] Comprehensive documentation (XML comments, examples, etc.)
 * [ ] Custom object types (TODO list TBD)
 * [ ] Object Properties/Schema (TODO list TBD)
+* [ ] Ensure all `DateTime` properties are ISO 8601 formatted (`yyyy-MM-ddThh:mm:ss.fffZ`)
 
  
 # HubSpot.NET
