@@ -30,6 +30,14 @@ namespace HubSpot.NET.Api.Company.Dto
         [DataMember(Name = "about_us")]
         public string About { get; set; }
         
+        // TODO - Need default value testing
+        [DataMember(Name = "address")]
+        public string StreetAddress1 { get; set; }
+        
+        // TODO - Need default value testing
+        [DataMember(Name = "address2")]
+        public string StreetAddress2 { get; set; }
+        
         [DataMember(Name = "city")]
         public string City { get; set; }
         

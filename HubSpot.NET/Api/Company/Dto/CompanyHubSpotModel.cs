@@ -111,6 +111,22 @@ namespace HubSpot.NET.Api.Company.Dto
             set => Properties.About = value;
         }
 
+        // TODO - Need default value testing
+        [IgnoreDataMember]
+        public string StreetAddress1
+        {
+            get => Properties.StreetAddress1;
+            set => Properties.StreetAddress1 = value;
+        }
+        
+        // TODO - Need default value testing
+        [IgnoreDataMember]
+        public string StreetAddress2
+        {
+            get => Properties.StreetAddress2;
+            set => Properties.StreetAddress2 = value;
+        }
+
         [IgnoreDataMember]
         public string City
         {

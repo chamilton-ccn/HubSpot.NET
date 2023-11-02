@@ -21,6 +21,12 @@ namespace HubSpot.NET.Api.Company.Dto
         [DataMember(Name = "description")]
         public IList<PropertiesHistoryModelItem> Description { get; set; }
         
+        [DataMember(Name = "address")]
+        public IList<PropertiesHistoryModelItem> StreetAddress1 { get; set; }
+        
+        [DataMember(Name = "address2")]
+        public IList<PropertiesHistoryModelItem> StreetAddress2 { get; set; }
+        
         [DataMember(Name = "about_us")]
         public IList<PropertiesHistoryModelItem> About { get; set; }
         
