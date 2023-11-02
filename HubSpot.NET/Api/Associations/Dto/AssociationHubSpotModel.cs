@@ -39,6 +39,7 @@ namespace HubSpot.NET.Api.Associations.Dto
         }
         public bool ShouldSerialize_associationSpec() => false;
         
+        // TODO - consider implementing a property that accepts a dynamic object that will be used to create the AssociationObjectIdModel
         [DataMember(Name = "from", EmitDefaultValue = false)]
         public AssociationObjectIdModel FromObject { get; set; } = new AssociationObjectIdModel();
         

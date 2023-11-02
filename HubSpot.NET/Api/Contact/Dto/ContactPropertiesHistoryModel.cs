@@ -6,6 +6,7 @@ namespace HubSpot.NET.Api.Contact.Dto
     [DataContract]
     public class ContactPropertiesHistoryModel
     {
+        // TODO - Need to write a test that checks to ensure each of the Properties on the ContactPropertiesModel exist in this class.
         [DataMember(Name = "email")]
         public IList<PropertiesHistoryModelItem> Email { get; set; }
         

@@ -132,7 +132,7 @@ namespace HubSpot.NET.Api.Contact
                 : path;
             
             path = path.SetQueryParam("limit", opts.Limit);
-                
+            
             path = opts.Archived 
                 ? path.SetQueryParam("archived", true)
                 : path;
