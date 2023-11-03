@@ -1,4 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Net.Mail;
+using System.Runtime.Serialization;
+
+// ReSharper disable InconsistentNaming
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
@@ -12,8 +15,15 @@ namespace HubSpot.NET.Api.Contact.Dto
     [DataContract]
     public class ContactPropertiesModel
     {
+        [IgnoreDataMember]
+        private string _email { get; set; }
+        
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public string Email
+        {
+            get => _email;
+            set => _email = value.ToLower();
+        }
         
         [DataMember(Name = "firstname")]
         public string FirstName { get; set; }
@@ -24,6 +34,11 @@ namespace HubSpot.NET.Api.Contact.Dto
         [DataMember(Name = "website")]
         public string Website { get; set; }
         
+        /// <summary>
+        /// Since EmailDomain is a calculated, read-only field (on HubSpot), if you need to compare email domain values
+        /// prior to retrieving records from HubSpot, you must use the domain part of the email address. Do not rely
+        /// on this field before it has been populated by HubSpot.
+        /// </summary>
         [DataMember(Name = "hs_email_domain")]
         public string EmailDomain { get; set; }
         
