@@ -15,6 +15,12 @@ namespace HubSpot.NET.Api.Contact.Dto
     [DataContract]
     public class ContactPropertiesModel
     {
+        /// <summary>
+        /// HubSpot <i>automatically</i> normalizes email addresses to lowercase, but we might need to compare email
+        /// address values before retrieving records from HubSpot, so we enforce lowercase email addresses at the object
+        /// level. If you are comparing email addresses from another source to the value below, ensure that you
+        /// normalize your source value(s) to lowercase.
+        /// </summary>
         [IgnoreDataMember]
         private string _email { get; set; }
         
