@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using HubSpot.NET.Api.Company.Dto;
@@ -33,10 +32,10 @@ namespace HubSpot.NET.Api.Company
         {
             var path = $"{companies.RouteBasePath}/batch/archive";
             
-            foreach (var contact in companies.Companies)
+            foreach (var company in companies.Companies)
             {
-                contact.SerializeAssociations = false;
-                contact.SerializeProperties = false;
+                company.SerializeAssociations = false;
+                company.SerializeProperties = false;
             }
             
             // TODO - remove SerializationType parameter
@@ -83,10 +82,10 @@ namespace HubSpot.NET.Api.Company
                 ? path.SetQueryParam("archived", true)
                 : path;
 
-            foreach (var contact in companies.Companies)
+            foreach (var company in companies.Companies)
             {   
-                contact.SerializeAssociations = false;
-                contact.SerializeProperties = false;
+                company.SerializeAssociations = false;
+                company.SerializeProperties = false;
             }   
 
             // TODO - remove SerializationType parameter

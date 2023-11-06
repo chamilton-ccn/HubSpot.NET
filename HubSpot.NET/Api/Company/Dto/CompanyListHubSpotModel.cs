@@ -12,7 +12,7 @@ using System.Runtime.Serialization;
 namespace HubSpot.NET.Api.Company.Dto
 {
     [DataContract]
-    public class CompanyListHubSpotModel<T> : IHubSpotModel, IHubSpotModelList<T> where T: CompanyHubSpotModel, new()
+    public class CompanyListHubSpotModel<T> : IHubSpotModel, IHubSpotModelList<T> where T : CompanyHubSpotModel, new()
     {
         /// <summary>
         /// The list of Companies
