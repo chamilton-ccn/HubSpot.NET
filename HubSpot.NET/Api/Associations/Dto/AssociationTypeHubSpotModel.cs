@@ -54,22 +54,11 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// yourself needing unlabeled custom associations, simply do not populate the Name or Label properties.
         /// Specifying a value for either one, will specify the same value for both. 
         /// </summary>
-        [IgnoreDataMember]
-        private string _associationLabelAndName { get; set; }
-        
         [DataMember(Name = "label")]
-        public string Label
-        {
-            get => _associationLabelAndName;
-            set => _associationLabelAndName = value;
-        }
-        
+        public string Label { get; set; }
+
         [DataMember(Name = "name")]
-        public string Name
-        {
-            get => _associationLabelAndName;
-            set => _associationLabelAndName = value;
-        }
+        public string Name => $"{Label}_{FromObjectType}_{ToObjectType}".ToLower();
 
         [IgnoreDataMember]
         public AssociationCategory AssociationCategory { get; set; } = AssociationCategory.HubSpotDefined;
