@@ -155,7 +155,7 @@ As HubSpot lets you create and add custom properties to your contacts, companies
   }
 ```
 ### Using checkbox/radio properties
-These properties should be of type `string` and set as a semicolon delimitemand list of values, e.g. "value1;value2". This is required by HubSpot, see [here](https://developers.hubspot.com/docs/faq/how-do-i-set-multiple-values-for-checkbox-properties) for more details.
+These properties should be of type `string` and set as a semicolon delimited list of values, e.g. "value1;value2". This is required by HubSpot, see [here](https://developers.hubspot.com/docs/faq/how-do-i-set-multiple-values-for-checkbox-properties) for more details.
 
 ## Contributing
 Please read [CONTRIBUTING.md](https://github.com/squaredup/HubSpot.NET/blob/master/CONTRIBUTING.md) for more information on how to contribute. PRs welcome!
