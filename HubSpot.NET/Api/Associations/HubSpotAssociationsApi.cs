@@ -325,6 +325,7 @@ namespace HubSpot.NET.Api.Associations
         public AssociationTypeListHubSpotModel<T> ListAssociationTypes<T>(string fromObjectType, string toObjectType) 
             where T : AssociationTypeHubSpotModel, new()
         {
+            // TODO - Path should accept a limit query parameter!
             var path = $"{new T().RouteBasePath}/associations/{fromObjectType}/{toObjectType}/labels";
             // TODO - remove debugging
             Console.WriteLine($"### PATH: {path}");

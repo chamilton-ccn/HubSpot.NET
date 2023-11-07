@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using HubSpot.NET.Api.Contact.Dto;
 
 namespace HubSpot.NET.Core.Utilities
 {
@@ -110,4 +111,34 @@ namespace HubSpot.NET.Core.Utilities
             return ((IEnumerable)_list).GetEnumerator();
         }
     }
+    
+    // TODO - Equality comparer for all other models
+    
+    /// <summary>
+    /// ContactHubSpotModelComparer - Determines whether or not two ContactHubSpotModel instances should be treated as
+    /// equals.
+    /// </summary>
+    public class ContactHubSpotModelComparer : IEqualityComparer<ContactHubSpotModel>
+    {
+        public bool Equals(ContactHubSpotModel thisContact, ContactHubSpotModel thatContact)
+        {
+            if ((thisContact?.Id != null) & (thatContact?.Id != null))
+                return thisContact?.Id == thatContact?.Id;
+            if ((thisContact?.Email != null) & (thatContact?.Email != null))
+                return string.Equals(thisContact?.Email, thatContact?.Email,
+                    StringComparison.CurrentCultureIgnoreCase);
+            throw new InvalidOperationException("'Id' or 'Email' property are required for comparison!");
+        }
+
+        public int GetHashCode(ContactHubSpotModel contact)
+        {
+            if (contact.Id != null)
+                return contact.Id.GetHashCode();
+            if (contact.Email != null)
+                return contact.Email.GetHashCode();
+            throw new InvalidOperationException("'Id' or 'Email' property are required to get hash code!");
+        }
+        
+    }
+    
 }
