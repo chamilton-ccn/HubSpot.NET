@@ -63,7 +63,7 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// If this association type is defined in the AssociationType enum, then it is a HubSpot defined type and it
         /// won't have a name so there's no point in setting a value here.
         /// </summary>
-        [DataMember(Name = "name")]
+        [DataMember(Name = "name", EmitDefaultValue = false)]
         public string Name => Enum.IsDefined(typeof(AssociationType), AssociationTypeId)
             ? null
             : NonAlphanumeric.Replace($"{Label}_{FromObjectType}_{ToObjectType}".ToLower(), "_");
