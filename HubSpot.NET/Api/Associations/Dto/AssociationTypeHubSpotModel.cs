@@ -68,7 +68,7 @@ namespace HubSpot.NET.Api.Associations.Dto
             ? null
             : NonAlphanumeric.Replace($"{Label}_{FromObjectType}_{ToObjectType}".ToLower(), "_");
 
-        private static Regex NonAlphanumeric => new Regex("[^a-zA-Z0-9 ]", RegexOptions.Compiled);
+        private static Regex NonAlphanumeric => new Regex(@"[^a-zA-Z0-9]|\s+", RegexOptions.Compiled);
 
         [IgnoreDataMember]
         public AssociationCategory AssociationCategory { get; set; } = AssociationCategory.HubSpotDefined;

@@ -205,7 +205,6 @@ namespace HubSpot.NET.Examples
                 .CreateCustomAssociationType(
                     new AssociationTypeHubSpotModel
                     {
-                        Name = "TEST LABEL #1", 
                         Label = "TEST LABEL #1",
                         AssociationCategory = AssociationCategory.UserDefined,
                         FromObjectType = randomContact.HubSpotObjectType,
@@ -253,7 +252,6 @@ namespace HubSpot.NET.Examples
                 .CreateCustomAssociationType(
                     new AssociationTypeHubSpotModel
                     {
-                        Name = "TEST LABEL #2",
                         Label = "TEST LABEL #2",
                         AssociationCategory = AssociationCategory.UserDefined,
                         FromObjectType = randomContact.HubSpotObjectType,
@@ -283,13 +281,11 @@ namespace HubSpot.NET.Examples
              */
             Console.WriteLine($"* Updating the name and label of the custom association type: " +
                               $"'{firstCustomAssociationLabel.Label}' to 'TEST LABEL #1 (UPDATED)'");
-            firstCustomAssociationLabel.Name = "TEST LABEL #1 (UPDATED)";
             firstCustomAssociationLabel.Label = "TEST LABEL #1 (UPDATED)";
             firstCustomAssociationLabel = api.Associations.UpdateCustomAssociationType(firstCustomAssociationLabel);
             Console.WriteLine($"-> Name and label have been updated to: '{firstCustomAssociationLabel.Name}'");
             Console.WriteLine($"* Updating the name and label of the custom association type: " +
                               $"'{secondCustomAssociationLabel.Label}' to 'TEST LABEL #2 (UPDATED)'");
-            secondCustomAssociationLabel.Name = "TEST LABEL #2 (UPDATED)";
             secondCustomAssociationLabel.Label = "TEST LABEL #2 (UPDATED)";
             secondCustomAssociationLabel = api.Associations.UpdateCustomAssociationType(secondCustomAssociationLabel);
             Console.WriteLine($"-> Name and label have been updated to: '{secondCustomAssociationLabel.Name}'");
