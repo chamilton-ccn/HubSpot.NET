@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using HubSpot.NET.Core.Interfaces;
 
 // ReSharper disable InconsistentNaming
@@ -56,9 +57,15 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// </summary>
         [DataMember(Name = "label")]
         public string Label { get; set; }
-
+        
+        /// <summary>
+        /// If this association type is defined in the AssociationType enum, then it is a HubSpot defined type and it
+        /// won't have a name so there's no point in setting a value here.
+        /// </summary>
         [DataMember(Name = "name")]
-        public string Name => $"{Label}_{FromObjectType}_{ToObjectType}".ToLower();
+        public string Name => Enum.IsDefined(typeof(AssociationType), AssociationTypeId) 
+            ? null 
+            : $"{Label}_{FromObjectType}_{ToObjectType}".ToLower();
 
         [IgnoreDataMember]
         public AssociationCategory AssociationCategory { get; set; } = AssociationCategory.HubSpotDefined;
