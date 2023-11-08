@@ -64,9 +64,12 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// won't have a name so there's no point in setting a value here.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name => Enum.IsDefined(typeof(AssociationType), AssociationTypeId)
-            ? null
-            : NonAlphanumeric.Replace($"{Label}_{FromObjectType}_{ToObjectType}".ToLower(), "_");
+        public string Name => AssociationTypeId != null 
+            ? Enum.IsDefined(typeof(AssociationType), AssociationTypeId) 
+                ? null 
+                : NonAlphanumeric.Replace($"{Label}_{FromObjectType}_{ToObjectType}".ToLower(), "_") 
+            : null; 
+        
         public bool ShouldSerializeName() => Name != null;
 
         private static Regex NonAlphanumeric => new Regex(@"[^a-zA-Z0-9]|\s+", RegexOptions.Compiled);
