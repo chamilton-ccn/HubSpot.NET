@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using HubSpot.NET.Core.Interfaces;
 
 // ReSharper disable InconsistentNaming
@@ -57,15 +58,17 @@ namespace HubSpot.NET.Api.Associations.Dto
         /// </summary>
         [DataMember(Name = "label")]
         public string Label { get; set; }
-        
+
         /// <summary>
         /// If this association type is defined in the AssociationType enum, then it is a HubSpot defined type and it
         /// won't have a name so there's no point in setting a value here.
         /// </summary>
         [DataMember(Name = "name")]
-        public string Name => Enum.IsDefined(typeof(AssociationType), AssociationTypeId) 
-            ? null 
-            : $"{Label}_{FromObjectType}_{ToObjectType}".ToLower();
+        public string Name => Enum.IsDefined(typeof(AssociationType), AssociationTypeId)
+            ? null
+            : NonAlphanumeric.Replace($"{Label}_{FromObjectType}_{ToObjectType}".ToLower(), "_");
+
+        private static Regex NonAlphanumeric => new Regex("[^a-zA-Z0-9 ]", RegexOptions.Compiled);
 
         [IgnoreDataMember]
         public AssociationCategory AssociationCategory { get; set; } = AssociationCategory.HubSpotDefined;
