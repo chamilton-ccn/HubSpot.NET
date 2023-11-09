@@ -34,13 +34,13 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			// Created company records should have an Id property that is a long type.
 			Assert.IsFalse(batchCreateResult.Companies
 					.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
 				"Found company records with invalid id properties");
 			var batchArchiveResult = companyApi.BatchArchive(batchCreateResult);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			// Archived company records should have a Status of "ARCHIVED"
 			Assert.IsTrue(batchArchiveResult.Status == "ARCHIVED",
 				"Status is not 'ARCHIVED'"); // TODO - Should this be an enum?
@@ -76,7 +76,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
@@ -113,7 +113,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
@@ -181,7 +181,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -194,7 +194,7 @@ namespace HubSpot.NET.Tests.Integration
 					company.Name = $"{company.Name} (UPDATED)";
 				}
 				var batchUpdateResult = companyApi.BatchUpdate(batchCreateResult);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				var batchReadResult = companyApi.BatchRead(batchUpdateResult);
 				// Updated company records should have a Name property that contains "(UPDATED)".
 				Assert.IsTrue(batchReadResult.Companies.All(c => c.Name.Contains("(UPDATED)")),
@@ -228,7 +228,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -242,7 +242,7 @@ namespace HubSpot.NET.Tests.Integration
 					company.Name = $"{company.Name} (UPDATED)";
 				companyApi.BatchUpdate(batchCreateResult);
 				
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				
 				// Update (again) our recently updated models so we can generate some more property history.
 				foreach (var company in batchCreateResult.Companies)
@@ -250,7 +250,7 @@ namespace HubSpot.NET.Tests.Integration
 
 				companyApi.BatchUpdate(batchCreateResult);
 				
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 
 				var searchOptions = new SearchRequestOptions
 				{
@@ -344,7 +344,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			finally
 			{
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				companyApi.Delete(company);
 			}
 		}
@@ -372,7 +372,7 @@ namespace HubSpot.NET.Tests.Integration
 				Companies = new List<CompanyHubSpotModel> { company }
 			};
 
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -398,7 +398,7 @@ namespace HubSpot.NET.Tests.Integration
 				 */
 				var oldCompanyId = company.Id;
 				companyApi.Delete(company);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				company = companyApi.Create(company);
 				createdCompanies.Companies.Add(company);
 				Assert.AreNotEqual(oldCompanyId, company.Id,
@@ -406,7 +406,7 @@ namespace HubSpot.NET.Tests.Integration
 
 				oldCompanyId = company.Id;
 				companyApi.Delete(company);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				company = companyApi.Create(company);
 				createdCompanies.Companies.Add(company);
 				Assert.AreNotEqual(oldCompanyId, company.Id,
@@ -448,7 +448,7 @@ namespace HubSpot.NET.Tests.Integration
 				Domain = "communityclosing.com"
 			});
 			
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -538,7 +538,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = companyApi.BatchCreate(companies);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{

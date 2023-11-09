@@ -7,17 +7,31 @@ namespace HubSpot.NET.Core.Utilities
 {
     public class Utilities
     {
+        public enum UnitOfTime
+        {
+            Milliseconds = 1,
+            Seconds = 1000,
+            Minutes = 1000 * 60,
+        }
+        
         /// <summary>
-        /// Sleep for n seconds
+        /// Sleep for n units of time.
         /// </summary>
         /// <param name="duration">
-        /// The number of seconds to sleep
+        /// Specifies a duration of n units of time; defaults to 1.
         /// </param>
-        public static void Sleep(int duration = 20)
+        /// <param name="unitOfTime">
+        /// Specifies the time unit; defaults to seconds. 
+        /// </param>
+        /// <remarks>
+        /// When called with no parameters, this method will sleep for one second by default.
+        /// </remarks>
+        public static void Sleep(int duration = 1, UnitOfTime unitOfTime = UnitOfTime.Seconds)
         {
-            System.Threading.Thread.Sleep(duration * 1000);
+            System.Threading.Thread.Sleep(duration * (int)unitOfTime);
         }
     }
+   
     
     /// <summary>
     /// Represents a collection of objects that can be individually accessed by index.
@@ -112,7 +126,7 @@ namespace HubSpot.NET.Core.Utilities
         }
     }
     
-    // TODO - Equality comparer for all other models
+    // TODO - Equality comparers for all other models
     
     /// <summary>
     /// ContactHubSpotModelComparer - Determines whether or not two ContactHubSpotModel instances should be treated as

@@ -37,13 +37,13 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			// Created contact records should have an Id property that is a long type.
 			Assert.IsFalse(batchCreateResult.Contacts
 				.All(c => (c.Id is null | c.Id == 0L) | !(c.Id is long)),
 				"Found contact records with invalid id properties");
 			var batchArchiveResult = contactApi.BatchArchive(batchCreateResult);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			// Archived contact records should have a Status of "ARCHIVED"
 			Assert.IsTrue(batchArchiveResult.Status == "ARCHIVED",
 				"Status is not 'ARCHIVED'"); // TODO - Should this be an enum?
@@ -81,7 +81,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
@@ -120,7 +120,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
@@ -181,7 +181,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -192,7 +192,7 @@ namespace HubSpot.NET.Tests.Integration
 				foreach (var contact in batchCreateResult.Contacts)
 					contact.FirstName = $"{contact.FirstName} (UPDATED)";
 				var batchUpdateResult = contactApi.BatchUpdate(batchCreateResult);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				var batchReadResult = contactApi.BatchRead(batchUpdateResult);
 				// Updated contact records should have a FirstName property that contains "(UPDATED)".
 				Assert.IsTrue(batchReadResult.Contacts.All(c => c.FirstName.Contains("(UPDATED)")),
@@ -228,7 +228,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 
 			try
 			{
@@ -242,7 +242,7 @@ namespace HubSpot.NET.Tests.Integration
 					contact.FirstName = $"{contact.FirstName} (UPDATED)";
 				contactApi.BatchUpdate(batchCreateResult);
 				
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				
 				// Update (again) our recently updated models so we can generate some more property history.
 				foreach (var contact in batchCreateResult.Contacts)
@@ -250,7 +250,7 @@ namespace HubSpot.NET.Tests.Integration
 				
 				contactApi.BatchUpdate(batchCreateResult);
 				
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				
 				var searchOptions = new SearchRequestOptions
 				{
@@ -348,7 +348,7 @@ namespace HubSpot.NET.Tests.Integration
 			}
 			finally
 			{
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				contactApi.Delete(contact);
 			}
 		}
@@ -378,7 +378,7 @@ namespace HubSpot.NET.Tests.Integration
 				Contacts = new List<ContactHubSpotModel> { contact }
 			};
 
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
@@ -409,7 +409,7 @@ namespace HubSpot.NET.Tests.Integration
 				 */
 				var oldContactId = contact.Id;
 				contactApi.Delete(contact);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				contact = contactApi.Create(contact);
 				createdContacts.Contacts.Add(contact);
 				Assert.AreNotEqual(oldContactId, contact.Id,
@@ -417,7 +417,7 @@ namespace HubSpot.NET.Tests.Integration
 
 				oldContactId = contact.Id;
 				contactApi.Delete(contact);
-				Utilities.Sleep();
+				Utilities.Sleep(20);
 				contact = contactApi.Create(contact);
 				createdContacts.Contacts.Add(contact);
 				Assert.AreNotEqual(oldContactId, contact.Id,
@@ -579,7 +579,7 @@ namespace HubSpot.NET.Tests.Integration
 				});
 			}
 			var batchCreateResult = contactApi.BatchCreate(contacts);
-			Utilities.Sleep();
+			Utilities.Sleep(20);
 			
 			try
 			{
