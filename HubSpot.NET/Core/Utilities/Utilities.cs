@@ -7,11 +7,15 @@ namespace HubSpot.NET.Core.Utilities
 {
     public class Utilities
     {
+        /// <summary>
+        /// UnitOfTime enum. This is intended to be used with the Sleep method, below.
+        /// </summary>
         public enum UnitOfTime
         {
             Milliseconds = 1,
             Seconds = 1000,
             Minutes = 1000 * 60,
+            Hours = 1000 * 60 * 60
         }
         
         /// <summary>
@@ -32,24 +36,21 @@ namespace HubSpot.NET.Core.Utilities
         }
     }
    
-    
     /// <summary>
-    /// Represents a collection of objects that can be individually accessed by index.
+    /// Represents a collection of objects that can be individually accessed by index. The size of the
+    /// collection can be limited via the `maxItems` parameter.
     /// </summary>
-    /// <typeparam name="T">T is T</typeparam>
+    /// <param name="maxItems">The maximum number of items this list is allowed to contain.</param>
     public class LimitedList<T> : IList<T>
     {
-        /// <summary>
-        /// Represents a collection of objects that can be individually accessed by index. The size of the
-        /// collection can be limited via the `maxItems` parameter.
-        /// </summary>
-        /// <param name="maxItems">The maximum number of items this list is allowed to contain.</param>
         public LimitedList(int maxItems = 0)
         {
+            if (maxItems < 0)
+                throw new ArgumentOutOfRangeException($"Maximum items cannot be a negative integer.");
             _maxItems = maxItems;
         }
 
-        private int _maxItems;
+        private readonly int _maxItems;
 
         private readonly IList<T> _list = new List<T>();
 
