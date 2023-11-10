@@ -80,14 +80,14 @@ namespace HubSpot.NET.Api.Company.Dto
         public string Domain
         {
             get => Properties.Domain;
-            set => Properties.Domain = value;
+            set => Properties.Domain = value.Trim().ToLower();
         }
 
         [IgnoreDataMember]
         public string Website
         {
             get => Properties.Website;
-            set => Properties.Website = value;
+            set => Properties.Website = value.Trim().ToLower();
         }
 
         [IgnoreDataMember]

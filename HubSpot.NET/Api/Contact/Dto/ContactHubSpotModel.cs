@@ -72,7 +72,7 @@ namespace HubSpot.NET.Api.Contact.Dto
         public string Email
         {
             get => Properties.Email;
-            set => Properties.Email = value;
+            set => Properties.Email = value.Trim().ToLower();
         }
 
         [IgnoreDataMember]
@@ -93,14 +93,14 @@ namespace HubSpot.NET.Api.Contact.Dto
         public string Website
         {
             get => Properties.Website;
-            set => Properties.Website = value;
+            set => Properties.Website = value.Trim().ToLower();
         }
         
         [IgnoreDataMember]
         public string EmailDomain
         {
             get => Properties.EmailDomain;
-            set => Properties.EmailDomain = value;
+            set => Properties.EmailDomain = value.Trim().ToLower();
         }        
         
         [IgnoreDataMember]
