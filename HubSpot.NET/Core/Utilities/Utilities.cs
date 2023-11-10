@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using HubSpot.NET.Api.Contact.Dto;
 
 namespace HubSpot.NET.Core.Utilities
@@ -33,6 +34,63 @@ namespace HubSpot.NET.Core.Utilities
         public static void Sleep(int duration = 1, UnitOfTime unitOfTime = UnitOfTime.Seconds)
         {
             System.Threading.Thread.Sleep(duration * (int)unitOfTime);
+        }
+
+        /// <summary>
+        /// Invoke the delegate specified by the operation parameter on each item in the batch. Exponential backoff is
+        /// enabled by default (see parameters: retries, retryDelay, unitOfTime, and jitter).
+        /// </summary>
+        /// <param name="operation">A delegate that will be invoked for each item in the batch</param>
+        /// <param name="batch">An enumerable containing HubSpot objects</param>
+        /// <param name="retries">The number of times to retry an operation</param>
+        /// <param name="retryDelay">The delay between retries</param>
+        /// <param name="timeUnit">The unit of time of the delay</param>
+        /// <param name="jitter">Enables/disables a random pad on the retry delay, between 1ms and 3s</param>
+        /// <typeparam name="T">T is T</typeparam>
+        /// <returns>
+        /// A tuple containing a list of objects of type T, for whom the operation was successful (Item1), and a tuple
+        /// (Item2) containing the failed objects (Item1) and exceptions (Item2) that were thrown during the process.
+        /// </returns>
+        public static Tuple<IList<T>, Tuple<IList<T>, IList<Exception>>> UnrollBatch<T>(
+            Delegate operation, 
+            IEnumerable<T> batch, 
+            int retries = 2, 
+            int retryDelay = 500, 
+            UnitOfTime timeUnit = UnitOfTime.Milliseconds,
+            bool jitter = true)
+        {
+            var jitterValue = 0;
+            if (jitter)
+            {
+                var random = new Random();
+                jitterValue = random.Next(1, 3000);
+            }
+            var successfulResults = new List<T>();
+            var unsuccessfulResults = new List<T>();
+            var exceptions = new List<Exception>();
+            foreach (var item in batch)
+            {
+                var attempts = 0;
+                while (attempts < retries)
+                {
+                    try
+                    {
+                        var result = (T)operation.DynamicInvoke(item);
+                        successfulResults.Add(result);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        unsuccessfulResults.Add(item);
+                        exceptions.Add(e);
+                        Sleep(retryDelay*(attempts+1), timeUnit);
+                        Sleep(jitterValue, UnitOfTime.Milliseconds); // Jitter should always be in Milliseconds
+                    }
+                    attempts++;
+                }
+            }
+            var errorsTuple = new Tuple<IList<T>, IList<Exception>>(unsuccessfulResults, exceptions);
+            return new Tuple<IList<T>, Tuple<IList<T>, IList<Exception>>>(successfulResults, errorsTuple);
         }
     }
    
