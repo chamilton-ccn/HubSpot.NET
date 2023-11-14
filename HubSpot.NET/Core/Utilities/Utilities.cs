@@ -38,12 +38,12 @@ namespace HubSpot.NET.Core.Utilities
 
         /// <summary>
         /// Invoke the delegate specified by the operation parameter on each item in the batch. Exponential backoff is
-        /// enabled by default (see parameters: retries, retryDelay, unitOfTime, and jitter).
+        /// enabled by default (see parameters: attempts, retryDelay, unitOfTime, and jitter).
         /// </summary>
         /// <param name="operation">A delegate that will be invoked for each item in the batch</param>
         /// <param name="batch">An enumerable containing HubSpot objects</param>
-        /// <param name="retries">The number of times to retry an operation</param>
-        /// <param name="retryDelay">The delay between retries</param>
+        /// <param name="attempts">The number of times to retry an operation</param>
+        /// <param name="retryDelay">The delay between attempts</param>
         /// <param name="timeUnit">The unit of time of the delay</param>
         /// <param name="jitter">Enables/disables a random pad on the retry delay, between 1ms and 3s</param>
         /// <typeparam name="T">T is T</typeparam>
@@ -55,7 +55,7 @@ namespace HubSpot.NET.Core.Utilities
         public static Tuple<IList<T>, IList<Tuple<T, Exception>>> UnrollBatch<T>(
             Delegate operation, 
             IEnumerable<T> batch, 
-            int retries = 2, 
+            int attempts = 2, 
             int retryDelay = 500, 
             UnitOfTime timeUnit = UnitOfTime.Milliseconds,
             bool jitter = true)
@@ -70,8 +70,8 @@ namespace HubSpot.NET.Core.Utilities
             var unsuccessfulResults = new List<Tuple<T, Exception>>();
             foreach (var item in batch)
             {
-                var attempts = 0;
-                while (attempts < retries)
+                var attemptCount = 0;
+                while (attemptCount < attempts)
                 {
                     try
                     {
@@ -82,10 +82,13 @@ namespace HubSpot.NET.Core.Utilities
                     catch (Exception e)
                     {
                         unsuccessfulResults.Add(new Tuple<T, Exception>(item, e));
-                        Sleep(retryDelay*(attempts+1), timeUnit);
-                        Sleep(jitterValue, UnitOfTime.Milliseconds); // Jitter should always be in Milliseconds
+                        if (attempts > 1)
+                        {
+                            Sleep(retryDelay * (attemptCount + 1), timeUnit);
+                            Sleep(jitterValue, UnitOfTime.Milliseconds); // Jitter should always be in Milliseconds
+                        }
                     }
-                    attempts++;
+                    attemptCount++;
                 }
             }
             return new Tuple<IList<T>, IList<Tuple<T, Exception>>>(successfulResults, unsuccessfulResults);
