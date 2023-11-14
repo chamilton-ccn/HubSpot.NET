@@ -46,7 +46,7 @@ namespace HubSpot.NET.Api.Company.Dto
                     }
                     catch (FormatException)
                     {
-                        _idString = (string)value;
+                        _idString = ((string)value).Trim().ToLower();
                     }
                 }
             }

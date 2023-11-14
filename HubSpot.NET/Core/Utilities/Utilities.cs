@@ -51,6 +51,7 @@ namespace HubSpot.NET.Core.Utilities
         /// A tuple containing a list of objects of type T, for whom the operation was successful (Item1), and a tuple
         /// (Item2) containing the failed objects (Item1) and exceptions (Item2) that were thrown during the process.
         /// </returns>
+        /// TODO - This needs a unit test!
         public static Tuple<IList<T>, IList<Tuple<T, Exception>>> UnrollBatch<T>(
             Delegate operation, 
             IEnumerable<T> batch, 
