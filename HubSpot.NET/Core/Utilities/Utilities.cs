@@ -42,7 +42,7 @@ namespace HubSpot.NET.Core.Utilities
         /// </summary>
         /// <param name="operation">A delegate that will be invoked for each item in the batch</param>
         /// <param name="batch">An enumerable containing HubSpot objects</param>
-        /// <param name="attempts">The number of times to retry an operation</param>
+        /// <param name="attempts">The number of times to attempt an operation</param>
         /// <param name="retryDelay">The delay between attempts</param>
         /// <param name="timeUnit">The unit of time of the delay</param>
         /// <param name="jitter">Enables/disables a random pad on the retry delay, between 1ms and 3s</param>
