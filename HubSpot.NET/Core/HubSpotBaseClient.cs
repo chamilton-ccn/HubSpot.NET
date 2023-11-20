@@ -1,17 +1,12 @@
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 //using System.Text.Json;
-using HubSpot.NET.Api;
-using HubSpot.NET.Api.Contact.Dto;
 using HubSpot.NET.Core.Errors;
 using HubSpot.NET.Core.Interfaces;
 using HubSpot.NET.Core.OAuth.Dto;
 using HubSpot.NET.Core.Requests;
-using HubSpot.NET.Core.Serializers;
 using Newtonsoft.Json;
 using RestSharp;
-//using Formatting = System.Xml.Formatting;
 
 namespace HubSpot.NET.Core
 {
@@ -34,7 +29,8 @@ namespace HubSpot.NET.Core
 
         protected virtual void Initialise()
         {
-            _client = new RestClient(BaseUrl);
+            //_client = new RestClient(BaseUrl);
+            _client = new RateLimitedRequestClient(BaseUrl);
         }
 
         /// <summary>
@@ -163,7 +159,7 @@ namespace HubSpot.NET.Core
                 request.AddParameter("application/json", json, ParameterType.RequestBody);
 
             var response = _client.Execute(request);
-
+            
             var responseData = response.Content;
             // TODO - remove debugging (begin)
             var jsonSerializerSettings = new JsonSerializerSettings { Formatting = Formatting.Indented };

@@ -13,12 +13,15 @@ namespace HubSpot.NET.Core.Errors
         [DataMember(Name = "missingScopes")]
         public IList<string> MissingScopes { get; set; }
         
+        // TODO - Need to find out more regarding the structure of errors returned by hubspot
         [DataMember(Name = "additionalProp1")]
         public IList<string> AdditionalProperty1 { get; set; }
         
+        // TODO - Need to find out more regarding the structure of errors returned by hubspot
         [DataMember(Name = "additionalProp2")]
         public IList<string> AdditionalProperty2 { get; set; }
         
+        // TODO - Need to find out more regarding the structure of errors returned by hubspot
         [DataMember(Name = "additionalProp3")]
         public IList<string> AdditionalProperty3 { get; set; }
         

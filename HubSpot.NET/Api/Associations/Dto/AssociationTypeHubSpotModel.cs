@@ -50,18 +50,13 @@ namespace HubSpot.NET.Api.Associations.Dto
         }
 
         /// <summary>
-        /// It is possible to create an unlabeled association type that has a name. It is also possible to create a
-        /// labeled association type that does not have a name. But, just because you *can* do something, doesn't mean
-        /// you *should*. Custom association types are most useful when they are both named and labeled. If you find
-        /// yourself needing unlabeled custom associations, simply do not populate the Name or Label properties.
-        /// Specifying a value for either one, will specify the same value for both. 
+        /// This is the human-readable name of the association type.
         /// </summary>
         [DataMember(Name = "label")]
         public string Label { get; set; }
 
         /// <summary>
-        /// If this association type is defined in the AssociationType enum, then it is a HubSpot defined type and it
-        /// won't have a name so there's no point in setting a value here.
+        /// This is the internal, unique name of the association type.
         /// </summary>
         [DataMember(Name = "name")]
         public string Name => AssociationCategory != AssociationCategory.HubSpotDefined

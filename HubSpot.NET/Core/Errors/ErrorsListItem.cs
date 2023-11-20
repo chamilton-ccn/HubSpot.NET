@@ -11,6 +11,9 @@ namespace HubSpot.NET.Core.Errors
         
         [DataMember(Name = "status")]
         public string Status { get; set; }
+        
+        [DataMember(Name = "errorType")]
+        public string ErrorType { get; set; }
 
         [DataMember(Name = "category")]
         public string Category { get; set; }

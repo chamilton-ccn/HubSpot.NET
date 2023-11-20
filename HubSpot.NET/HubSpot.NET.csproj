@@ -106,6 +106,9 @@
 		<Folder Include="Properties\" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Reference Include="netstandard" Condition="'$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net472'">
+	    <HintPath>..\..\..\..\..\Program Files\dotnet\sdk\7.0.311\Microsoft\Microsoft.NET.Build.Extensions\net461\lib\netstandard.dll</HintPath>
+	  </Reference>
 	  <Reference Include="RestSharp" Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net48'">
 	    <HintPath>..\..\..\.nuget\packages\restsharp\110.2.0\lib\net471\RestSharp.dll</HintPath>
 	  </Reference>

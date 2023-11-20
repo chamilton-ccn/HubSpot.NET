@@ -277,7 +277,7 @@ namespace HubSpot.NET.Tests.Integration
 				{
 					Assert.IsTrue(company.PropertiesWithHistory.Name.Count == 3,
 						$"Unexpected number of 'Name' property history items: " +
-						$"{company.PropertiesWithHistory.Name.Count}; expected: 3");
+						$"{company.PropertiesWithHistory.Name.Count.ToString()}; expected: 3");
 				}
 				
 				/*
@@ -287,7 +287,7 @@ namespace HubSpot.NET.Tests.Integration
 				searchOptions.Limit = 10;
 				var list10Companies = companyApi.List<CompanyHubSpotModel>(searchOptions);
 				Assert.AreEqual(10, list10Companies.Companies.Count,
-					$"Unexpected number of companies: {list10Companies.Companies.Count}; expected: 10");
+					$"Unexpected number of companies: {list10Companies.Companies.Count.ToString()}; expected: 10");
 				Assert.IsNotNull(list10Companies.Paging, "Paging object was null");
 				Assert.IsTrue(list10Companies.MoreResultsAvailable, "More results were expected");
 				
@@ -470,8 +470,9 @@ namespace HubSpot.NET.Tests.Integration
 					$"LLC (UPDATED)'");
 				Assert.AreEqual("2408675309", company.Phone,
 					$"Unexpected value for 'Phone': '{company.Phone}'; expected: '2408675309'");
-				Assert.AreEqual("UPDATED-communityclosing.com", company.Domain,
-					$"Unexpected value for 'Domain': {company.Domain}; expected: 'UPDATED-communityclosing.com'");
+				// HubSpot normalizes domain names to lowercase, just like email addresses.
+				Assert.AreEqual("updated-communityclosing.com", company.Domain,
+					$"Unexpected value for 'Domain': {company.Domain}; expected: 'updated-communityclosing.com'");
 			}
 			finally
 			{

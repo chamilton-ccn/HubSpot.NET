@@ -1,99 +1,100 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using HubSpot.NET.Api.Contact.Dto;
 
 namespace HubSpot.NET.Core.Utilities
 {
     public class Utilities
     {
-        /// <summary>
-        /// UnitOfTime enum. This is intended to be used with the Sleep method, below.
-        /// </summary>
-        public enum UnitOfTime
-        {
-            Milliseconds = 1,
-            Seconds = 1000,
-            Minutes = 1000 * 60,
-            Hours = 1000 * 60 * 60
-        }
-        
-        /// <summary>
-        /// Sleep for n units of time.
-        /// </summary>
-        /// <param name="duration">
-        /// Specifies a duration of n units of time; defaults to 1.
-        /// </param>
-        /// <param name="unitOfTime">
-        /// Specifies the time unit; defaults to seconds. 
-        /// </param>
-        /// <remarks>
-        /// When called with no parameters, this method will sleep for one second by default.
-        /// </remarks>
-        public static void Sleep(int duration = 1, UnitOfTime unitOfTime = UnitOfTime.Seconds)
-        {
-            System.Threading.Thread.Sleep(duration * (int)unitOfTime);
-        }
-
-        /// <summary>
-        /// Invoke the delegate specified by the operation parameter on each item in the batch. Exponential backoff is
-        /// enabled by default (see parameters: attempts, retryDelay, unitOfTime, and jitter).
-        /// </summary>
-        /// <param name="operation">A delegate that will be invoked for each item in the batch</param>
-        /// <param name="batch">An enumerable containing HubSpot objects</param>
-        /// <param name="attempts">The number of times to attempt an operation</param>
-        /// <param name="retryDelay">The delay between attempts</param>
-        /// <param name="timeUnit">The unit of time of the delay</param>
-        /// <param name="jitter">Enables/disables a random pad on the retry delay, between 1ms and 3s</param>
-        /// <typeparam name="T">T is T</typeparam>
-        /// <returns>
-        /// A tuple containing a list of objects of type T, for whom the operation was successful (Item1), and a tuple
-        /// (Item2) containing the failed objects (Item1) and exceptions (Item2) that were thrown during the process.
-        /// </returns>
-        /// TODO - This needs a unit test!
-        public static Tuple<IList<T>, IList<Tuple<T, Exception>>> UnrollBatch<T>(
-            Delegate operation, 
-            IEnumerable<T> batch, 
-            int attempts = 2, 
-            int retryDelay = 500, 
-            UnitOfTime timeUnit = UnitOfTime.Milliseconds,
-            bool jitter = true)
-        {
-            var jitterValue = 0;
-            if (jitter)
-            {
-                var random = new Random();
-                jitterValue = random.Next(1, 3000);
-            }
-            var successfulResults = new List<T>();
-            var unsuccessfulResults = new List<Tuple<T, Exception>>();
-            foreach (var item in batch)
-            {
-                var attemptCount = 0;
-                while (attemptCount < attempts)
-                {
-                    try
-                    {
-                        var result = (T)operation.DynamicInvoke(item);
-                        successfulResults.Add(result);
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        unsuccessfulResults.Add(new Tuple<T, Exception>(item, e));
-                        if (attempts > 1)
-                        {
-                            Sleep(retryDelay * (attemptCount + 1), timeUnit);
-                            Sleep(jitterValue, UnitOfTime.Milliseconds); // Jitter should always be in Milliseconds
-                        }
-                    }
-                    attemptCount++;
-                }
-            }
-            return new Tuple<IList<T>, IList<Tuple<T, Exception>>>(successfulResults, unsuccessfulResults);
-        }
+    /// <summary>
+    /// UnitOfTime enum. This is intended to be used with the Sleep method, below.
+    /// </summary>
+    public enum UnitOfTime
+    {
+        Milliseconds = 1,
+        Seconds = 1000,
+        Minutes = 1000 * 60,
+        Hours = 1000 * 60 * 60
     }
+    
+    /// <summary>
+    /// Sleep for n units of time.
+    /// </summary>
+    /// <param name="duration">
+    /// Specifies a duration of n units of time; defaults to 1.
+    /// </param>
+    /// <param name="unitOfTime">
+    /// Specifies the time unit; defaults to seconds. 
+    /// </param>
+    /// <remarks>
+    /// When called with no parameters, this method will sleep for one second by default.
+    /// </remarks>
+    public static void Sleep(int duration = 1, UnitOfTime unitOfTime = UnitOfTime.Seconds)
+    {
+        System.Threading.Thread.Sleep(duration * (int)unitOfTime);
+    }
+
+    /// <summary>
+    /// Invoke the delegate specified by the operation parameter on each item in the batch. Exponential backoff is
+    /// enabled by default (see parameters: attempts, retryDelay, unitOfTime, and jitter).
+    /// </summary>
+    /// <param name="operation">A delegate that will be invoked for each item in the batch</param>
+    /// <param name="batch">An enumerable containing HubSpot objects</param>
+    /// <param name="attempts">The number of times to attempt an operation</param>
+    /// <param name="retryDelay">The delay between attempts</param>
+    /// <param name="timeUnit">The unit of time of the delay</param>
+    /// <param name="jitter">Enables/disables a random pad on the retry delay, between 1ms and 3s</param>
+    /// <typeparam name="T">T is T</typeparam>
+    /// <returns>
+    /// A tuple containing a list of objects of type T, for whom the operation was successful (Item1), and a tuple
+    /// (Item2) containing the failed objects (Item1) and exceptions (Item2) that were thrown during the process.
+    /// </returns>
+    /// TODO - This needs a unit test!
+    public static Tuple<IList<T>, IList<Tuple<T, Exception>>> UnrollBatch<T>(
+        Delegate operation, 
+        IEnumerable<T> batch, 
+        int attempts = 2, 
+        int retryDelay = 500, 
+        UnitOfTime timeUnit = UnitOfTime.Milliseconds,
+        bool jitter = true)
+    {
+        var jitterValue = 0;
+        if (jitter)
+        {
+            var random = new Random();
+            jitterValue = random.Next(1, 3000);
+        }
+        var successfulResults = new List<T>();
+        var unsuccessfulResults = new List<Tuple<T, Exception>>();
+        foreach (var item in batch)
+        {
+            var attemptCount = 0;
+            while (attemptCount < attempts)
+            {
+                try
+                {
+                    var result = (T)operation.DynamicInvoke(item);
+                    successfulResults.Add(result);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    unsuccessfulResults.Add(new Tuple<T, Exception>(item, e));
+                    if (attempts > 1)
+                    {
+                        Sleep(retryDelay * (attemptCount + 1), timeUnit);
+                        Sleep(jitterValue, UnitOfTime.Milliseconds); // Jitter should always be in Milliseconds
+                    }
+                }
+                attemptCount++;
+            }
+        }
+        return new Tuple<IList<T>, IList<Tuple<T, Exception>>>(successfulResults, unsuccessfulResults);
+    }
+    }
+    
+    
    
     /// <summary>
     /// Represents a collection of objects that can be individually accessed by index. The size of the
