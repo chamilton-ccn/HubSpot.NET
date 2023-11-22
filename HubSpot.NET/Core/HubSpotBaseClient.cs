@@ -14,7 +14,7 @@ namespace HubSpot.NET.Core
     {
         // TODO - marked for removal
         protected readonly RequestSerializer _serializer = new RequestSerializer(new RequestDataConverter());
-        private RestClient _client;
+        private RateLimitedRequestClient _client;
 
         public static string BaseUrl { get => "https://api.hubapi.com"; }
 
