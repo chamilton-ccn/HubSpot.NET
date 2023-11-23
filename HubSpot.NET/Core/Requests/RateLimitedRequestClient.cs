@@ -9,7 +9,7 @@ namespace HubSpot.NET.Core.Requests
         public RateLimitedRequestClient(
             string baseUrl, 
             int attempts = 3, 
-            int retryDelay = 5000,
+            int retryDelay = 10000,
             bool jitter = true) : base(baseUrl)
         {
             Attempts = attempts;
@@ -29,15 +29,18 @@ namespace HubSpot.NET.Core.Requests
             if (Jitter)
             {
                 var random = new Random();
-                jitterValue = random.Next(1, 3000);
+                jitterValue = random.Next(1, 10000);
             }
-            var attemptCount = 0;
+            
             var response = ExecuteAsync(request);
-            while (attemptCount <= Attempts && response.Result.StatusCode == (HttpStatusCode)429)
+            var attemptCount = 1;
+            
+            while (attemptCount <= Attempts && response.Result.StatusCode != (HttpStatusCode)429)
             {
                 // TODO - Remove debugging
                 var messageRetryDelay = (RetryDelay ^ attemptCount) + jitterValue;
                 Console.WriteLine($"We've been throttled! Sleeping for {messageRetryDelay.ToString()}ms.");
+                response = ExecuteAsync(request);
                 attemptCount++;
                 Utilities.Utilities.Sleep(RetryDelay ^ attemptCount, TimeUnit);
                 Utilities.Utilities.Sleep(jitterValue, TimeUnit);
