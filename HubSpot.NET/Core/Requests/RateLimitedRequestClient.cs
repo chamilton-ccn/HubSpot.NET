@@ -35,11 +35,12 @@ namespace HubSpot.NET.Core.Requests
             var response = ExecuteAsync(request);
             var attemptCount = 1;
             
-            while (attemptCount <= Attempts && response.Result.StatusCode != (HttpStatusCode)429)
+            while (attemptCount <= Attempts && response.Result.StatusCode == (HttpStatusCode)429)
             {
                 // TODO - Remove debugging
                 var messageRetryDelay = (RetryDelay ^ attemptCount) + jitterValue;
-                Console.WriteLine($"We've been throttled! Sleeping for {messageRetryDelay.ToString()}ms.");
+                Console.WriteLine($"We've been throttled (HTTP Status code: {response.Result.StatusCode})! " +
+                                  $"Sleeping for {messageRetryDelay.ToString()}ms.");
                 response = ExecuteAsync(request);
                 attemptCount++;
                 Utilities.Utilities.Sleep(RetryDelay ^ attemptCount, TimeUnit);
