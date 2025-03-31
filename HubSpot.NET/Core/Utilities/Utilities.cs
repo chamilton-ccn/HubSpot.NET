@@ -190,7 +190,7 @@ namespace HubSpot.NET.Core.Utilities
     // TODO - Equality comparers for all other models
     
     /// <summary>
-    /// ContactHubSpotModelComparer - Determines whether or not two ContactHubSpotModel instances should be treated as
+    /// ContactHubSpotModelComparer - Determines whether two ContactHubSpotModel instances should be treated as
     /// equals.
     /// </summary>
     public class ContactHubSpotModelComparer : IEqualityComparer<ContactHubSpotModel>
