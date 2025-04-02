@@ -12,6 +12,7 @@ namespace HubSpot.NET.Api.Company.Dto
     [DataContract]
     public class CompanyHubSpotModel : IHubSpotModel
     {
+        // ReSharper disable once GrammarMistakeInComment
         /// <summary>
         /// This property can be either a <c>long</c> or a <c>string</c>. By default, the Id (<c>id</c>) property refers
         /// to the numeric HubSpot ID of a record, but it can also refer to any unique value of a given record by

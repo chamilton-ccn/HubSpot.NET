@@ -12,6 +12,7 @@ namespace HubSpot.NET.Api.Contact.Dto
     [DataContract]
     public class ContactHubSpotModel : IHubSpotModel
     {
+        // ReSharper disable once GrammarMistakeInComment
         /// <summary>
         /// This property can be either a <c>long</c> or a <c>string</c>. By default, the Id (<c>id</c>) property refers
         /// to the numeric HubSpot ID of a record, but it can also refer to any unique value of a given record by
@@ -150,6 +151,13 @@ namespace HubSpot.NET.Api.Contact.Dto
         {
             get => Properties.ZipCode;
             set => Properties.ZipCode = value;
+        }
+
+        [IgnoreDataMember]
+        public IList<string> AdditionalEmailAddressesList
+        {
+            get => Properties.AdditionalEmailAddressesList;
+            set => Properties.AdditionalEmailAddressesList = value;
         }
 
         [DataMember(Name = "propertiesWithHistory", EmitDefaultValue = false)]

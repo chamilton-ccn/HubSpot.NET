@@ -1,7 +1,9 @@
-﻿using System.Net.Mail;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
 namespace HubSpot.NET.Api.Contact.Dto
 {
@@ -15,15 +17,15 @@ namespace HubSpot.NET.Api.Contact.Dto
     [DataContract]
     public class ContactPropertiesModel
     {
+        [IgnoreDataMember]
+        private string _email { get; set; }
+        
         /// <summary>
         /// HubSpot <i>automatically</i> normalizes email addresses to lowercase, but we might need to compare email
         /// address values before retrieving records from HubSpot, so we enforce lowercase email addresses at the object
         /// level. If you are comparing email addresses from another source to the value below, ensure that you
         /// normalize your source value(s) to lowercase.
         /// </summary>
-        [IgnoreDataMember]
-        private string _email { get; set; }
-        
         [DataMember(Name = "email")]
         public string Email
         {
@@ -67,6 +69,35 @@ namespace HubSpot.NET.Api.Contact.Dto
         /// true
         /// </returns>
         public static bool ShouldDeserializeEmailDomain() => true;
+        
+        /// <summary>
+        /// This is a read-only property containing any secondary emails a contact record might have. This field is
+        /// usually populated by merging two contact objects referring to the same person (i.e., an otherwise duplicate
+        /// contact) but having different (primary) email addresses. 
+        /// </summary>
+        [DataMember(Name = "hs_additional_emails")]
+        public dynamic AdditionalEmailAddressesList
+        {
+            get => _additionalEmailAddressesList.ToList();
+            set
+            {
+                switch (value)
+                {
+                    case string _:
+                        _additionalEmailAddressesList.Add(value);
+                        break;
+                    case IList<string> list:
+                        _additionalEmailAddressesList.Union(list);
+                        break;
+                }
+            }
+        }
+
+        [IgnoreDataMember]
+        private List<string> _additionalEmailAddressesList { get; } = new List<string>();
+        public static bool ShouldSerializeAdditionalEmailAddressesList() => false;
+        public static bool ShouldDeserializeAdditionalEmailAddressesList() => false;
+        
         
         [DataMember(Name = "company")]
         public string Company { get; set; }
