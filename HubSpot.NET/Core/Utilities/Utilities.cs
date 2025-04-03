@@ -187,13 +187,13 @@ namespace HubSpot.NET.Core.Utilities
     // TODO - Equality comparers for all other models
 
     /// <summary>
-    ///     Determines whether two ContactHubSpotModel instances should be treated as
-    ///     equals by comparing both their <c>Id</c> <i>and</i> <c>Email</c> properties. HubSpot treats the email address as
-    ///     a quasi-unique identifier. Let's say you have a contact, with HubSpot ID #123456, and its <c>Email</c> property
-    ///     is <c>someuser@domain.tld</c>. At some point, one of your HubSpot users merged this contact record with another
-    ///     contact record whose <c>Email</c> property was <c>someusers-other-email-address@domain.tld</c>; the implication
-    ///     being these two contacts were merged because they were merely two separate email addresses referring to the same
-    ///     <i>person</i>. A few things happen in this scenario:
+    ///     Determines whether two ContactHubSpotModel instances should be treated as equals by comparing both their <c>Id</c>
+    ///     <i>and</i> <c>Email</c> properties. HubSpot treats the email address as a quasi-unique identifier. Let's say you
+    ///     have a contact, with HubSpot ID #123456, and its <c>Email</c> property is <c>someuser@domain.tld</c>. At some
+    ///     point, one of your HubSpot users merged this contact record with another contact record whose <c>Email</c> property
+    ///     was <c>someusers-other-email-address@domain.tld</c>; the implication being these two contacts were merged because
+    ///     they were merely two separate email addresses referring to the same <i>person</i>. A few things happen in this
+    ///     scenario:
     ///     <ul>
     ///         <li>
     ///             The <c>hs_additional_emails</c> read-only property will be populated with the email address(-es) of every
@@ -201,7 +201,8 @@ namespace HubSpot.NET.Core.Utilities
     ///         </li>
     ///         <li>
     ///             The contact record associated with HubSpot ID #123456 can now be retrieved using <i>any</i> email address
-    ///             belonging to this contact. I.e., both <c>someuser@domain.tld</c> and <c>someusers-other-email-address@domain.tld</c>
+    ///             belonging to this contact. I.e., both <c>someuser@domain.tld</c> and
+    ///             <c>someusers-other-email-address@domain.tld</c>
     ///             refer to a contact record with the HubSpot ID #123456.
     ///         </li>
     ///     </ul>
