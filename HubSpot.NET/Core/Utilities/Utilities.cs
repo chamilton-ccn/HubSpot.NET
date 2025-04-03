@@ -197,15 +197,12 @@ namespace HubSpot.NET.Core.Utilities
     ///     <ul>
     ///         <li>
     ///             The <c>hs_additional_emails</c> read-only property will be populated with the email address(-es) of every
-    ///             contact
-    ///             that was merged into the initial contact.
+    ///             contact that was merged into the initial contact.
     ///         </li>
     ///         <li>
     ///             The contact record associated with HubSpot ID #123456 can now be retrieved using <i>any</i> email address
-    ///             belonging
-    ///             to this contact. I.e., both <c>someuser@domain.tld</c> and <c>someusers-other-email-address@domain.tld</c>
-    ///             refer
-    ///             to a contact record with the HubSpot ID #123456.
+    ///             belonging to this contact. I.e., both <c>someuser@domain.tld</c> and <c>someusers-other-email-address@domain.tld</c>
+    ///             refer to a contact record with the HubSpot ID #123456.
     ///         </li>
     ///     </ul>
     ///     So when comparing contact objects for equality, we must first check see if both <c>Id</c> and <c>Email</c>
@@ -213,15 +210,12 @@ namespace HubSpot.NET.Core.Utilities
     ///     <ul>
     ///         <li>
     ///             If they are, and <i>both</i> <c>Id</c> and <c>Email</c> are identical on <i>both</i> contact objects, then
-    ///             they
-    ///             shall be treated as equal.
+    ///             they shall be treated as equal.
     ///         </li>
     ///         <li>
     ///             However, if the <c>Id</c> properties match, but the <c>Email</c> properties <i>do not match</i> we may need
-    ///             to
-    ///             treat these as separate contact records, even though they are <i>technically</i> identical, as far as
-    ///             HubSpot is
-    ///             concerned.
+    ///             to treat these as separate contact records, even though they are <i>technically</i> identical, as far as
+    ///             HubSpot is concerned.
     ///         </li>
     ///     </ul>
     /// </summary>
