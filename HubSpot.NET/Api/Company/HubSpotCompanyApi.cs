@@ -244,6 +244,18 @@ namespace HubSpot.NET.Api.Company
         }
         
         /// <summary>
+        /// This is a version of <c>Update</c> that can be called as a delegate.
+        /// </summary>
+        /// <param name="company">CompanyHubSpotModel</param>
+        /// <typeparam name="T">Implementation of CompanyHubSpotModel</typeparam>
+        /// <returns>CompanyHubSpotModel</returns>
+        public T DelegatedUpdate<T>(T company) where T : CompanyHubSpotModel, new()
+        {
+            return Update(company);
+        }
+        
+        
+        /// <summary>
         /// Deletes (archives) the given company
         /// </summary>
         /// <param name="companyId">The ID of the company</param>

@@ -19,6 +19,7 @@ namespace HubSpot.NET.Core.Interfaces
         T GetByUniqueId<T>(long uniqueId, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
         T GetByUniqueId<T>(int uniqueId, SearchRequestOptions opts = null) where T : ContactHubSpotModel, new();
         T Update<T>(T contact, string idProperty = null) where T : ContactHubSpotModel, new();
+        T DelegatedUpdate<T>(T contact) where T : ContactHubSpotModel, new();
         void Delete(long contactId);
         void Delete(ContactHubSpotModel contact);
         T GetByUserToken<T>(string userToken) where T : ContactHubSpotModel, new();

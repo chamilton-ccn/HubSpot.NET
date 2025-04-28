@@ -246,6 +246,17 @@ namespace HubSpot.NET.Api.Contact
         }
         
         /// <summary>
+        /// This is a version of <c>Update</c> that can be called as a delegate.
+        /// </summary>
+        /// <param name="contact">ContactHubSpotModel</param>
+        /// <typeparam name="T">Implementation of ContactHubSpotModel</typeparam>
+        /// <returns>ContactHubSpotModel</returns>
+        public T DelegatedUpdate<T>(T contact) where T : ContactHubSpotModel, new()
+        {
+            return Update(contact);
+        }
+        
+        /// <summary>
         /// Deletes (archives) a given contact
         /// </summary>
         /// <param name="contactId">The ID of the contact</param>

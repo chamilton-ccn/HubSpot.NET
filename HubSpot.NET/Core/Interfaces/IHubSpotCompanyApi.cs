@@ -25,6 +25,8 @@ namespace HubSpot.NET.Core.Interfaces
         T GetByUniqueId<T>(int uniqueId, SearchRequestOptions opts = null)
             where T : CompanyHubSpotModel, new();
         T Update<T>(T company, string idProperty = null) where T : CompanyHubSpotModel, new();
+        T DelegatedUpdate<T>(T company) where T : CompanyHubSpotModel, new();
+        
         void Delete(long companyId);
         void Delete(CompanyHubSpotModel company);
         CompanyListHubSpotModel<T> Search<T>(SearchRequestOptions opts = null) where T : CompanyHubSpotModel, new();
